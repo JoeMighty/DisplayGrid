@@ -25,11 +25,95 @@ const ROLE_COLOURS: Record<Role, string> = {
   viewer:      'bg-gray-500/15 text-gray-400 border-gray-500/20',
 };
 
+const ROLE_INFO: { role: Role; colour: string; description: string; permissions: string[] }[] = [
+  {
+    role: 'super_admin',
+    colour: 'text-purple-400',
+    description: 'Full unrestricted access.',
+    permissions: [
+      'Create, edit and delete any user (including other super admins)',
+      'Manage all zones, screens, playlists and assets',
+      'Activate emergency overrides',
+      'Change global settings and app name',
+    ],
+  },
+  {
+    role: 'admin',
+    colour: 'text-blue-400',
+    description: 'Day-to-day management without destructive user controls.',
+    permissions: [
+      'Create and edit operator and viewer accounts',
+      'Manage all zones, screens, playlists and assets',
+      'Activate emergency overrides',
+      'Cannot create super admin accounts or delete users',
+    ],
+  },
+  {
+    role: 'operator',
+    colour: 'text-green-400',
+    description: 'Content management only.',
+    permissions: [
+      'Upload and manage assets',
+      'Create and edit playlists and slides',
+      'Cannot manage users, zones or screens',
+      'Cannot activate emergency overrides',
+    ],
+  },
+  {
+    role: 'viewer',
+    colour: 'text-gray-400',
+    description: 'Read-only access to the dashboard.',
+    permissions: [
+      'View screens, zones, playlists and assets',
+      'Cannot create, edit or delete anything',
+      'Cannot manage users or activate overrides',
+    ],
+  },
+];
+
+function RolesHelpModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-lg" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-base font-semibold text-gray-100">Role permissions</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div className="space-y-4">
+          {ROLE_INFO.map(({ role, colour, description, permissions }) => (
+            <div key={role} className="bg-gray-800/50 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`text-sm font-semibold ${colour}`}>{ROLE_LABELS[role]}</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-2">{description}</p>
+              <ul className="space-y-1">
+                {permissions.map((p, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-gray-500">
+                    <svg className="shrink-0 mt-0.5" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function UsersPage() {
   const [users, setUsers]           = useState<User[]>([]);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState('');
   const [showAdd, setShowAdd]       = useState(false);
+  const [showHelp, setShowHelp]     = useState(false);
   const [editUser, setEditUser]     = useState<User | null>(null);
 
   // New user form
@@ -112,15 +196,24 @@ export default function UsersPage() {
           <h1 className="text-2xl font-bold text-gray-100 mb-1">Users</h1>
           <p className="text-sm text-gray-400">Manage who has access to the DisplayGrid dashboard.</p>
         </div>
-        <button
-          onClick={() => { setShowAdd(true); setFormError(''); }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          New User
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowHelp(true)}
+            title="Role permissions"
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600 transition-colors text-sm font-semibold"
+          >
+            ?
+          </button>
+          <button
+            onClick={() => { setShowAdd(true); setFormError(''); }}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New User
+          </button>
+        </div>
       </div>
 
       {/* Role legend */}
@@ -189,6 +282,9 @@ export default function UsersPage() {
           </table>
         </div>
       )}
+
+      {/* Role help modal */}
+      {showHelp && <RolesHelpModal onClose={() => setShowHelp(false)} />}
 
       {/* Add User Modal */}
       {showAdd && (
