@@ -1,0 +1,27 @@
+# DisplayGrid — Caddyfile
+# Reverse proxy so the dashboard is accessible at http://displaygrid.test (no port)
+# and the WebSocket server at ws://displaygrid.test/ws
+#
+# Requirements: Caddy 2.x  (https://caddyserver.com)
+# Also requires the displaygrid.test hosts entry — see docs/SETUP.md
+#
+# Usage:
+#   caddy run --config Caddyfile
+#
+# Leave your existing dev servers running (Next.js on :3000, WS on :3001).
+# Caddy listens on port 80 and forwards traffic.
+
+{
+  # Disable automatic HTTPS for local .test domains
+  auto_https off
+}
+
+displaygrid.test {
+  # WebSocket server — must be matched before the catch-all
+  handle /ws* {
+    reverse_proxy localhost:3001
+  }
+
+  # Dashboard (Next.js)
+  reverse_proxy localhost:3000
+}
