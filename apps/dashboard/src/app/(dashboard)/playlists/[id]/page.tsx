@@ -99,6 +99,20 @@ function SortableSlide({ slide, onEdit, onDelete, deleting }: {
   );
 }
 
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function parseSchedule(json: string | null) {
+  try {
+    const s = JSON.parse(json ?? 'null');
+    if (!s) return null;
+    return {
+      days:      (s.days ?? [0,1,2,3,4,5,6]) as number[],
+      startTime: (s.startTime ?? '00:00') as string,
+      endTime:   (s.endTime   ?? '23:59') as string,
+    };
+  } catch { return null; }
+}
+
 function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
   slide?: Slide; assets: Asset[]; playlistId: number; onSave: () => void; onClose: () => void;
 }) {
@@ -111,6 +125,17 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
   const [loading, setLoading]             = useState(false);
   const [error, setError]                 = useState('');
 
+  // Schedule
+  const parsedSched                           = parseSchedule(slide?.scheduleJson ?? null);
+  const [schedEnabled, setSchedEnabled]       = useState(!!parsedSched);
+  const [schedDays, setSchedDays]             = useState<number[]>(parsedSched?.days ?? [0,1,2,3,4,5,6]);
+  const [schedStart, setSchedStart]           = useState(parsedSched?.startTime ?? '00:00');
+  const [schedEnd, setSchedEnd]               = useState(parsedSched?.endTime ?? '23:59');
+
+  function toggleDay(d: number) {
+    setSchedDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d].sort());
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -122,6 +147,9 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
       transition,
       enabled,
       sortOrder:       slide?.sortOrder ?? 9999,
+      scheduleJson:    schedEnabled
+        ? JSON.stringify({ days: schedDays, startTime: schedStart, endTime: schedEnd })
+        : null,
     };
     const url    = slide ? `/api/playlists/${playlistId}/slides/${slide.id}` : `/api/playlists/${playlistId}/slides`;
     const method = slide ? 'PUT' : 'POST';
@@ -199,6 +227,46 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
             <input type="checkbox" checked={enabled} onChange={e => setEnabled(e.target.checked)} className="accent-blue-500" />
             <span className="text-sm text-gray-300">Enabled</span>
           </label>
+
+          {/* Schedule picker */}
+          <div className="border border-gray-800 rounded-lg p-3 space-y-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={schedEnabled} onChange={e => setSchedEnabled(e.target.checked)} className="accent-blue-500" />
+              <span className="text-sm font-medium text-gray-300">Restrict to schedule</span>
+            </label>
+            {schedEnabled && (
+              <>
+                <div>
+                  <p className="text-xs text-gray-500 mb-2">Show on days</p>
+                  <div className="flex gap-1 flex-wrap">
+                    {DAYS.map((d, i) => (
+                      <button
+                        key={i} type="button"
+                        onClick={() => toggleDay(i)}
+                        className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${
+                          schedDays.includes(i)
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-800 text-gray-500 hover:text-gray-300'
+                        }`}
+                      >{d}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Start time</label>
+                    <input type="time" value={schedStart} onChange={e => setSchedStart(e.target.value)}
+                      className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-blue-500" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">End time</label>
+                    <input type="time" value={schedEnd} onChange={e => setSchedEnd(e.target.value)}
+                      className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-blue-500" />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
 
           {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="flex gap-3 pt-1">

@@ -54,6 +54,16 @@ const NAV = [
     ),
   },
   {
+    label: 'Users',
+    href: '/users',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
+  {
     label: 'Settings',
     href: '/settings',
     icon: (
@@ -67,10 +77,12 @@ const NAV = [
 
 interface Props {
   appName: string;
+  userRole: string;
 }
 
-export default function Sidebar({ appName }: Props) {
+export default function Sidebar({ appName, userRole }: Props) {
   const pathname = usePathname();
+  const canManageUsers = userRole === 'super_admin' || userRole === 'admin';
 
   return (
     <aside className="fixed top-0 left-0 h-screen w-56 bg-gray-900 border-r border-gray-800 flex flex-col z-30">
@@ -87,7 +99,7 @@ export default function Sidebar({ appName }: Props) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {NAV.map(({ label, href, icon }) => {
+        {NAV.filter(({ href }) => href !== '/users' || canManageUsers).map(({ label, href, icon }) => {
           const active = pathname === href || (href !== '/' && pathname.startsWith(href));
           return (
             <Link

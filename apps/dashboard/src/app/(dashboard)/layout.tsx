@@ -21,10 +21,11 @@ export default async function DashboardLayout({
   }
 
   const appName = await getAppName()
+  const userRole = (session.user as { role?: string })?.role ?? 'viewer'
 
   return (
     <div className="flex min-h-screen bg-gray-950">
-      <Sidebar appName={appName} />
+      <Sidebar appName={appName} userRole={userRole} />
       <main className="flex-1 ml-56 overflow-y-auto p-8 text-gray-100">
         {children}
       </main>

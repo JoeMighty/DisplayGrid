@@ -42,7 +42,7 @@ function broadcast(screenId, payload) {
 }
 
 function getPlayload(screenId) {
-  const slides = db.prepare(`
+  const rawSlides = db.prepare(`
     SELECT s.*, a.filename as asset_filename, a.mime_type as asset_mime_type, a.type as asset_type
     FROM slides s
     LEFT JOIN playlists p ON s.playlist_id = p.id
@@ -50,6 +50,17 @@ function getPlayload(screenId) {
     WHERE p.screen_id = ? AND p.is_active = 1 AND s.enabled = 1
     ORDER BY s.sort_order ASC
   `).all(screenId);
+
+  // Map snake_case DB columns → camelCase expected by SlidePlayer
+  const slides = rawSlides.map(s => ({
+    ...s,
+    contentType:     s.content_type,
+    durationSeconds: s.duration_seconds,
+    assetId:         s.asset_id,
+    sortOrder:       s.sort_order,
+    playlistId:      s.playlist_id,
+    createdAt:       s.created_at,
+  }));
 
   const override = db.prepare(`
     SELECT * FROM emergency_override

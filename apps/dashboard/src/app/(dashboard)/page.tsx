@@ -70,26 +70,6 @@ export default async function OverviewPage() {
       </div>
 
       <EmergencyOverridePanel />
-
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mt-4">
-        <h2 className="text-sm font-semibold text-gray-300 mb-4">Getting started</h2>
-        <ol className="space-y-3">
-          {[
-            { n: 1, text: 'Create a Zone to group your screens by location.' },
-            { n: 2, text: 'Add a Screen and assign it to a zone.' },
-            { n: 3, text: 'Upload assets (images, videos) to the asset library.' },
-            { n: 4, text: 'Build a Playlist and assign slides to it.' },
-            { n: 5, text: 'Assign the playlist to a screen — it will start playing immediately.' },
-          ].map(({ n, text }) => (
-            <li key={n} className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-600/15 text-blue-400 text-xs font-bold flex items-center justify-center mt-0.5">
-                {n}
-              </span>
-              <span className="text-sm text-gray-400">{text}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
     </div>
   );
 }
