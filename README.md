@@ -18,6 +18,35 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 
 ---
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><b>Screens dashboard</b></td>
+    <td align="center"><b>Playlist manager</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/screenshots/screens.png" alt="Screens dashboard" /></td>
+    <td><img src="docs/assets/screenshots/playlists.png" alt="Playlist manager" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Asset library</b></td>
+    <td align="center"><b>Multi-zone layout editor</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/screenshots/assets.png" alt="Asset library" /></td>
+    <td><img src="docs/assets/screenshots/layout-regions.png" alt="Multi-zone layout editor" /></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><b>Display client (kiosk view)</b></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="docs/assets/screenshots/display-client.png" alt="Display client" width="600" /></td>
+  </tr>
+</table>
+
+---
+
 ## Features
 
 - **Multi-screen management:** configure resolution, refresh rate, rotation, colour profile, and panel grid per screen
@@ -36,6 +65,7 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 
 ### Coming Soon
 
+- **Standalone apps:** native installers for Windows, macOS, and Linux — a tray-based server app manages the dashboard and WebSocket server, and a dedicated kiosk app runs displays fullscreen with no browser configuration required. ARM64 support for Raspberry Pi 4B/5 included.
 - **NDI source support:** stream live video from NDI devices on the network directly to any display
 
 ---
