@@ -4,7 +4,7 @@
 
 **Open-source, self-hosted digital signage for the places people gather.**
 
-Restaurants, churches, schools, event venues, and community spaces <br>DisplayGrid gives you full control over your screens without a cloud subscription, recurring fees, or vendor lock-in.
+Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGrid gives you full control over your screens without a cloud subscription, recurring fees, or vendor lock-in.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
@@ -20,22 +20,23 @@ Restaurants, churches, schools, event venues, and community spaces <br>DisplayGr
 
 ## Features
 
-- **Multi-screen management** — configure resolution, refresh rate, rotation, colour profile, and panel grid per screen
-- **Zone-based organisation** — group screens into named zones (lobby, corridor, reception)
-- **Playlist builder** — drag-and-drop slides with per-slide durations, transitions, and day/time scheduling
-- **Asset library** — upload images, videos, and PDFs with automatic WebP optimisation via Sharp
-- **Real-time delivery** — WebSocket server pushes playlist updates to displays instantly
-- **Screen health monitoring** — live online/offline status, last-seen timestamps, and client IP
-- **Emergency override** — broadcast a full-screen alert to every display simultaneously
-- **Kiosk lock** — PIN-protected overlay with configurable key combo; no browser chrome visible
-- **Offline resilience** — display clients cache their last playlist and keep playing through network outages
-- **Role-based access** — Super Admin, Admin, Operator, Viewer
-- **LED wall support** — define panel grids (e.g. 3×2) for tiled display configurations
+- **Multi-screen management:** configure resolution, refresh rate, rotation, colour profile, and panel grid per screen
+- **Zone-based organisation:** group screens into named zones (lobby, corridor, reception)
+- **Playlist builder:** drag-and-drop slides with per-slide durations, transitions, and day/time scheduling
+- **Asset library:** upload images, videos, and PDFs with automatic WebP optimisation via Sharp
+- **Real-time delivery:** WebSocket server pushes playlist updates to displays instantly
+- **Screen health monitoring:** live online/offline status, last-seen timestamps, and client IP
+- **Emergency override:** broadcast a full-screen alert to every display simultaneously
+- **Kiosk lock:** PIN-protected overlay with configurable key combo; no browser chrome visible
+- **Offline resilience:** display clients cache their last playlist and keep playing through network outages
+- **Role-based access:** Super Admin, Admin, Operator, Viewer
+- **LED wall support:** define panel grids (e.g. 3×2) for tiled display configurations
 
 ### Coming Soon
 
-- **Multi-zone layouts** — split a screen into independently controlled regions
-- **Time-based scheduling** — automatically switch playlists by time of day or day of week
+- **Multi-zone layouts:** split a screen into independently controlled regions
+- **Time-based scheduling:** automatically switch playlists by time of day or day of week
+- **NDI source support:** stream live video from NDI devices on the network directly to any display
 
 ---
 
@@ -94,10 +95,10 @@ pnpm db:migrate
 **Start:**
 
 ```bash
-# Terminal 1 — dashboard (port 3000) + display client (port 5173)
+# Terminal 1: dashboard (port 3000) + display client (port 5173)
 pnpm dev
 
-# Terminal 2 — WebSocket server (port 3001)
+# Terminal 2: WebSocket server (port 3001)
 node apps/dashboard/ws-server.js
 ```
 
@@ -107,10 +108,10 @@ Open `http://localhost:3000` and follow the first-run setup wizard.
 
 ## Local Domain (Optional)
 
-For a cleaner dev URL — `http://displaygrid.test` instead of `http://localhost:3000`:
+For a cleaner dev URL (`http://displaygrid.test` instead of `http://localhost:3000`):
 
 ```powershell
-# Windows — run PowerShell as Administrator
+# Windows: run PowerShell as Administrator
 .\scripts\add-hosts.ps1
 ```
 
@@ -230,7 +231,7 @@ See [docs/SETUP.md](docs/SETUP.md) for cross-VLAN and firewall configuration.
 |------|--------|
 | **Super Admin** | Everything, including deleting users and assigning any role |
 | **Admin** | Manage all content and users (cannot delete users) |
-| **Operator** | Manage screens, playlists, assets — no user management |
+| **Operator** | Manage screens, playlists, assets (no user management) |
 | **Viewer** | Read-only access to all content pages |
 
 ---
@@ -243,12 +244,12 @@ Issues and pull requests are welcome. Please open an issue before starting signi
 
 ## Ethical Use
 
-DisplayGrid is designed for community gathering places — restaurants, churches, schools, and event venues. It is not intended for surveillance, military use, law enforcement monitoring, or facial recognition systems.
+DisplayGrid is designed for community gathering places: restaurants, churches, schools, and event venues. It is not intended for surveillance, military use, law enforcement monitoring, or facial recognition systems.
 
 ---
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE)
+MIT. See [LICENSE](LICENSE)
 
 *By [JoeMighty](https://github.com/JoeMighty)*

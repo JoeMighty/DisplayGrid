@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started: DisplayGrid</title>
+  <meta name="description" content="Install DisplayGrid and get your first screen displaying content in minutes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="../index.html" class="nav__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="nav__links">
+        <li><a href="getting-started.html" class="active">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+      </ul>
+      <div class="nav__cta">
+        <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="container--narrow">
+    <span class="section__label">Guide</span>
+    <h1>Getting Started</h1>
+    <p>Install DisplayGrid and get your first screen displaying content in under 10 minutes.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="guide-layout">
+
+    <!-- TOC -->
+    <aside class="guide-toc">
+      <p class="guide-toc__title">On this page</p>
+      <ul class="guide-toc__links">
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#configure">Configure</a></li>
+        <li><a href="#database">Database</a></li>
+        <li><a href="#start">Start the services</a></li>
+        <li><a href="#wizard">Setup wizard</a></li>
+        <li><a href="#first-screen">Add your first screen</a></li>
+        <li><a href="#display-client">Connect a display</a></li>
+        <li><a href="#local-domain">Local domain</a></li>
+      </ul>
+    </aside>
+
+    <!-- Body -->
+    <article class="guide-body">
+
+      <h2 id="prerequisites">Prerequisites</h2>
+      <p>Install these on the machine that will run the server:</p>
+      <table>
+        <thead><tr><th>Tool</th><th>Version</th><th>Download</th></tr></thead>
+        <tbody>
+          <tr><td>Node.js</td><td>18 or 20 LTS</td><td><a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a></td></tr>
+          <tr><td>pnpm</td><td>9+</td><td><code>npm install -g pnpm</code></td></tr>
+          <tr><td>Git</td><td>any</td><td><a href="https://git-scm.com" target="_blank" rel="noopener">git-scm.com</a></td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="install">Install</h2>
+      <p>Clone the repository and install dependencies:</p>
+      <pre><code>git clone https://github.com/JoeMighty/DisplayGrid.git
+cd DisplayGrid
+pnpm install</code></pre>
+
+      <h2 id="configure">Configure</h2>
+      <p>Copy the example environment files and fill in your values:</p>
+      <pre><code>cp apps/dashboard/.env.example apps/dashboard/.env.local</code></pre>
+
+      <p>Edit <code>apps/dashboard/.env.local</code>:</p>
+      <pre><code># Generate a secret (run this in your terminal):
+# node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+NEXTAUTH_SECRET=your-secret-here
+
+# The public URL of your dashboard
+NEXTAUTH_URL=http://localhost:3000
+
+# Absolute path to the SQLite database file
+# Windows:   C:/path/to/DisplayGrid/data/displaygrid.db
+# Mac/Linux: /path/to/DisplayGrid/data/displaygrid.db
+DB_PATH=/path/to/DisplayGrid/data/displaygrid.db</code></pre>
+
+      <div class="callout">
+        <p><strong>Local domain:</strong> If you've set up <code>displaygrid.test</code>, use that as <code>NEXTAUTH_URL</code> instead. See <a href="#local-domain">Local domain</a> below.</p>
+      </div>
+
+      <h2 id="database">Database</h2>
+      <p>Create the data directory and run the database migrations:</p>
+      <pre><code>mkdir -p data
+pnpm db:migrate</code></pre>
+      <p>This creates the SQLite database at the path you specified in <code>DB_PATH</code>. Keep regular backups of the <code>data/</code> folder, which contains your database and all uploaded assets.</p>
+
+      <h2 id="start">Start the services</h2>
+      <p>DisplayGrid needs two processes running simultaneously. Open two terminal windows in the project root:</p>
+
+      <h3>Terminal 1: Dashboard and display client</h3>
+      <pre><code>pnpm dev</code></pre>
+      <p>This starts the dashboard at <code>http://localhost:3000</code> and the display client at <code>http://localhost:5173</code>.</p>
+
+      <h3>Terminal 2: WebSocket server</h3>
+      <pre><code>node apps/dashboard/ws-server.js</code></pre>
+      <p>The WebSocket server listens on port <code>3001</code> and pushes playlist updates to connected display clients in real time.</p>
+
+      <div class="callout callout--warn">
+        <p>Both processes must be running for the display client to receive content updates. If the WS server isn't running, displays will fall back to their cached playlist.</p>
+      </div>
+
+      <h2 id="wizard">Setup wizard</h2>
+      <p>On your first visit to <code>http://localhost:3000</code>, you'll be redirected to the setup wizard. It walks through:</p>
+      <ol>
+        <li><strong>App name:</strong> shown in the dashboard sidebar and browser tab</li>
+        <li><strong>Super Admin account:</strong> the primary administrator username and password</li>
+        <li><strong>Kiosk PIN:</strong> used to unlock display clients from kiosk mode</li>
+        <li><strong>Kiosk key combo:</strong> the key combination that triggers the unlock panel</li>
+      </ol>
+      <p>After the wizard completes, you'll be redirected to the dashboard login page. Sign in with the Super Admin credentials you just created.</p>
+
+      <h2 id="first-screen">Add your first screen</h2>
+      <ol>
+        <li>Go to <strong>Zones</strong> and create a zone (e.g. "Main Lobby").</li>
+        <li>Go to <strong>Screens</strong> and click <strong>New Screen</strong>. Give it a name, assign it to your zone, and set the resolution. Click <strong>Add screen</strong>.</li>
+        <li>Go to <strong>Playlists</strong>. You'll see a playlist was automatically created for your new screen. Click it to open the playlist builder.</li>
+        <li>Go to <strong>Assets</strong> and upload an image or video. Then go back to the playlist and add it as a slide.</li>
+      </ol>
+
+      <h2 id="display-client">Connect a display</h2>
+      <ol>
+        <li>On the <strong>Screens</strong> page, click the key icon on your screen card to view its token.</li>
+        <li>On the device you want to use as a display, open a browser and go to <code>http://&lt;server-ip&gt;:5173</code>.</li>
+        <li>Enter the screen token when prompted. The display will connect to the WebSocket server and start playing your playlist.</li>
+      </ol>
+      <p>To skip the token entry screen on future boots, set <code>VITE_SCREEN_TOKEN</code> in <code>apps/display-client/.env.local</code>. See the <a href="kiosk-setup.html">Kiosk Setup guide</a> for details.</p>
+
+      <h2 id="local-domain">Local domain (optional)</h2>
+      <p>For a cleaner URL (<code>http://displaygrid.test</code> instead of <code>http://localhost:3000</code>), add a hosts file entry. Run the setup script for your OS:</p>
+
+      <h3>Windows (run PowerShell as Administrator)</h3>
+      <pre><code>.\scripts\add-hosts.ps1</code></pre>
+
+      <h3>macOS / Linux</h3>
+      <pre><code>sudo ./scripts/add-hosts.sh</code></pre>
+
+      <p>Then update <code>NEXTAUTH_URL</code> in your <code>.env.local</code> to <code>http://displaygrid.test:3000</code>.</p>
+      <p>For truly clean URLs with no port number, use <a href="https://caddyserver.com" target="_blank" rel="noopener">Caddy</a> as a reverse proxy. See the <a href="network-setup.html">Network guide</a>.</p>
+
+    </article>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:4rem;">
+  <div class="container">
+    <div class="footer__inner">
+      <a href="../index.html" class="footer__brand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="footer__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+        <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+      <p class="footer__copy">MIT licence &middot; <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">JoeMighty</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hardware Guide: DisplayGrid</title>
+  <meta name="description" content="Recommended hardware for running DisplayGrid as a server and on display kiosks." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="../index.html" class="nav__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="nav__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html" class="active">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+      </ul>
+      <div class="nav__cta">
+        <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="container--narrow">
+    <span class="section__label">Guide</span>
+    <h1>Hardware Guide</h1>
+    <p>Recommended hardware for the server and display clients — from budget Raspberry Pis to mini PCs.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="guide-layout">
+
+    <aside class="guide-toc">
+      <p class="guide-toc__title">On this page</p>
+      <ul class="guide-toc__links">
+        <li><a href="#architecture">Architecture overview</a></li>
+        <li><a href="#server">Server hardware</a></li>
+        <li><a href="#display-client">Display client hardware</a></li>
+        <li><a href="#same-machine">Running on one machine</a></li>
+        <li><a href="#storage">Storage recommendations</a></li>
+        <li><a href="#networking">Networking</a></li>
+      </ul>
+    </aside>
+
+    <article class="guide-body">
+
+      <h2 id="architecture">Architecture overview</h2>
+      <p>DisplayGrid has two distinct hardware roles:</p>
+      <ul>
+        <li><strong>Server:</strong> runs the Next.js dashboard and WebSocket server. Needs to be always-on and reachable by all display devices on the network.</li>
+        <li><strong>Display client:</strong> runs a browser in kiosk mode. Can be any device from a Raspberry Pi to an old laptop.</li>
+      </ul>
+      <p>For a single-screen setup, both roles can run on the same machine. For larger deployments, dedicate a separate server so display clients don't compete for resources.</p>
+
+      <h2 id="server">Server hardware</h2>
+
+      <h3>Minimum</h3>
+      <table>
+        <thead><tr><th>Component</th><th>Specification</th></tr></thead>
+        <tbody>
+          <tr><td>Device</td><td>Raspberry Pi 4 (2 GB RAM)</td></tr>
+          <tr><td>OS</td><td>Raspberry Pi OS Lite, Ubuntu Server, any Linux distro</td></tr>
+          <tr><td>Storage</td><td>16 GB microSD (Class 10 / A1)</td></tr>
+          <tr><td>Network</td><td>Wired Ethernet recommended</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Recommended</h3>
+      <table>
+        <thead><tr><th>Component</th><th>Specification</th></tr></thead>
+        <tbody>
+          <tr><td>Device</td><td>Raspberry Pi 5 (4 GB+) or any x86 mini PC</td></tr>
+          <tr><td>OS</td><td>Raspberry Pi OS, Ubuntu, Windows, macOS</td></tr>
+          <tr><td>Storage</td><td>32 GB+ USB SSD or NVMe (Pi 5 supports NVMe via HAT)</td></tr>
+          <tr><td>Cooling</td><td>Active cooling required for Pi 5 under sustained load</td></tr>
+          <tr><td>Network</td><td>Gigabit Ethernet</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <p><strong>Pi 5 tip:</strong> Use the official Raspberry Pi Active Cooler or a third-party heatsink with fan. The Pi 5 throttles under sustained load without active cooling, which can cause WS latency spikes.</p>
+      </div>
+
+      <h3>Mini PC alternatives</h3>
+      <p>Any always-on mini PC works well as a server. Popular choices include Intel NUC, Beelink, Minisforum, and ASUS NUC units. These offer faster storage, more RAM, and better thermal performance than a Pi, which is useful when serving many screens or large video assets.</p>
+
+      <h2 id="display-client">Display client hardware</h2>
+      <p>The display client runs in a standard browser. Any device that can run Chrome or Chromium is suitable.</p>
+
+      <table>
+        <thead><tr><th>Device</th><th>Best for</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Raspberry Pi 5 (4 GB+)</td>
+            <td>4K images, 1080p video, web content</td>
+            <td>Recommended for video-heavy playlists</td>
+          </tr>
+          <tr>
+            <td>Raspberry Pi 4 (2 GB)</td>
+            <td>1080p images, simple web slides</td>
+            <td>Struggles with 4K or complex video</td>
+          </tr>
+          <tr>
+            <td>Intel NUC / mini PC</td>
+            <td>Any resolution, any content type</td>
+            <td>Most reliable for demanding content</td>
+          </tr>
+          <tr>
+            <td>Old laptop (2015+)</td>
+            <td>1080p images and video</td>
+            <td>Good for repurposing existing hardware</td>
+          </tr>
+          <tr>
+            <td>Mac mini</td>
+            <td>Any resolution</td>
+            <td>Excellent performance, higher cost</td>
+          </tr>
+          <tr>
+            <td>Android TV stick</td>
+            <td>Basic image slideshows</td>
+            <td>Use Chromium via ADB; limited video support</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout--warn">
+        <p><strong>Video performance:</strong> Video playback is handled entirely by the browser's hardware decoder. Raspberry Pi 4 can play 1080p H.264 smoothly but may drop frames on H.265 or 4K. Use the Pi 5 or an x86 device for video-heavy deployments.</p>
+      </div>
+
+      <h2 id="same-machine">Running on one machine</h2>
+      <p>For a single-screen setup or development, you can run the server and display client on the same machine. The display client connects to the local server at <code>http://localhost:3000</code> and <code>ws://localhost:3001</code>.</p>
+      <p>This works well on a Raspberry Pi 5 or any desktop/laptop. On a Pi 4, resource contention between the server and browser may cause occasional stuttering on video content.</p>
+
+      <h2 id="storage">Storage recommendations</h2>
+      <p>All uploaded assets are stored on the server's disk. Plan for storage based on your content:</p>
+      <ul>
+        <li><strong>Images only:</strong> 16 GB is more than enough. Images are compressed to WebP on upload.</li>
+        <li><strong>Mixed images and video:</strong> 64 GB minimum. A 1-minute 1080p MP4 is typically 100-300 MB.</li>
+        <li><strong>Heavy video library:</strong> use an external USB SSD or network-attached storage.</li>
+      </ul>
+      <p>For Raspberry Pi deployments, avoid cheap microSD cards for the server as they fail under sustained write load. Use a USB SSD or the NVMe HAT for Pi 5.</p>
+
+      <h2 id="networking">Networking</h2>
+      <p>DisplayGrid uses standard HTTP and WebSocket (port 3001). No special network configuration is needed for a basic deployment where all devices are on the same subnet.</p>
+      <ul>
+        <li>Use <strong>wired Ethernet</strong> for the server if possible, as Wi-Fi adds latency and increases the chance of WS disconnects.</li>
+        <li>Display clients can use Wi-Fi without issue. The WS connection auto-reconnects if the network drops.</li>
+        <li>For cross-VLAN deployments, see the <a href="network-setup.html">Network guide</a>.</li>
+      </ul>
+
+    </article>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:4rem;">
+  <div class="container">
+    <div class="footer__inner">
+      <a href="../index.html" class="footer__brand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="footer__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+        <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+      <p class="footer__copy">MIT licence &middot; <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">JoeMighty</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

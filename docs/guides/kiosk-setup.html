@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kiosk Setup: DisplayGrid</title>
+  <meta name="description" content="Configure display clients to run in full-screen kiosk mode on Linux, Raspberry Pi, macOS, and Windows." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="../index.html" class="nav__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="nav__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html" class="active">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+      </ul>
+      <div class="nav__cta">
+        <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="container--narrow">
+    <span class="section__label">Guide</span>
+    <h1>Kiosk Setup</h1>
+    <p>Configure the display client to run full-screen on Linux, Raspberry Pi, macOS, and Windows, with autostart on boot.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="guide-layout">
+
+    <aside class="guide-toc">
+      <p class="guide-toc__title">On this page</p>
+      <ul class="guide-toc__links">
+        <li><a href="#pre-configure">Pre-configure the token</a></li>
+        <li><a href="#linux">Linux / Raspberry Pi</a></li>
+        <li><a href="#macos">macOS</a></li>
+        <li><a href="#windows">Windows</a></li>
+        <li><a href="#unlock">Unlocking the kiosk</a></li>
+        <li><a href="#static-build">Static build for production</a></li>
+      </ul>
+    </aside>
+
+    <article class="guide-body">
+
+      <h2 id="pre-configure">Pre-configure the screen token</h2>
+      <p>By default, the display client shows a token entry screen on first launch. To skip this and boot straight into the player, pre-configure the token in the environment file.</p>
+
+      <p>Create or edit <code>apps/display-client/.env.local</code>:</p>
+      <pre><code># URL of your DisplayGrid server
+VITE_API_BASE=http://192.168.1.10:3000
+VITE_WS_BASE=ws://192.168.1.10:3001
+
+# Token for this specific screen (get it from Dashboard → Screens → key icon)
+VITE_SCREEN_TOKEN=your-screen-token-here</code></pre>
+
+      <div class="callout">
+        <p>Get the token from the dashboard: <strong>Screens → your screen → key icon → Copy token</strong>. Each screen has a unique token. Use a separate <code>.env.local</code> per kiosk device.</p>
+      </div>
+
+      <h2 id="linux">Linux / Raspberry Pi</h2>
+
+      <h3>Manual launch</h3>
+      <pre><code>chromium-browser \
+  --kiosk \
+  --noerrdialogs \
+  --disable-infobars \
+  --autoplay-policy=no-user-gesture-required \
+  http://192.168.1.10:5173</code></pre>
+
+      <h3>Autostart on Raspberry Pi OS (LXDE)</h3>
+      <p>Edit the autostart file:</p>
+      <pre><code>sudo nano /etc/xdg/lxsession/LXDE-pi/autostart</code></pre>
+      <p>Add this line at the end:</p>
+      <pre><code>@chromium-browser --kiosk --noerrdialogs --disable-infobars --autoplay-policy=no-user-gesture-required http://192.168.1.10:5173</code></pre>
+
+      <h3>Autostart with systemd (headless or Wayland)</h3>
+      <p>Create a systemd user service at <code>~/.config/systemd/user/displaygrid-kiosk.service</code>:</p>
+      <pre><code>[Unit]
+Description=DisplayGrid Kiosk
+After=graphical-session.target
+
+[Service]
+ExecStart=chromium-browser --kiosk --noerrdialogs --disable-infobars http://192.168.1.10:5173
+Restart=on-failure
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=graphical-session.target</code></pre>
+      <p>Enable and start:</p>
+      <pre><code>systemctl --user enable displaygrid-kiosk
+systemctl --user start displaygrid-kiosk</code></pre>
+
+      <h3>Hide the mouse cursor</h3>
+      <p>Install <code>unclutter</code> to hide the cursor after inactivity:</p>
+      <pre><code>sudo apt install unclutter
+unclutter -idle 1 &amp;</code></pre>
+      <p>Add <code>@unclutter -idle 1</code> to your autostart file to persist across reboots.</p>
+
+      <h2 id="macos">macOS</h2>
+
+      <h3>Manual launch</h3>
+      <pre><code>/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+  --kiosk \
+  --noerrdialogs \
+  --disable-infobars \
+  --autoplay-policy=no-user-gesture-required \
+  http://192.168.1.10:5173</code></pre>
+
+      <h3>Autostart on login</h3>
+      <ol>
+        <li>Create a file named <code>DisplayGrid Kiosk.command</code> on your desktop with the launch command above.</li>
+        <li>Make it executable: <code>chmod +x ~/Desktop/DisplayGrid\ Kiosk.command</code></li>
+        <li>Go to <strong>System Settings → General → Login Items</strong> and add the file.</li>
+      </ol>
+
+      <h2 id="windows">Windows</h2>
+
+      <h3>Manual launch</h3>
+      <pre><code>"C:\Program Files\Google\Chrome\Application\chrome.exe" ^
+  --kiosk ^
+  --noerrdialogs ^
+  --disable-infobars ^
+  --autoplay-policy=no-user-gesture-required ^
+  http://192.168.1.10:5173</code></pre>
+
+      <h3>Autostart on login</h3>
+      <ol>
+        <li>Create a shortcut to Chrome with the above arguments as the target.</li>
+        <li>Press <kbd>Win+R</kbd>, type <code>shell:startup</code>, and press Enter.</li>
+        <li>Copy the shortcut into the Startup folder that opens.</li>
+      </ol>
+
+      <div class="callout callout--warn">
+        <p><strong>Windows kiosk tip:</strong> Consider using Windows Assigned Access (kiosk mode) in Settings to lock the device to a single app. This prevents users from exiting Chrome even with keyboard shortcuts.</p>
+      </div>
+
+      <h2 id="unlock">Unlocking the kiosk</h2>
+      <p>The display client has a built-in kiosk lock feature. To activate it, hold the configured key combination (default: <strong>Ctrl+Alt+K</strong>) for 3 seconds. A PIN entry panel will appear.</p>
+      <p>The PIN is set during the dashboard setup wizard, and can be changed in <strong>Settings</strong>. The key combination can also be customised there.</p>
+      <p>Once unlocked, the admin panel gives access to session management without touching the server.</p>
+
+      <h2 id="static-build">Static build for production</h2>
+      <p>For production kiosks, build the display client into a static bundle rather than running the Vite dev server. This is faster, uses fewer resources, and requires no Node.js on the kiosk device.</p>
+
+      <p>On the <strong>server machine</strong>, build with the correct env vars baked in:</p>
+      <pre><code>cd apps/display-client
+VITE_API_BASE=http://192.168.1.10:3000 \
+VITE_WS_BASE=ws://192.168.1.10:3001 \
+VITE_SCREEN_TOKEN=your-token-here \
+pnpm build</code></pre>
+
+      <p>This produces a <code>dist/</code> folder. Serve it on the kiosk with any static file server:</p>
+      <pre><code># Option 1: Node.js serve (install once: npm i -g serve)
+serve apps/display-client/dist -p 8080
+
+# Option 2: Python (no install needed)
+python3 -m http.server 8080 --directory apps/display-client/dist</code></pre>
+
+      <p>Then point Chrome at <code>http://localhost:8080</code> in kiosk mode.</p>
+
+    </article>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:4rem;">
+  <div class="container">
+    <div class="footer__inner">
+      <a href="../index.html" class="footer__brand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="footer__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+        <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+      <p class="footer__copy">MIT licence &middot; <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">JoeMighty</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

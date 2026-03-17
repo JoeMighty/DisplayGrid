@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network Setup: DisplayGrid</title>
+  <meta name="description" content="Configure networking for DisplayGrid: firewall rules, cross-VLAN routing, mDNS, and Caddy reverse proxy for clean URLs." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="../index.html" class="nav__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="nav__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html" class="active">Network</a></li>
+      </ul>
+      <div class="nav__cta">
+        <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="container--narrow">
+    <span class="section__label">Guide</span>
+    <h1>Network Setup</h1>
+    <p>Firewall rules, cross-VLAN routing, mDNS, and Caddy reverse proxy for clean&nbsp;URLs.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="guide-layout">
+
+    <aside class="guide-toc">
+      <p class="guide-toc__title">On this page</p>
+      <ul class="guide-toc__links">
+        <li><a href="#ports">Required ports</a></li>
+        <li><a href="#firewall">Firewall rules</a></li>
+        <li><a href="#mdns">mDNS / local hostname</a></li>
+        <li><a href="#cross-vlan">Cross-VLAN deployments</a></li>
+        <li><a href="#caddy">Caddy reverse proxy</a></li>
+        <li><a href="#checklist">Pre-flight checklist</a></li>
+      </ul>
+    </aside>
+
+    <article class="guide-body">
+
+      <h2 id="ports">Required ports</h2>
+      <p>DisplayGrid uses three ports. All traffic stays on your local network. Nothing needs to be exposed to the internet.</p>
+
+      <table>
+        <thead>
+          <tr><th>Port</th><th>Service</th><th>Protocol</th><th>Direction</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>3000</code></td><td>Dashboard (Next.js)</td><td>HTTP</td><td>Kiosks → Server, Admin browsers → Server</td></tr>
+          <tr><td><code>3001</code></td><td>WebSocket server</td><td>WS</td><td>Kiosks → Server</td></tr>
+          <tr><td><code>5173</code></td><td>Display client (dev only)</td><td>HTTP</td><td>Kiosk browser → Kiosk localhost</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <p>Port 5173 is only used in development (Vite dev server). For production kiosks using a static build, the display client is served on whatever port you choose (e.g. <code>8080</code>) and is local to the kiosk. Kiosks only need outbound access to ports <strong>3000</strong> and <strong>3001</strong> on the server.</p>
+      </div>
+
+      <h2 id="firewall">Firewall rules</h2>
+
+      <h3>Linux (ufw)</h3>
+      <pre><code># Allow dashboard and WS server from any LAN device
+sudo ufw allow 3000/tcp
+sudo ufw allow 3001/tcp
+
+# Check status
+sudo ufw status</code></pre>
+
+      <h3>Linux (firewalld / RHEL-based)</h3>
+      <pre><code>sudo firewall-cmd --permanent --add-port=3000/tcp
+sudo firewall-cmd --permanent --add-port=3001/tcp
+sudo firewall-cmd --reload</code></pre>
+
+      <h3>macOS</h3>
+      <p>macOS prompts automatically when Node.js first binds to a port. Click <strong>Allow</strong> in the dialog. If you missed it, go to <strong>System Settings → Network → Firewall → Options</strong> and add Node.js to the allowed list.</p>
+
+      <h3>Windows</h3>
+      <p>Run these commands in PowerShell as Administrator:</p>
+      <pre><code>New-NetFirewallRule -DisplayName "DisplayGrid Dashboard" `
+  -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow
+
+New-NetFirewallRule -DisplayName "DisplayGrid WebSocket" `
+  -Direction Inbound -Protocol TCP -LocalPort 3001 -Action Allow</code></pre>
+
+      <p>Or use the GUI: <strong>Windows Defender Firewall → Advanced Settings → Inbound Rules → New Rule → Port</strong>.</p>
+
+      <h2 id="mdns">mDNS / local hostname</h2>
+      <p>By default you access DisplayGrid at <code>192.168.x.x:3000</code>. There are two ways to use a friendlier hostname instead.</p>
+
+      <h3>Option 1: hosts file (recommended for fixed setups)</h3>
+      <p>Add a line to your hosts file pointing <code>displaygrid.test</code> at the server IP. The setup scripts do this automatically:</p>
+      <pre><code># macOS / Linux
+sudo ./scripts/add-hosts.sh
+
+# Windows (run PowerShell as Administrator)
+.\scripts\add-hosts.ps1</code></pre>
+
+      <p>Or add manually:</p>
+      <pre><code># File: /etc/hosts (macOS/Linux) or C:\Windows\System32\drivers\etc\hosts (Windows)
+192.168.1.10    displaygrid.test</code></pre>
+
+      <div class="callout callout--warn">
+        <p><strong>All admin machines need the hosts entry.</strong> The hosts file change only affects the device it's made on. Each laptop or PC you use to access the dashboard needs its own entry pointing to the server's IP.</p>
+      </div>
+
+      <h3>Option 2: mDNS / Bonjour</h3>
+      <p>If your network supports mDNS (most home and small office networks do), the server's hostname is reachable at <code>hostname.local</code> without any hosts file changes.</p>
+      <pre><code># Find the server's hostname
+hostname        # Linux / macOS
+hostname        # Windows (in cmd or PowerShell)</code></pre>
+      <p>Then access DisplayGrid at <code>http://&lt;hostname&gt;.local:3000</code> from any device on the same subnet. Update your env files accordingly:</p>
+      <pre><code>VITE_API_BASE=http://displaygrid-server.local:3000
+VITE_WS_BASE=ws://displaygrid-server.local:3001</code></pre>
+
+      <div class="callout">
+        <p>mDNS does not cross VLAN boundaries. If your server and kiosks are on different VLANs, use a static IP or DNS entry. See the Cross-VLAN section below.</p>
+      </div>
+
+      <h2 id="cross-vlan">Cross-VLAN deployments</h2>
+      <p>In managed network environments (offices, schools, hotels) kiosks are often on a separate VLAN from the server, for example a "displays" VLAN isolated from the admin LAN. DisplayGrid works across VLANs as long as the correct traffic is permitted.</p>
+
+      <h3>What to allow on your router / firewall</h3>
+      <table>
+        <thead>
+          <tr><th>Source VLAN</th><th>Destination VLAN</th><th>Port</th><th>Protocol</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Displays</td><td>Server</td><td>3000</td><td>TCP</td><td>Asset fetching, API calls</td></tr>
+          <tr><td>Displays</td><td>Server</td><td>3001</td><td>TCP</td><td>WebSocket real-time updates</td></tr>
+          <tr><td>Admin</td><td>Server</td><td>3000</td><td>TCP</td><td>Dashboard access</td></tr>
+        </tbody>
+      </table>
+
+      <p>No traffic needs to flow from the server VLAN <em>to</em> the display VLAN; the connection is always initiated by the kiosk.</p>
+
+      <h3>Using a static IP for the server</h3>
+      <p>In multi-VLAN environments, assign the server a static IP (via DHCP reservation or static network config) so kiosk env vars never need to change:</p>
+      <pre><code># Ubuntu / Debian: edit Netplan config
+sudo nano /etc/netplan/01-netcfg.yaml</code></pre>
+      <pre><code>network:
+  version: 2
+  ethernets:
+    eth0:
+      addresses: [192.168.10.5/24]
+      gateway4: 192.168.10.1
+      nameservers:
+        addresses: [192.168.10.1]</code></pre>
+      <pre><code>sudo netplan apply</code></pre>
+
+      <h3>Internal DNS</h3>
+      <p>If you have an internal DNS server (Pi-hole, Unbound, Active Directory, etc.), add an A record for <code>displaygrid.test</code> or any hostname pointing to the server's static IP. All devices on all VLANs that use that DNS server will resolve it automatically, with no per-device hosts file changes needed.</p>
+
+      <h2 id="caddy">Caddy reverse proxy</h2>
+      <p>By default, the dashboard is served on port 3000 and the WebSocket server on port 3001. Caddy lets you serve both on standard port 80 (or 443 with HTTPS) so kiosks connect to <code>http://displaygrid.test</code> with no port number.</p>
+
+      <h3>Install Caddy</h3>
+      <pre><code># Debian / Ubuntu
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update && sudo apt install caddy
+
+# macOS (Homebrew)
+brew install caddy
+
+# Windows: download from https://caddyserver.com/download</code></pre>
+
+      <h3>The Caddyfile</h3>
+      <p>The project root includes a <code>Caddyfile</code> already configured for DisplayGrid:</p>
+      <pre><code>http://displaygrid.test {
+    # Dashboard
+    reverse_proxy /api/*    localhost:3000
+    reverse_proxy /auth/*   localhost:3000
+    reverse_proxy /_next/*  localhost:3000
+
+    # WebSocket server
+    reverse_proxy /ws*      localhost:3001
+
+    # Everything else → dashboard
+    reverse_proxy           localhost:3000
+}</code></pre>
+
+      <h3>Start Caddy</h3>
+      <pre><code># From the project root
+caddy run --config Caddyfile</code></pre>
+
+      <p>Or run it as a background service:</p>
+      <pre><code># Linux systemd
+sudo systemctl enable caddy
+sudo systemctl start caddy</code></pre>
+
+      <h3>Update your env files</h3>
+      <p>Once Caddy is running, remove the port numbers from your environment variables:</p>
+      <pre><code># apps/dashboard/.env.local
+NEXTAUTH_URL=http://displaygrid.test
+
+# apps/display-client/.env.local
+VITE_API_BASE=http://displaygrid.test
+VITE_WS_BASE=ws://displaygrid.test</code></pre>
+
+      <div class="callout callout--warn">
+        <p><strong>Windows note:</strong> Port 80 requires elevated privileges on Windows. Run Caddy as Administrator, or add <code>{ http_port 8080 }</code> to the top of your Caddyfile to use a non-privileged port instead.</p>
+      </div>
+
+      <h3>HTTPS with a self-signed cert</h3>
+      <p>For HTTPS on a local network, Caddy can generate a self-signed certificate automatically. Change the site address in the Caddyfile:</p>
+      <pre><code>https://displaygrid.test {
+    tls internal
+    reverse_proxy localhost:3000
+}</code></pre>
+      <p>Run <code>caddy trust</code> once to add Caddy's local CA to your system trust store so browsers don't show a certificate warning.</p>
+
+      <h2 id="checklist">Pre-flight checklist</h2>
+      <p>Use this checklist before deploying to production to confirm the network is configured correctly.</p>
+
+      <table>
+        <thead><tr><th>Check</th><th>Command / Action</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Server reachable from kiosk</td>
+            <td><code>ping 192.168.1.10</code> from kiosk</td>
+          </tr>
+          <tr>
+            <td>Port 3000 open</td>
+            <td><code>curl http://192.168.1.10:3000/api/health</code> → should return <code>{"ok":true}</code></td>
+          </tr>
+          <tr>
+            <td>Port 3001 open</td>
+            <td><code>curl http://192.168.1.10:3001</code> → should return <code>426 Upgrade Required</code> (normal, WS only)</td>
+          </tr>
+          <tr>
+            <td>WS connection works</td>
+            <td>Open kiosk display client → browser DevTools → Network → WS tab, look for a connected frame</td>
+          </tr>
+          <tr>
+            <td>Assets load on kiosk</td>
+            <td>Assign an image to a playlist and check the kiosk displays it</td>
+          </tr>
+          <tr>
+            <td>Dashboard reachable from admin machine</td>
+            <td>Navigate to <code>http://192.168.1.10:3000</code> (or your hostname)</td>
+          </tr>
+          <tr>
+            <td>Firewall rules applied</td>
+            <td><code>sudo ufw status</code> (Linux) or check Windows Firewall inbound rules</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <p><strong>426 Upgrade Required on port 3001 is normal.</strong> The WebSocket server speaks only the WebSocket protocol; any plain HTTP request (including <code>curl</code> or a browser address bar) returns 426. This confirms the port is open and the server is running correctly.</p>
+      </div>
+
+    </article>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:4rem;">
+  <div class="container">
+    <div class="footer__inner">
+      <a href="../index.html" class="footer__brand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="footer__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+        <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+      <p class="footer__copy">MIT licence &middot; <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">JoeMighty</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
