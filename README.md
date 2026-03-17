@@ -1,8 +1,20 @@
+<div align="center">
+
 # DisplayGrid
 
 **Open-source, self-hosted digital signage for the places people gather.**
 
 Restaurants, churches, schools, event venues, and community spaces — DisplayGrid gives you full control over your screens without a cloud subscription, recurring fees, or vendor lock-in.
+
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org)
+[![pnpm](https://img.shields.io/badge/pnpm-9-orange.svg)](https://pnpm.io)
+[![SQLite](https://img.shields.io/badge/database-SQLite-lightblue.svg)](https://sqlite.org)
+
+**[Website](https://joemighty.github.io/DisplayGrid/) · [Setup Guide](docs/SETUP.md) · [Report a Bug](https://github.com/JoeMighty/DisplayGrid/issues)**
+
+</div>
 
 ---
 
