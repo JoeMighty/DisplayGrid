@@ -4,7 +4,7 @@
 
 **Open-source, self-hosted digital signage for the places people gather.**
 
-Restaurants, churches, schools, event venues, and community spaces — DisplayGrid gives you full control over your screens without a cloud subscription, recurring fees, or vendor lock-in.
+Restaurants, churches, schools, event venues, and community spaces <br>DisplayGrid gives you full control over your screens without a cloud subscription, recurring fees, or vendor lock-in.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
