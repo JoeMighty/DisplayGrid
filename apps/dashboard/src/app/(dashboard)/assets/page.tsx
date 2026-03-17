@@ -19,6 +19,8 @@ function formatBytes(b: number | null) {
   return `${(b / 1048576).toFixed(1)} MB`;
 }
 
+// ─── Thumbnail ────────────────────────────────────────────────────────────────
+
 function AssetThumb({ asset }: { asset: Asset }) {
   const src = `/api/assets/${asset.id}/file`;
   if (asset.type === 'image') {
@@ -42,16 +44,112 @@ function AssetThumb({ asset }: { asset: Asset }) {
   );
 }
 
-function AssetCard({ asset, onDelete, deleting }: { asset: Asset; onDelete: () => void; deleting: boolean }) {
+// ─── Preview modal ────────────────────────────────────────────────────────────
+
+function PreviewModal({ asset, onClose }: { asset: Asset; onClose: () => void }) {
+  const src = `/api/assets/${asset.id}/file`;
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose(); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative max-w-5xl w-full flex flex-col"
+        style={{ maxHeight: '90vh' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-gray-100 truncate">{asset.originalName}</p>
+            <p className="text-xs text-gray-500">{formatBytes(asset.sizeBytes)} · {asset.mimeType}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="ml-4 shrink-0 p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="rounded-xl overflow-hidden bg-gray-900 flex items-center justify-center" style={{ maxHeight: 'calc(90vh - 64px)' }}>
+          {asset.type === 'image' && (
+            <img
+              src={src}
+              alt={asset.originalName}
+              className="max-w-full object-contain"
+              style={{ maxHeight: 'calc(90vh - 64px)' }}
+            />
+          )}
+          {asset.type === 'video' && (
+            <video
+              src={src}
+              controls
+              autoPlay
+              className="max-w-full"
+              style={{ maxHeight: 'calc(90vh - 64px)' }}
+            />
+          )}
+          {asset.type === 'pdf' && (
+            <iframe
+              src={src}
+              className="w-full"
+              style={{ height: 'calc(90vh - 64px)' }}
+              title={asset.originalName}
+            />
+          )}
+          {(asset.type === 'html' || asset.type === 'url') && (
+            <div className="p-8 text-center">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4b5563" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+              <p className="text-sm text-gray-500">Preview not available for this asset type.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Asset card ───────────────────────────────────────────────────────────────
+
+function AssetCard({ asset, onPreview, onDelete, deleting }: {
+  asset: Asset; onPreview: () => void; onDelete: () => void; deleting: boolean;
+}) {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden group">
-      <div className="relative aspect-video bg-gray-800 overflow-hidden">
+      <div
+        className="relative aspect-video bg-gray-800 overflow-hidden cursor-pointer"
+        onClick={onPreview}
+      >
         <AssetThumb asset={asset} />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
           <button
-            onClick={onDelete}
+            onClick={e => { e.stopPropagation(); onPreview(); }}
+            className="p-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-white transition"
+            title="Preview"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+          <button
+            onClick={e => { e.stopPropagation(); onDelete(); }}
             disabled={deleting}
-            className="p-2 bg-red-600 hover:bg-red-500 rounded-lg text-white transition disabled:opacity-40"
+            className="p-2 bg-red-600/80 hover:bg-red-500 rounded-lg text-white transition disabled:opacity-40"
             title="Delete"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -71,6 +169,8 @@ function AssetCard({ asset, onDelete, deleting }: { asset: Asset; onDelete: () =
     </div>
   );
 }
+
+// ─── Drop zone ────────────────────────────────────────────────────────────────
 
 function DropZone({ onFiles }: { onFiles: (files: FileList) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -110,12 +210,15 @@ function DropZone({ onFiles }: { onFiles: (files: FileList) => void }) {
   );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function AssetsPage() {
   const [assetList, setAssetList] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string[]>([]);
   const [deleting, setDeleting] = useState<number | null>(null);
+  const [preview, setPreview] = useState<Asset | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -153,6 +256,7 @@ export default function AssetsPage() {
     setDeleting(id);
     await fetch(`/api/assets/${id}`, { method: 'DELETE' });
     setDeleting(null);
+    if (preview?.id === id) setPreview(null);
     load();
   }
 
@@ -188,9 +292,19 @@ export default function AssetsPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {assetList.map(a => (
-            <AssetCard key={a.id} asset={a} onDelete={() => handleDelete(a.id)} deleting={deleting === a.id} />
+            <AssetCard
+              key={a.id}
+              asset={a}
+              onPreview={() => setPreview(a)}
+              onDelete={() => handleDelete(a.id)}
+              deleting={deleting === a.id}
+            />
           ))}
         </div>
+      )}
+
+      {preview && (
+        <PreviewModal asset={preview} onClose={() => setPreview(null)} />
       )}
     </div>
   );

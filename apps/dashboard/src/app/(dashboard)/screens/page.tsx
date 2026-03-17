@@ -10,7 +10,41 @@ interface Screen {
   refreshRate: number; rotation: number;
   panelGridCols: number; panelGridRows: number;
   colourProfile: string;
+  lastSeen: number | null;
+  currentSlideId: number | null;
+  clientIp: string | null;
 }
+
+// ─── Status helpers ──────────────────────────────────────────────────────────
+
+type StatusLevel = 'online' | 'idle' | 'offline' | 'never';
+
+function getStatus(lastSeen: number | null): { level: StatusLevel; label: string } {
+  if (!lastSeen) return { level: 'never', label: 'Never connected' };
+  const ago = Math.floor(Date.now() / 1000) - lastSeen;
+  if (ago < 90)   return { level: 'online',  label: 'Online' };
+  if (ago < 600)  return { level: 'idle',    label: `Idle ${Math.round(ago / 60)}m ago` };
+  if (ago < 3600) return { level: 'offline', label: `Offline ${Math.round(ago / 60)}m ago` };
+  const h = Math.round(ago / 3600);
+  if (h < 24)     return { level: 'offline', label: `Offline ${h}h ago` };
+  return { level: 'offline', label: 'Offline' };
+}
+
+const STATUS_DOT: Record<StatusLevel, string> = {
+  online:  'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.7)]',
+  idle:    'bg-yellow-400',
+  offline: 'bg-gray-600',
+  never:   'bg-gray-700',
+};
+
+const STATUS_TEXT: Record<StatusLevel, string> = {
+  online:  'text-green-400',
+  idle:    'text-yellow-400',
+  offline: 'text-gray-500',
+  never:   'text-gray-600',
+};
+
+// ─── Shared UI ───────────────────────────────────────────────────────────────
 
 const RESOLUTION_PRESETS = [
   { label: '1920 × 1080 (FHD)', w: 1920, h: 1080 },
@@ -50,6 +84,8 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
 const inputCls = 'w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition';
 const selectCls = inputCls + ' cursor-pointer';
 
+// ─── Screen form ─────────────────────────────────────────────────────────────
+
 function ScreenFormModal({ screen, zones, onSave, onClose }: {
   screen?: Screen; zones: Zone[]; onSave: () => void; onClose: () => void;
 }) {
@@ -66,7 +102,6 @@ function ScreenFormModal({ screen, zones, onSave, onClose }: {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Determine preset on init
   useEffect(() => {
     const match = RESOLUTION_PRESETS.find(p => p.w === resolutionW && p.h === resolutionH && p.w !== 0);
     setCustomRes(!match);
@@ -199,6 +234,8 @@ function ScreenFormModal({ screen, zones, onSave, onClose }: {
   );
 }
 
+// ─── Token modal ─────────────────────────────────────────────────────────────
+
 function TokenModal({ screen, onClose }: { screen: Screen; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
 
@@ -228,15 +265,18 @@ function TokenModal({ screen, onClose }: { screen: Screen; onClose: () => void }
   );
 }
 
+// ─── Screen card ─────────────────────────────────────────────────────────────
+
 function ScreenCard({ screen, onEdit, onDelete, onToken, deleting }: {
   screen: Screen; onEdit: () => void; onDelete: () => void; onToken: () => void; deleting: boolean;
 }) {
   const isLEDWall = (screen.panelGridCols ?? 1) > 1 || (screen.panelGridRows ?? 1) > 1;
+  const status = getStatus(screen.lastSeen);
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-gray-100 truncate">{screen.name}</p>
           <p className="text-xs text-gray-500 mt-0.5">
             {screen.zoneName ?? <span className="italic text-gray-600">Unassigned</span>}
@@ -253,6 +293,15 @@ function ScreenCard({ screen, onEdit, onDelete, onToken, deleting }: {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
           </button>
         </div>
+      </div>
+
+      {/* Status badge */}
+      <div className="flex items-center gap-2">
+        <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[status.level]}`} />
+        <span className={`text-xs ${STATUS_TEXT[status.level]}`}>{status.label}</span>
+        {screen.clientIp && status.level === 'online' && (
+          <span className="text-xs text-gray-700 ml-auto font-mono">{screen.clientIp}</span>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -277,6 +326,8 @@ function ScreenCard({ screen, onEdit, onDelete, onToken, deleting }: {
   );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function ScreensPage() {
   const [screens, setScreens] = useState<Screen[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
@@ -286,14 +337,21 @@ export default function ScreensPage() {
   const [deleting, setDeleting] = useState<number | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    const [s, z] = await Promise.all([fetch('/api/screens').then(r => r.json()), fetch('/api/zones').then(r => r.json())]);
+    const [s, z] = await Promise.all([
+      fetch('/api/screens').then(r => r.json()),
+      fetch('/api/zones').then(r => r.json()),
+    ]);
     setScreens(s);
     setZones(z);
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+    // Poll every 30 s to keep status badges fresh
+    const t = setInterval(load, 30_000);
+    return () => clearInterval(t);
+  }, [load]);
 
   async function handleDelete(id: number) {
     if (!confirm('Delete this screen? This will also remove its playlists.')) return;
@@ -303,12 +361,22 @@ export default function ScreensPage() {
     load();
   }
 
+  const onlineCount = screens.filter(s => getStatus(s.lastSeen).level === 'online').length;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-100 mb-1">Screens</h1>
-          <p className="text-sm text-gray-400">Manage and configure your display screens.</p>
+          <p className="text-sm text-gray-400">
+            Manage and configure your display screens.
+            {screens.length > 0 && (
+              <span className="ml-2">
+                <span className="text-green-400 font-medium">{onlineCount}</span>
+                <span className="text-gray-600"> / {screens.length} online</span>
+              </span>
+            )}
+          </p>
         </div>
         <button onClick={() => setModal('create')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

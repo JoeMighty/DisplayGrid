@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { db, screens, zones } from '@/lib/db';
+import { db, screens, zones, screenSessions } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { generateScreenToken } from '@/lib/tokens';
 import { DEFAULT_RESOLUTION_W, DEFAULT_RESOLUTION_H, DEFAULT_REFRESH_RATE } from '@displaygrid/shared';
@@ -11,22 +11,26 @@ export async function GET() {
 
   const rows = await db
     .select({
-      id:            screens.id,
-      name:          screens.name,
-      token:         screens.token,
-      zoneId:        screens.zoneId,
-      zoneName:      zones.name,
-      resolutionW:   screens.resolutionW,
-      resolutionH:   screens.resolutionH,
-      refreshRate:   screens.refreshRate,
-      rotation:      screens.rotation,
-      panelGridCols: screens.panelGridCols,
-      panelGridRows: screens.panelGridRows,
-      colourProfile: screens.colourProfile,
-      createdAt:     screens.createdAt,
+      id:             screens.id,
+      name:           screens.name,
+      token:          screens.token,
+      zoneId:         screens.zoneId,
+      zoneName:       zones.name,
+      resolutionW:    screens.resolutionW,
+      resolutionH:    screens.resolutionH,
+      refreshRate:    screens.refreshRate,
+      rotation:       screens.rotation,
+      panelGridCols:  screens.panelGridCols,
+      panelGridRows:  screens.panelGridRows,
+      colourProfile:  screens.colourProfile,
+      createdAt:      screens.createdAt,
+      lastSeen:       screenSessions.lastSeen,
+      currentSlideId: screenSessions.currentSlideId,
+      clientIp:       screenSessions.ip,
     })
     .from(screens)
     .leftJoin(zones, eq(screens.zoneId, zones.id))
+    .leftJoin(screenSessions, eq(screens.id, screenSessions.screenId))
     .all();
 
   return NextResponse.json(rows);
