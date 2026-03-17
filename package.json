@@ -1,0 +1,20 @@
+{
+  "name": "displaygrid",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "dev":          "turbo dev",
+    "build":        "turbo build",
+    "lint":         "turbo lint",
+    "db:generate":  "pnpm --filter @displaygrid/db generate",
+    "db:migrate":   "pnpm --filter @displaygrid/db migrate",
+    "db:studio":    "pnpm --filter @displaygrid/db studio"
+  },
+  "devDependencies": {
+    "turbo":      "latest",
+    "typescript": "^5.4.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3", "esbuild", "sharp", "unrs-resolver"]
+  }
+}

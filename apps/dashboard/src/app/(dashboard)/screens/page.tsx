@@ -1,0 +1,362 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+
+interface Zone { id: number; name: string; }
+interface Screen {
+  id: number; name: string; token: string;
+  zoneId: number | null; zoneName: string | null;
+  resolutionW: number; resolutionH: number;
+  refreshRate: number; rotation: number;
+  panelGridCols: number; panelGridRows: number;
+  colourProfile: string;
+}
+
+const RESOLUTION_PRESETS = [
+  { label: '1920 × 1080 (FHD)', w: 1920, h: 1080 },
+  { label: '3840 × 2160 (4K UHD)', w: 3840, h: 2160 },
+  { label: '1280 × 720 (HD)', w: 1280, h: 720 },
+  { label: '2560 × 1440 (QHD)', w: 2560, h: 1440 },
+  { label: '1080 × 1920 (Portrait FHD)', w: 1080, h: 1920 },
+  { label: '2160 × 3840 (Portrait 4K)', w: 2160, h: 3840 },
+  { label: 'Custom', w: 0, h: 0 },
+];
+
+function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4 py-8 overflow-y-auto">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-lg p-6 my-auto">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-base font-semibold text-gray-100">{title}</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-300 mb-1.5">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+const inputCls = 'w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition';
+const selectCls = inputCls + ' cursor-pointer';
+
+function ScreenFormModal({ screen, zones, onSave, onClose }: {
+  screen?: Screen; zones: Zone[]; onSave: () => void; onClose: () => void;
+}) {
+  const [name, setName] = useState(screen?.name ?? '');
+  const [zoneId, setZoneId] = useState<string>(screen?.zoneId?.toString() ?? '');
+  const [resolutionW, setResolutionW] = useState(screen?.resolutionW ?? 1920);
+  const [resolutionH, setResolutionH] = useState(screen?.resolutionH ?? 1080);
+  const [customRes, setCustomRes] = useState(false);
+  const [refreshRate, setRefreshRate] = useState(screen?.refreshRate ?? 60);
+  const [rotation, setRotation] = useState(screen?.rotation ?? 0);
+  const [panelGridCols, setPanelGridCols] = useState(screen?.panelGridCols ?? 1);
+  const [panelGridRows, setPanelGridRows] = useState(screen?.panelGridRows ?? 1);
+  const [colourProfile, setColourProfile] = useState(screen?.colourProfile ?? 'srgb');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Determine preset on init
+  useEffect(() => {
+    const match = RESOLUTION_PRESETS.find(p => p.w === resolutionW && p.h === resolutionH && p.w !== 0);
+    setCustomRes(!match);
+  }, []); // eslint-disable-line
+
+  function handlePresetChange(val: string) {
+    if (val === 'custom') { setCustomRes(true); return; }
+    const preset = RESOLUTION_PRESETS.find(p => `${p.w}x${p.h}` === val);
+    if (preset) { setResolutionW(preset.w); setResolutionH(preset.h); setCustomRes(false); }
+  }
+
+  const presetValue = customRes ? 'custom' : `${resolutionW}x${resolutionH}`;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    const url = screen ? `/api/screens/${screen.id}` : '/api/screens';
+    const method = screen ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, zoneId: zoneId ? parseInt(zoneId) : null,
+        resolutionW, resolutionH, refreshRate, rotation,
+        panelGridCols, panelGridRows, colourProfile,
+      }),
+    });
+    setLoading(false);
+    if (!res.ok) { const d = await res.json(); setError(d.error ?? 'Failed'); return; }
+    onSave();
+  }
+
+  const isLEDWall = panelGridCols > 1 || panelGridRows > 1;
+
+  return (
+    <Modal title={screen ? 'Edit Screen' : 'New Screen'} onClose={onClose}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <FieldRow label="Name">
+          <input value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Lobby Left" className={inputCls} />
+        </FieldRow>
+
+        <FieldRow label="Zone">
+          <select value={zoneId} onChange={e => setZoneId(e.target.value)} className={selectCls}>
+            <option value="">— Unassigned —</option>
+            {zones.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
+          </select>
+        </FieldRow>
+
+        {/* Resolution */}
+        <FieldRow label="Resolution">
+          <select value={presetValue} onChange={e => handlePresetChange(e.target.value)} className={selectCls + ' mb-2'}>
+            {RESOLUTION_PRESETS.map(p => (
+              <option key={p.w + 'x' + p.h} value={p.w === 0 ? 'custom' : `${p.w}x${p.h}`}>{p.label}</option>
+            ))}
+          </select>
+          {customRes && (
+            <div className="flex gap-2 items-center">
+              <input type="number" value={resolutionW} onChange={e => setResolutionW(+e.target.value)} min={1} placeholder="Width" className={inputCls} />
+              <span className="text-gray-500 text-sm">×</span>
+              <input type="number" value={resolutionH} onChange={e => setResolutionH(+e.target.value)} min={1} placeholder="Height" className={inputCls} />
+            </div>
+          )}
+        </FieldRow>
+
+        <div className="grid grid-cols-2 gap-3">
+          <FieldRow label="Refresh Rate (Hz)">
+            <select value={refreshRate} onChange={e => setRefreshRate(+e.target.value)} className={selectCls}>
+              {[24, 30, 48, 50, 60, 75, 120, 144].map(r => <option key={r} value={r}>{r} Hz</option>)}
+            </select>
+          </FieldRow>
+          <FieldRow label="Rotation">
+            <select value={rotation} onChange={e => setRotation(+e.target.value)} className={selectCls}>
+              <option value={0}>0°</option>
+              <option value={90}>90°</option>
+              <option value={180}>180°</option>
+              <option value={270}>270°</option>
+            </select>
+          </FieldRow>
+        </div>
+
+        <FieldRow label="Colour Profile">
+          <select value={colourProfile} onChange={e => setColourProfile(e.target.value)} className={selectCls}>
+            <option value="srgb">sRGB</option>
+            <option value="display-p3">Display P3</option>
+            <option value="rec2020">Rec. 2020</option>
+          </select>
+        </FieldRow>
+
+        {/* LED Wall Panel Grid */}
+        <div className="border border-gray-800 rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-gray-300">LED Wall / Panel Grid</p>
+            {isLEDWall && (
+              <span className="text-xs px-2 py-0.5 bg-purple-500/15 text-purple-400 rounded-full">
+                {panelGridCols} × {panelGridRows} panels
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-gray-500">Set to 1×1 for a single display. Increase for tiled LED wall configurations.</p>
+          <div className="grid grid-cols-2 gap-3">
+            <FieldRow label="Columns">
+              <input type="number" value={panelGridCols} onChange={e => setPanelGridCols(Math.max(1, +e.target.value))} min={1} max={20} className={inputCls} />
+            </FieldRow>
+            <FieldRow label="Rows">
+              <input type="number" value={panelGridRows} onChange={e => setPanelGridRows(Math.max(1, +e.target.value))} min={1} max={20} className={inputCls} />
+            </FieldRow>
+          </div>
+          {isLEDWall && (
+            <div className="flex gap-1 flex-wrap">
+              {Array.from({ length: panelGridRows }).map((_, r) =>
+                Array.from({ length: panelGridCols }).map((_, c) => (
+                  <div key={`${r}-${c}`} style={{ width: `${Math.min(32, Math.floor(200 / panelGridCols))}px`, height: `${Math.min(20, Math.floor(120 / panelGridRows))}px` }}
+                    className="bg-purple-500/20 border border-purple-500/40 rounded-sm" />
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {error && <p className="text-sm text-red-400">{error}</p>}
+        <div className="flex gap-3 pt-1">
+          <button type="button" onClick={onClose} className="flex-1 py-2 px-4 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium rounded-lg transition">Cancel</button>
+          <button type="submit" disabled={loading} className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition">
+            {loading ? 'Saving…' : screen ? 'Save changes' : 'Add screen'}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function TokenModal({ screen, onClose }: { screen: Screen; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  function copy() {
+    navigator.clipboard.writeText(screen.token);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <Modal title="Screen Token" onClose={onClose}>
+      <div className="space-y-4">
+        <p className="text-sm text-gray-400">Use this token to pair the display client with <span className="text-gray-200 font-medium">{screen.name}</span>.</p>
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center justify-between gap-3">
+          <code className="text-xs text-blue-300 font-mono break-all">{screen.token}</code>
+          <button onClick={copy} className="shrink-0 p-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-lg transition">
+            {copied
+              ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            }
+          </button>
+        </div>
+        <p className="text-xs text-gray-600">Keep this token secret. Anyone with it can pair a display to this screen.</p>
+        <button onClick={onClose} className="w-full py-2 px-4 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium rounded-lg transition">Close</button>
+      </div>
+    </Modal>
+  );
+}
+
+function ScreenCard({ screen, onEdit, onDelete, onToken, deleting }: {
+  screen: Screen; onEdit: () => void; onDelete: () => void; onToken: () => void; deleting: boolean;
+}) {
+  const isLEDWall = (screen.panelGridCols ?? 1) > 1 || (screen.panelGridRows ?? 1) > 1;
+
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col gap-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-gray-100 truncate">{screen.name}</p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {screen.zoneName ?? <span className="italic text-gray-600">Unassigned</span>}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button onClick={onToken} title="View token" className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          </button>
+          <button onClick={onEdit} className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button onClick={onDelete} disabled={deleting} className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition disabled:opacity-40">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        <span className="text-xs px-2 py-0.5 bg-gray-800 text-gray-400 rounded-full">
+          {screen.resolutionW}×{screen.resolutionH}
+        </span>
+        <span className="text-xs px-2 py-0.5 bg-gray-800 text-gray-400 rounded-full">
+          {screen.refreshRate} Hz
+        </span>
+        {screen.rotation !== 0 && (
+          <span className="text-xs px-2 py-0.5 bg-gray-800 text-gray-400 rounded-full">
+            {screen.rotation}°
+          </span>
+        )}
+        {isLEDWall && (
+          <span className="text-xs px-2 py-0.5 bg-purple-500/15 text-purple-400 rounded-full">
+            {screen.panelGridCols}×{screen.panelGridRows} panels
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function ScreensPage() {
+  const [screens, setScreens] = useState<Screen[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState<'create' | Screen | null>(null);
+  const [tokenModal, setTokenModal] = useState<Screen | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const [s, z] = await Promise.all([fetch('/api/screens').then(r => r.json()), fetch('/api/zones').then(r => r.json())]);
+    setScreens(s);
+    setZones(z);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function handleDelete(id: number) {
+    if (!confirm('Delete this screen? This will also remove its playlists.')) return;
+    setDeleting(id);
+    await fetch(`/api/screens/${id}`, { method: 'DELETE' });
+    setDeleting(null);
+    load();
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-100 mb-1">Screens</h1>
+          <p className="text-sm text-gray-400">Manage and configure your display screens.</p>
+        </div>
+        <button onClick={() => setModal('create')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Screen
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20 text-gray-600">
+          <svg className="animate-spin mr-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          Loading…
+        </div>
+      ) : screens.length === 0 ? (
+        <div className="bg-gray-900 border border-gray-800 border-dashed rounded-xl py-16 flex flex-col items-center justify-center text-center">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-3">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          <p className="text-sm font-medium text-gray-400 mb-1">No screens yet</p>
+          <p className="text-xs text-gray-600 mb-4">Add a screen to start displaying content.</p>
+          <button onClick={() => setModal('create')} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition">Add your first screen</button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {screens.map(s => (
+            <ScreenCard
+              key={s.id}
+              screen={s}
+              onEdit={() => setModal(s)}
+              onDelete={() => handleDelete(s.id)}
+              onToken={() => setTokenModal(s)}
+              deleting={deleting === s.id}
+            />
+          ))}
+        </div>
+      )}
+
+      {modal !== null && (
+        <ScreenFormModal
+          screen={modal === 'create' ? undefined : modal}
+          zones={zones}
+          onSave={() => { setModal(null); load(); }}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {tokenModal && (
+        <TokenModal screen={tokenModal} onClose={() => setTokenModal(null)} />
+      )}
+    </div>
+  );
+}

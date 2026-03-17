@@ -1,0 +1,24 @@
+{
+  "name": "@displaygrid/db",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate":  "drizzle-kit migrate",
+    "push":     "drizzle-kit push",
+    "studio":   "drizzle-kit studio"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.5.0",
+    "drizzle-orm":    "^0.36.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.10",
+    "drizzle-kit":           "^0.27.2",
+    "typescript":            "^5.4.0"
+  }
+}
