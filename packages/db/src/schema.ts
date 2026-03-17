@@ -91,6 +91,20 @@ export const tutorialProgress = sqliteTable('tutorial_progress', {
   completedAt: integer('completed_at', { mode: 'timestamp' }),
 });
 
+export const screenRegions = sqliteTable('screen_regions', {
+  id:         integer('id').primaryKey({ autoIncrement: true }),
+  screenId:   integer('screen_id').notNull()
+                .references(() => screens.id, { onDelete: 'cascade' }),
+  name:       text('name').notNull(),
+  x:          real('x').notNull().default(0),
+  y:          real('y').notNull().default(0),
+  width:      real('width').notNull().default(100),
+  height:     real('height').notNull().default(100),
+  playlistId: integer('playlist_id')
+                .references(() => playlists.id, { onDelete: 'set null' }),
+  sortOrder:  integer('sort_order').notNull().default(0),
+});
+
 export const emergencyOverride = sqliteTable('emergency_override', {
   id:        integer('id').primaryKey({ autoIncrement: true }),
   assetId:   integer('asset_id').references(() => assets.id),

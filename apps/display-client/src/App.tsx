@@ -10,7 +10,18 @@ const SCREEN_TOKEN = import.meta.env.VITE_SCREEN_TOKEN ?? '';
 
 type AppState = 'setup' | 'loading' | 'playing' | 'error';
 
-interface PlaylistMsg { type: 'playlist'; slides: Slide[]; override: OverrideMsg | null; }
+interface Region {
+  id: number;
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  playlistId: number | null;
+  slides: Slide[];
+}
+
+interface PlaylistMsg { type: 'playlist'; slides: Slide[]; regions?: Region[] | null; override: OverrideMsg | null; }
 interface AckMsg      { type: 'ack'; }
 interface OverrideMsg { message: string | null; asset_id: number | null; }
 
@@ -26,6 +37,7 @@ function loadCache(): Slide[] {
 export default function App() {
   const [state,      setState]      = useState<AppState>(SCREEN_TOKEN ? 'loading' : 'setup');
   const [slides,     setSlides]     = useState<Slide[]>(() => loadCache());
+  const [regions,    setRegions]    = useState<Region[] | null>(null);
   const [override,   setOverride]   = useState<OverrideMsg | null>(null);
   const [kioskLock,  setKioskLock]  = useState(false);
   const [token,      setToken]      = useState(SCREEN_TOKEN);
@@ -42,6 +54,7 @@ export default function App() {
     if (msg.type === 'playlist') {
       setSlides(msg.slides);
       saveCache(msg.slides);
+      setRegions(msg.regions && msg.regions.length > 0 ? msg.regions : null);
       setOverride(msg.override);
       setState('playing');
     }
@@ -197,6 +210,35 @@ export default function App() {
           <p style={{ fontSize: 'min(2vw, 1.25rem)', color: '#fca5a5' }}>Please follow the instructions of building staff.</p>
         </div>
         {kioskLock && <KioskLock apiBase={API_BASE} onUnlock={() => setKioskLock(false)} />}
+      </div>
+    );
+  }
+
+  // Multi-zone layout: render each region as an absolutely-positioned SlidePlayer
+  if (regions && regions.length > 0) {
+    return (
+      <div style={{ width: '100%', height: '100%', background: '#000', position: 'relative', overflow: 'hidden' }}>
+        {regions.map(region => (
+          <div
+            key={region.id}
+            style={{
+              position: 'absolute',
+              left:   `${region.x}%`,
+              top:    `${region.y}%`,
+              width:  `${region.width}%`,
+              height: `${region.height}%`,
+              overflow: 'hidden',
+            }}
+          >
+            <SlidePlayer
+              slides={region.slides}
+              onSlideChange={id => { currentSlideId.current = id; }}
+            />
+          </div>
+        ))}
+        {kioskLock && (
+          <KioskLock apiBase={API_BASE} onUnlock={() => setKioskLock(false)} />
+        )}
       </div>
     );
   }

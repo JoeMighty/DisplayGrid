@@ -31,11 +31,11 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 - **Offline resilience:** display clients cache their last playlist and keep playing through network outages
 - **Role-based access:** Super Admin, Admin, Operator, Viewer
 - **LED wall support:** define panel grids (e.g. 3×2) for tiled display configurations
+- **Multi-zone layouts:** split a screen into independently controlled regions, each with its own playlist
+- **Time-based scheduling:** restrict slides to specific days and time windows; server re-evaluates every minute
 
 ### Coming Soon
 
-- **Multi-zone layouts:** split a screen into independently controlled regions
-- **Time-based scheduling:** automatically switch playlists by time of day or day of week
 - **NDI source support:** stream live video from NDI devices on the network directly to any display
 
 ---

@@ -14,6 +14,12 @@ interface Screen {
   currentSlideId: number | null;
   clientIp: string | null;
 }
+interface Region {
+  id: number; screenId: number; name: string;
+  x: number; y: number; width: number; height: number;
+  playlistId: number | null; sortOrder: number; playlistName: string | null;
+}
+interface Playlist { id: number; name: string; screenId: number; screenName: string | null; }
 
 // ─── Status helpers ──────────────────────────────────────────────────────────
 
@@ -265,10 +271,255 @@ function TokenModal({ screen, onClose }: { screen: Screen; onClose: () => void }
   );
 }
 
+// ─── Layout regions modal ─────────────────────────────────────────────────────
+
+const REGION_COLORS = [
+  'rgba(59,130,246,0.45)',  // blue
+  'rgba(168,85,247,0.45)',  // purple
+  'rgba(16,185,129,0.45)',  // green
+  'rgba(245,158,11,0.45)',  // amber
+  'rgba(239,68,68,0.45)',   // red
+  'rgba(6,182,212,0.45)',   // cyan
+];
+const REGION_BORDERS = [
+  '#3b82f6', '#a855f7', '#10b981', '#f59e0b', '#ef4444', '#06b2d4',
+];
+
+function RegionForm({ region, playlists, onSave, onClose }: {
+  region?: Region; playlists: Playlist[]; onSave: (data: Omit<Region, 'id' | 'screenId' | 'playlistName'>) => Promise<void>; onClose: () => void;
+}) {
+  const [name,       setName]       = useState(region?.name ?? '');
+  const [x,          setX]          = useState(String(region?.x ?? 0));
+  const [y,          setY]          = useState(String(region?.y ?? 0));
+  const [width,      setWidth]      = useState(String(region?.width ?? 100));
+  const [height,     setHeight]     = useState(String(region?.height ?? 100));
+  const [playlistId, setPlaylistId] = useState<string>(region?.playlistId?.toString() ?? '');
+  const [loading,    setLoading]    = useState(false);
+  const [error,      setError]      = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      await onSave({
+        name: name.trim(),
+        x: parseFloat(x) || 0,
+        y: parseFloat(y) || 0,
+        width: parseFloat(width) || 100,
+        height: parseFloat(height) || 100,
+        playlistId: playlistId ? parseInt(playlistId) : null,
+        sortOrder: region?.sortOrder ?? 0,
+      });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save region');
+    }
+    setLoading(false);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="border border-gray-700 rounded-lg p-4 space-y-3 bg-gray-800/50">
+      <p className="text-sm font-medium text-gray-200">{region ? 'Edit Region' : 'New Region'}</p>
+      <div>
+        <label className="block text-xs text-gray-400 mb-1">Name</label>
+        <input value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Main Content"
+          className={inputCls} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">X (%)</label>
+          <input type="number" value={x} onChange={e => setX(e.target.value)} min={0} max={100} step={0.1} className={inputCls} />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">Y (%)</label>
+          <input type="number" value={y} onChange={e => setY(e.target.value)} min={0} max={100} step={0.1} className={inputCls} />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">Width (%)</label>
+          <input type="number" value={width} onChange={e => setWidth(e.target.value)} min={1} max={100} step={0.1} className={inputCls} />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">Height (%)</label>
+          <input type="number" value={height} onChange={e => setHeight(e.target.value)} min={1} max={100} step={0.1} className={inputCls} />
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs text-gray-400 mb-1">Playlist</label>
+        <select value={playlistId} onChange={e => setPlaylistId(e.target.value)} className={selectCls}>
+          <option value="">— None —</option>
+          {playlists.map(p => (
+            <option key={p.id} value={p.id}>
+              {p.name}{p.screenName ? ` (${p.screenName})` : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+      {error && <p className="text-xs text-red-400">{error}</p>}
+      <div className="flex gap-2">
+        <button type="button" onClick={onClose}
+          className="flex-1 py-1.5 px-3 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-medium rounded-lg transition">
+          Cancel
+        </button>
+        <button type="submit" disabled={loading || !name.trim()}
+          className="flex-1 py-1.5 px-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition">
+          {loading ? 'Saving…' : region ? 'Save' : 'Add'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function LayoutModal({ screen, onClose }: { screen: Screen; onClose: () => void }) {
+  const [regions,   setRegions]   = useState<Region[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [loading,   setLoading]   = useState(true);
+  const [editing,   setEditing]   = useState<Region | 'add' | null>(null);
+  const [deleting,  setDeleting]  = useState<number | null>(null);
+
+  const load = useCallback(async () => {
+    const [r, p] = await Promise.all([
+      fetch(`/api/screens/${screen.id}/regions`).then(res => res.json()),
+      fetch('/api/playlists').then(res => res.json()),
+    ]);
+    setRegions(Array.isArray(r) ? r : []);
+    setPlaylists(Array.isArray(p) ? p : []);
+    setLoading(false);
+  }, [screen.id]);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function handleSave(data: Omit<Region, 'id' | 'screenId' | 'playlistName'>) {
+    if (typeof editing === 'string') {
+      // editing === 'add'
+      const res = await fetch(`/api/screens/${screen.id}/regions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, sortOrder: regions.length }),
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? 'Failed'); }
+    } else if (editing) {
+      const res = await fetch(`/api/screens/${screen.id}/regions/${editing.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? 'Failed'); }
+    }
+    setEditing(null);
+    load();
+  }
+
+  async function handleDelete(regionId: number) {
+    if (!confirm('Remove this region?')) return;
+    setDeleting(regionId);
+    await fetch(`/api/screens/${screen.id}/regions/${regionId}`, { method: 'DELETE' });
+    setDeleting(null);
+    load();
+  }
+
+  // Aspect ratio for preview: use screen's actual ratio
+  const aspectRatio = screen.resolutionH > 0
+    ? (screen.resolutionH / screen.resolutionW) * 100
+    : 56.25;
+
+  return (
+    <Modal title={`Layout Regions: ${screen.name}`} onClose={onClose}>
+      <div className="space-y-4">
+        {/* Visual preview */}
+        <div style={{ width: '100%', paddingBottom: `${Math.min(aspectRatio, 70)}%`, position: 'relative', background: '#0f172a', borderRadius: '6px', border: '1px solid #1e293b', overflow: 'hidden' }}>
+          {regions.map((r, i) => (
+            <div key={r.id} style={{
+              position: 'absolute',
+              left: `${r.x}%`, top: `${r.y}%`,
+              width: `${r.width}%`, height: `${r.height}%`,
+              background: REGION_COLORS[i % REGION_COLORS.length],
+              border: `1.5px solid ${REGION_BORDERS[i % REGION_BORDERS.length]}`,
+              borderRadius: '2px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+            }}>
+              <span style={{ fontSize: '9px', color: '#fff', textAlign: 'center', padding: '2px', pointerEvents: 'none', lineHeight: 1.2 }}>
+                {r.name}
+              </span>
+            </div>
+          ))}
+          {regions.length === 0 && (
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: '10px', color: '#334155' }}>No regions — full-screen</span>
+            </div>
+          )}
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-6 text-gray-600">
+            <svg className="animate-spin mr-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            Loading…
+          </div>
+        ) : (
+          <>
+            {/* Region list */}
+            {regions.length > 0 && (
+              <div className="space-y-2">
+                {regions.map((r, i) => (
+                  <div key={r.id} className="flex items-center gap-2 px-3 py-2 bg-gray-800 rounded-lg">
+                    <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: REGION_BORDERS[i % REGION_BORDERS.length] }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-200 truncate">{r.name}</p>
+                      <p className="text-xs text-gray-600">
+                        {r.x}%, {r.y}% &nbsp;&middot;&nbsp; {r.width}% × {r.height}%
+                        {r.playlistName && <span className="ml-1 text-gray-500"> &middot; {r.playlistName}</span>}
+                      </p>
+                    </div>
+                    <button onClick={() => setEditing(r)} className="p-1 text-gray-500 hover:text-gray-300 hover:bg-gray-700 rounded transition">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button onClick={() => handleDelete(r.id)} disabled={deleting === r.id}
+                      className="p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition disabled:opacity-40">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Inline form for add/edit */}
+            {editing !== null && (
+              <RegionForm
+                region={typeof editing === 'string' ? undefined : editing}
+                playlists={playlists}
+                onSave={handleSave}
+                onClose={() => setEditing(null)}
+              />
+            )}
+
+            {editing === null && (
+              <button onClick={() => setEditing('add')}
+                className="w-full flex items-center justify-center gap-2 py-2 px-4 border border-dashed border-gray-700 hover:border-gray-600 text-gray-500 hover:text-gray-300 text-sm rounded-lg transition">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add region
+              </button>
+            )}
+
+            {regions.length === 0 && editing === null && (
+              <p className="text-xs text-gray-600 text-center -mt-1">
+                No regions defined. The screen plays its playlist full-screen. Add regions to split the screen into independently controlled areas.
+              </p>
+            )}
+          </>
+        )}
+
+        <button onClick={onClose}
+          className="w-full py-2 px-4 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium rounded-lg transition">
+          Close
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
 // ─── Screen card ─────────────────────────────────────────────────────────────
 
-function ScreenCard({ screen, onEdit, onDelete, onToken, deleting }: {
-  screen: Screen; onEdit: () => void; onDelete: () => void; onToken: () => void; deleting: boolean;
+function ScreenCard({ screen, onEdit, onDelete, onToken, onLayout, deleting }: {
+  screen: Screen; onEdit: () => void; onDelete: () => void; onToken: () => void; onLayout: () => void; deleting: boolean;
 }) {
   const isLEDWall = (screen.panelGridCols ?? 1) > 1 || (screen.panelGridRows ?? 1) > 1;
   const status = getStatus(screen.lastSeen);
@@ -285,6 +536,9 @@ function ScreenCard({ screen, onEdit, onDelete, onToken, deleting }: {
         <div className="flex items-center gap-1 shrink-0">
           <button onClick={onToken} title="View token" className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          </button>
+          <button onClick={onLayout} title="Manage layout regions" className="p-1.5 text-gray-500 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
           </button>
           <button onClick={onEdit} className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -329,12 +583,13 @@ function ScreenCard({ screen, onEdit, onDelete, onToken, deleting }: {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ScreensPage() {
-  const [screens, setScreens] = useState<Screen[]>([]);
-  const [zones, setZones] = useState<Zone[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState<'create' | Screen | null>(null);
-  const [tokenModal, setTokenModal] = useState<Screen | null>(null);
-  const [deleting, setDeleting] = useState<number | null>(null);
+  const [screens,     setScreens]     = useState<Screen[]>([]);
+  const [zones,       setZones]       = useState<Zone[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [modal,       setModal]       = useState<'create' | Screen | null>(null);
+  const [tokenModal,  setTokenModal]  = useState<Screen | null>(null);
+  const [layoutModal, setLayoutModal] = useState<Screen | null>(null);
+  const [deleting,    setDeleting]    = useState<number | null>(null);
 
   const load = useCallback(async () => {
     const [s, z] = await Promise.all([
@@ -407,6 +662,7 @@ export default function ScreensPage() {
               onEdit={() => setModal(s)}
               onDelete={() => handleDelete(s.id)}
               onToken={() => setTokenModal(s)}
+              onLayout={() => setLayoutModal(s)}
               deleting={deleting === s.id}
             />
           ))}
@@ -424,6 +680,10 @@ export default function ScreensPage() {
 
       {tokenModal && (
         <TokenModal screen={tokenModal} onClose={() => setTokenModal(null)} />
+      )}
+
+      {layoutModal && (
+        <LayoutModal screen={layoutModal} onClose={() => setLayoutModal(null)} />
       )}
     </div>
   );

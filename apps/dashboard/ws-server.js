@@ -2,7 +2,7 @@
  * DisplayGrid WebSocket server — runs on port 3001.
  * Display clients connect here with their screen token.
  * Keeps screen_sessions table up to date and broadcasts
- * playlist payloads when requested.
+ * playlist payloads when requested or when slide schedules change.
  */
 
 'use strict';
@@ -41,6 +41,49 @@ function broadcast(screenId, payload) {
   }
 }
 
+/**
+ * Returns true if a slide with the given scheduleJson should be shown right now.
+ * If scheduleJson is null/empty, the slide is always shown.
+ */
+function isSlideActiveNow(scheduleJson) {
+  if (!scheduleJson) return true;
+  try {
+    const sched = JSON.parse(scheduleJson);
+    if (!sched) return true;
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday
+    if (Array.isArray(sched.days) && !sched.days.includes(dayOfWeek)) return false;
+    if (sched.startTime && sched.endTime) {
+      const cur = now.getHours() * 60 + now.getMinutes();
+      const [sh, sm] = sched.startTime.split(':').map(Number);
+      const [eh, em] = sched.endTime.split(':').map(Number);
+      if (cur < sh * 60 + sm || cur >= eh * 60 + em) return false;
+    }
+    return true;
+  } catch { return true; }
+}
+
+/** Fetch slides for a specific playlist (used for multi-zone regions). */
+function getSlidesForPlaylist(playlistId) {
+  const raw = db.prepare(`
+    SELECT s.*, a.filename as asset_filename, a.mime_type as asset_mime_type, a.type as asset_type
+    FROM slides s
+    LEFT JOIN assets a ON s.asset_id = a.id
+    WHERE s.playlist_id = ? AND s.enabled = 1
+    ORDER BY s.sort_order ASC
+  `).all(playlistId);
+  return raw
+    .filter(s => isSlideActiveNow(s.schedule_json))
+    .map(s => ({
+      ...s,
+      contentType:     s.content_type,
+      durationSeconds: s.duration_seconds,
+      assetId:         s.asset_id,
+      sortOrder:       s.sort_order,
+      playlistId:      s.playlist_id,
+    }));
+}
+
 function getPlayload(screenId) {
   const rawSlides = db.prepare(`
     SELECT s.*, a.filename as asset_filename, a.mime_type as asset_mime_type, a.type as asset_type
@@ -52,15 +95,45 @@ function getPlayload(screenId) {
   `).all(screenId);
 
   // Map snake_case DB columns → camelCase expected by SlidePlayer
-  const slides = rawSlides.map(s => ({
-    ...s,
-    contentType:     s.content_type,
-    durationSeconds: s.duration_seconds,
-    assetId:         s.asset_id,
-    sortOrder:       s.sort_order,
-    playlistId:      s.playlist_id,
-    createdAt:       s.created_at,
-  }));
+  // Also enforce time-based schedule: only include slides active right now
+  const slides = rawSlides
+    .filter(s => isSlideActiveNow(s.schedule_json))
+    .map(s => ({
+      ...s,
+      contentType:     s.content_type,
+      durationSeconds: s.duration_seconds,
+      assetId:         s.asset_id,
+      sortOrder:       s.sort_order,
+      playlistId:      s.playlist_id,
+      createdAt:       s.created_at,
+    }));
+
+  // Load layout regions for this screen (if any)
+  let regions = null;
+  try {
+    const rawRegions = db.prepare(`
+      SELECT r.id, r.name, r.x, r.y, r.width, r.height, r.playlist_id, r.sort_order
+      FROM screen_regions r
+      WHERE r.screen_id = ?
+      ORDER BY r.sort_order ASC
+    `).all(screenId);
+
+    if (rawRegions.length > 0) {
+      regions = rawRegions.map(r => ({
+        id:         r.id,
+        name:       r.name,
+        x:          r.x,
+        y:          r.y,
+        width:      r.width,
+        height:     r.height,
+        playlistId: r.playlist_id,
+        slides:     r.playlist_id ? getSlidesForPlaylist(r.playlist_id) : [],
+      }));
+    }
+  } catch {
+    // screen_regions table may not exist yet (before migration)
+    regions = null;
+  }
 
   const override = db.prepare(`
     SELECT * FROM emergency_override
@@ -68,8 +141,18 @@ function getPlayload(screenId) {
     LIMIT 1
   `).get(Math.floor(Date.now() / 1000));
 
-  return { type: 'playlist', slides, override: override ?? null };
+  return { type: 'playlist', slides, regions, override: override ?? null };
 }
+
+// Broadcast updated playlists every 60 seconds so time-based schedules are enforced
+// (slides that start/end on a schedule will be included/excluded automatically)
+setInterval(() => {
+  for (const [screenId, conns] of connections) {
+    if (conns.size > 0) {
+      broadcast(screenId, getPlayload(screenId));
+    }
+  }
+}, 60_000);
 
 wss.on('connection', (ws, req) => {
   const { query } = url.parse(req.url, true);
