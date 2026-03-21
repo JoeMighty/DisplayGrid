@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download — DisplayGrid</title>
+  <meta name="description" content="Download DisplayGrid native apps for Windows, macOS, Linux, and Raspberry Pi. Server tray app and fullscreen kiosk app." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* ── Download page specific ──────────────────────────────────────────── */
+    .dl-hero {
+      text-align: center;
+      padding: 5rem 1.5rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    #dl-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .dl-hero > *:not(#dl-canvas) { position: relative; z-index: 1; }
+
+    .dl-hero h1 { margin-bottom: 1rem; }
+    .dl-hero p  { font-size: 1.1rem; max-width: 560px; margin: 0 auto 2rem; }
+
+    /* OS detector banner */
+    .dl-detected {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.25);
+      color: #93c5fd;
+      font-size: 0.875rem;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      margin-bottom: 2.5rem;
+    }
+    .dl-detected svg { color: #60a5fa; }
+
+    /* App type tabs */
+    .dl-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 3rem;
+    }
+    .dl-tab {
+      padding: 0.5rem 1.5rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .dl-tab.active,
+    .dl-tab:hover {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    /* Platform cards grid */
+    .dl-platforms {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      max-width: 1100px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .dl-platform {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .dl-platform:hover { border-color: var(--border2); transform: translateY(-2px); }
+    .dl-platform.recommended {
+      border-color: rgba(59,130,246,0.5);
+      background: linear-gradient(135deg, rgba(59,130,246,0.06) 0%, var(--bg-card) 60%);
+    }
+
+    .dl-platform__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--blue);
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 4px;
+      padding: 0.2rem 0.5rem;
+      align-self: flex-start;
+    }
+
+    .dl-platform__icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+    }
+    .dl-platform__icon--win   { background: #1565c0; }
+    .dl-platform__icon--mac   { background: #1c1c1e; border: 1px solid var(--border2); }
+    .dl-platform__icon--linux { background: #0d2137; border: 1px solid #1e3a5f; }
+    .dl-platform__icon--pi    { background: #1a0d33; border: 1px solid #3b1f6e; }
+
+    .dl-platform__name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .dl-platform__desc {
+      font-size: 0.8125rem;
+      color: var(--text-dim);
+      margin: 0;
+      flex: 1;
+    }
+
+    .dl-platform__btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s, filter 0.15s;
+      gap: 0.5rem;
+    }
+    .dl-platform__btn:hover { opacity: 0.85; filter: brightness(1.1); text-decoration: none; }
+
+    .dl-platform__btn--win   { background: #1565c0; color: #fff; }
+    .dl-platform__btn--mac   { background: #2c2c2e; color: #fff; border: 1px solid var(--border2); }
+    .dl-platform__btn--linux { background: #0d2137; color: #64b5f6; border: 1px solid #1e3a5f; }
+    .dl-platform__btn--pi    { background: #1a0d33; color: #c084fc; border: 1px solid #3b1f6e; }
+
+    .dl-platform__btn-label { display: flex; align-items: center; gap: 0.5rem; }
+    .dl-platform__btn-ext   { font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.7; }
+
+    /* What's included section */
+    .dl-info {
+      max-width: 900px;
+      margin: 4rem auto 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .dl-info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .dl-info-card h3 { font-size: 1rem; color: var(--text); margin-bottom: 0.75rem; }
+    .dl-info-card ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .dl-info-card li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    .dl-info-card li::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .dl-source-note {
+      text-align: center;
+      margin: 3rem 0 1rem;
+      color: var(--text-dim);
+      font-size: 0.875rem;
+    }
+    .dl-source-note a { color: var(--blue); }
+
+    @media (max-width: 640px) {
+      .dl-platforms { grid-template-columns: 1fr; }
+      .dl-info       { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Nav ──────────────────────────────────────────────────────────────── -->
+<nav class="nav">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="nav__links">
+        <li><a href="download.html" class="active">Download</a></li>
+        <li><a href="guides/getting-started.html">Getting Started</a></li>
+        <li><a href="guides/hardware.html">Hardware</a></li>
+        <li><a href="guides/kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="guides/network-setup.html">Network</a></li>
+      </ul>
+      <div class="nav__cta">
+        <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="guides/getting-started.html" class="btn btn--primary">
+          Run from source
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── Hero ─────────────────────────────────────────────────────────────── -->
+<div class="dl-hero">
+  <canvas id="dl-canvas" aria-hidden="true"></canvas>
+
+  <div class="section__label" style="margin-bottom:1rem;">Standalone apps</div>
+  <h1>Download DisplayGrid</h1>
+  <p>Native installers for every platform. No Node.js, no terminal. Just download and run.</p>
+
+  <div id="dl-detected-banner" class="dl-detected" style="display:none">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="dl-detected-text">Detected your OS</span>
+  </div>
+
+  <!-- App tabs -->
+  <div class="dl-tabs">
+    <button class="dl-tab active" data-tab="server">Server App</button>
+    <button class="dl-tab" data-tab="kiosk">Kiosk App</button>
+  </div>
+
+  <!-- Server App platforms -->
+  <div id="tab-server" class="dl-platforms">
+    <div class="dl-platform" id="card-win-server">
+      <div class="dl-platform__icon dl-platform__icon--win">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+      </div>
+      <div class="dl-platform__name">Windows</div>
+      <p class="dl-platform__desc">Windows 10 or later · x64 · NSIS installer</p>
+      <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-Setup.exe"
+         class="dl-platform__btn dl-platform__btn--win">
+        <span class="dl-platform__btn-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Windows
+        </span>
+        <span class="dl-platform__btn-ext">.exe</span>
+      </a>
+    </div>
+
+    <div class="dl-platform" id="card-mac-server">
+      <div class="dl-platform__icon dl-platform__icon--mac">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      </div>
+      <div class="dl-platform__name">macOS</div>
+      <p class="dl-platform__desc">macOS 11 or later · Intel &amp; Apple Silicon (Universal)</p>
+      <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.dmg"
+         class="dl-platform__btn dl-platform__btn--mac">
+        <span class="dl-platform__btn-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for macOS
+        </span>
+        <span class="dl-platform__btn-ext">.dmg</span>
+      </a>
+    </div>
+
+    <div class="dl-platform" id="card-linux-server">
+      <div class="dl-platform__icon dl-platform__icon--linux">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#64b5f6" aria-hidden="true"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00.11.28c.12.12.289.19.464.19.394 0 .694-.321.644-.714-.06-.44-.01-.9.115-1.386.26-1.023.74-2.003 1.36-2.87.99-1.402 1.73-2.83 1.945-4.403.175-1.29.154-2.578.334-3.852.165-1.174.574-2.24 1.585-2.65.313-.124.67-.176 1.068-.17 1.05-.012 2.222.444 2.97 1.244.73.78 1.1 1.847 1.1 2.98 0 .77-.193 1.574-.523 2.246-.354.717-.866 1.336-1.462 1.83-.86.71-1.8 1.357-2.7 2.027-.9.67-1.6 1.41-1.77 2.275-.068.35-.075.71-.03 1.07.047.347.15.682.3 1.01.3.647.77 1.27 1.315 1.872.54.6 1.13 1.17 1.717 1.714.58.54 1.14 1.05 1.637 1.53.5.485.916.94 1.178 1.375.262.433.38.848.302 1.233-.077.384-.343.697-.74.894-.39.19-.88.27-1.38.19-.49-.077-.97-.3-1.38-.62-.4-.32-.74-.73-.98-1.185-.236-.455-.367-.948-.38-1.45-.013-.5.097-1.008.278-1.495.36-.973 1.01-1.847 1.71-2.697.7-.85 1.44-1.7 1.98-2.576.54-.875.9-1.797.95-2.78.04-.63-.078-1.277-.36-1.878-.282-.6-.73-1.15-1.284-1.574-.553-.424-1.21-.72-1.905-.863C13.37.045 12.93 0 12.504 0z"/></svg>
+      </div>
+      <div class="dl-platform__name">Linux</div>
+      <p class="dl-platform__desc">Ubuntu, Debian, Fedora and more · x64 AppImage</p>
+      <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.AppImage"
+         class="dl-platform__btn dl-platform__btn--linux">
+        <span class="dl-platform__btn-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Linux
+        </span>
+        <span class="dl-platform__btn-ext">.AppImage</span>
+      </a>
+    </div>
+
+    <div class="dl-platform" id="card-pi-server">
+      <div class="dl-platform__icon dl-platform__icon--pi">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="14" x2="22" y2="14"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="14" x2="4" y2="14"/></svg>
+      </div>
+      <div class="dl-platform__name">Raspberry Pi</div>
+      <p class="dl-platform__desc">Pi 4B &amp; Pi 5 · 64-bit ARM · AppImage</p>
+      <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-arm64.AppImage"
+         class="dl-platform__btn dl-platform__btn--pi">
+        <span class="dl-platform__btn-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Raspberry Pi
+        </span>
+        <span class="dl-platform__btn-ext">ARM64</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Kiosk App platforms (hidden by default) -->
+  <div id="tab-kiosk" class="dl-platforms" style="display:none">
+    <div class="dl-platform">
+      <div class="dl-platform__icon dl-platform__icon--win">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+      </div>
+      <div class="dl-platform__name">Windows</div>
+      <p class="dl-platform__desc">Windows 10 or later · x64 · NSIS installer</p>
+      <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-Setup.exe"
+         class="dl-platform__btn dl-platform__btn--win">
+        <span class="dl-platform__btn-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Windows
+        </span>
+        <span class="dl-platform__btn-ext">.exe</span>
+      </a>
+    </div>
+
+    <div class="dl-platform">
+      <div class="dl-platform__icon dl-platform__icon--mac">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      </div>
+      <div class="dl-platform__name">macOS</div>
+      <p class="dl-platform__desc">macOS 11 or later · Intel &amp; Apple Silicon</p>
+      <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.dmg"
+         class="dl-platform__btn dl-platform__btn--mac">
+        <span class="dl-platform__btn-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for macOS
+        </span>
+        <span class="dl-platform__btn-ext">.dmg</span>
+      </a>
+    </div>
+
+    <div class="dl-platform">
+      <div class="dl-platform__icon dl-platform__icon--linux">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#64b5f6" aria-hidden="true"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00.11.28c.12.12.289.19.464.19.394 0 .694-.321.644-.714-.06-.44-.01-.9.115-1.386.26-1.023.74-2.003 1.36-2.87.99-1.402 1.73-2.83 1.945-4.403.175-1.29.154-2.578.334-3.852.165-1.174.574-2.24 1.585-2.65.313-.124.67-.176 1.068-.17 1.05-.012 2.222.444 2.97 1.244.73.78 1.1 1.847 1.1 2.98 0 .77-.193 1.574-.523 2.246-.354.717-.866 1.336-1.462 1.83-.86.71-1.8 1.357-2.7 2.027-.9.67-1.6 1.41-1.77 2.275-.068.35-.075.71-.03 1.07.047.347.15.682.3 1.01.3.647.77 1.27 1.315 1.872.54.6 1.13 1.17 1.717 1.714.58.54 1.14 1.05 1.637 1.53.5.485.916.94 1.178 1.375.262.433.38.848.302 1.233-.077.384-.343.697-.74.894-.39.19-.88.27-1.38.19-.49-.077-.97-.3-1.38-.62-.4-.32-.74-.73-.98-1.185-.236-.455-.367-.948-.38-1.45-.013-.5.097-1.008.278-1.495.36-.973 1.01-1.847 1.71-2.697.7-.85 1.44-1.7 1.98-2.576.54-.875.9-1.797.95-2.78.04-.63-.078-1.277-.36-1.878-.282-.6-.73-1.15-1.284-1.574-.553-.424-1.21-.72-1.905-.863C13.37.045 12.93 0 12.504 0z"/></svg>
+      </div>
+      <div class="dl-platform__name">Linux</div>
+      <p class="dl-platform__desc">Ubuntu, Debian, Fedora and more · x64 AppImage</p>
+      <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.AppImage"
+         class="dl-platform__btn dl-platform__btn--linux">
+        <span class="dl-platform__btn-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Linux
+        </span>
+        <span class="dl-platform__btn-ext">.AppImage</span>
+      </a>
+    </div>
+
+    <div class="dl-platform">
+      <div class="dl-platform__icon dl-platform__icon--pi">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="14" x2="22" y2="14"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="14" x2="4" y2="14"/></svg>
+      </div>
+      <div class="dl-platform__name">Raspberry Pi</div>
+      <p class="dl-platform__desc">Pi 4B &amp; Pi 5 · 64-bit ARM · AppImage</p>
+      <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-arm64.AppImage"
+         class="dl-platform__btn dl-platform__btn--pi">
+        <span class="dl-platform__btn-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Raspberry Pi
+        </span>
+        <span class="dl-platform__btn-ext">ARM64</span>
+      </a>
+    </div>
+  </div>
+
+  <p class="dl-source-note">
+    No release yet? <a href="guides/getting-started.html">Run from source</a> (takes about 5 minutes).
+    &nbsp; <a href="https://github.com/JoeMighty/DisplayGrid/releases" target="_blank" rel="noopener">All releases on GitHub</a>
+  </p>
+</div>
+
+<!-- ─── Setup guide ───────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container--narrow">
+    <span class="section__label">Setup guide</span>
+    <h2 class="section__heading">Get up and running in minutes</h2>
+    <p class="section__sub">Follow the steps below for each app. You only need the Server App on one machine. Install the Kiosk App on every display device.</p>
+
+    <div style="display:grid; gap:2.5rem; margin-top:2.5rem;">
+
+      <!-- Server App setup -->
+      <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;">
+        <div style="padding:1.5rem 1.75rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:1rem;">
+          <div style="width:40px; height:40px; background:#1565c0; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><circle cx="18.5" cy="5.5" r="2" fill="#fff" stroke="none" opacity="0.7"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:700; color:var(--text); font-size:1rem;">Server App</div>
+            <div style="font-size:0.8125rem; color:var(--text-dim);">Install once on your server machine (PC, NUC, Pi)</div>
+          </div>
+        </div>
+        <div style="padding:1.5rem 1.75rem;">
+          <ol style="list-style:none; display:flex; flex-direction:column; gap:1.25rem; counter-reset:step;">
+            <li style="display:flex; gap:1rem; counter-increment:step;">
+              <div style="width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">1</div>
+              <div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Download and install</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">Run the installer for your platform. On Linux, make the AppImage executable: <code>chmod +x DisplayGrid-Server.AppImage</code> then double-click it.</div>
+              </div>
+            </li>
+            <li style="display:flex; gap:1rem; counter-increment:step;">
+              <div style="width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">2</div>
+              <div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Wait for the tray icon</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">A DisplayGrid icon appears in your system tray. A notification pops when the server is ready (usually within 10 seconds).</div>
+              </div>
+            </li>
+            <li style="display:flex; gap:1rem; counter-increment:step;">
+              <div style="width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">3</div>
+              <div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Open the dashboard</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">Click the tray icon and select "Open Dashboard". Your browser opens at <code>http://localhost:3000</code>. Complete the first-run setup wizard to create your admin account.</div>
+              </div>
+            </li>
+            <li style="display:flex; gap:1rem; counter-increment:step;">
+              <div style="width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">4</div>
+              <div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Add your first screen</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">Go to Screens, click "+ New Screen", give it a name (and optionally a custom token like <code>lobby</code>). Note the screen token shown in the token modal.</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Kiosk App setup -->
+      <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;">
+        <div style="padding:1.5rem 1.75rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:1rem;">
+          <div style="width:40px; height:40px; background:#1a0d33; border:1px solid #3b1f6e; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:700; color:var(--text); font-size:1rem;">Kiosk App</div>
+            <div style="font-size:0.8125rem; color:var(--text-dim);">Install on each display device (PC, Pi, TV stick)</div>
+          </div>
+        </div>
+        <div style="padding:1.5rem 1.75rem;">
+          <ol style="list-style:none; display:flex; flex-direction:column; gap:1.25rem; counter-reset:step;">
+            <li style="display:flex; gap:1rem;">
+              <div style="width:28px; height:28px; border-radius:50%; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); color:#a855f7; font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">1</div>
+              <div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Download and install on each display device</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">Use the ARM64 AppImage for Raspberry Pi 4B/5. On Linux, run <code>chmod +x DisplayGrid-Kiosk.AppImage</code> before launching.</div>
+              </div>
+            </li>
+            <li style="display:flex; gap:1rem;">
+              <div style="width:28px; height:28px; border-radius:50%; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); color:#a855f7; font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">2</div>
+              <div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Edit the config file</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">On first launch, a config file is created at <code>~/AppData/Roaming/DisplayGrid Kiosk/kiosk-config.json</code> (Windows) or <code>~/.config/DisplayGrid Kiosk/kiosk-config.json</code> (Linux/Pi). Edit it with your server's IP and screen token:</div>
+                <pre style="margin-top:0.5rem; font-size:0.8rem; background:var(--bg-card2); border:1px solid var(--border2); border-radius:6px; padding:0.75rem; overflow-x:auto;"><code>{
+  "apiBase": "http://192.168.1.10:3000",
+  "wsBase":  "ws://192.168.1.10:3001",
+  "screenToken": "lobby"
+}</code></pre>
+              </div>
+            </li>
+            <li style="display:flex; gap:1rem;">
+              <div style="width:28px; height:28px; border-radius:50%; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); color:#a855f7; font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">3</div>
+              <div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Launch the app</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">The kiosk opens fullscreen and connects to your server automatically. If the token matches a screen in the dashboard, it starts playing the assigned playlist immediately.</div>
+              </div>
+            </li>
+            <li style="display:flex; gap:1rem;">
+              <div style="width:28px; height:28px; border-radius:50%; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); color:#a855f7; font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">4</div>
+              <div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Auto-start on boot (optional)</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);"><strong style="color:var(--text);">Windows:</strong> Add a shortcut to <code>shell:startup</code>. <strong style="color:var(--text);">Linux/Pi:</strong> Add to your desktop session autostart or use a systemd <code>--user</code> service. Emergency quit: hold <kbd style="background:var(--bg-card2); border:1px solid var(--border2); border-radius:3px; padding:0.1em 0.35em; font-size:0.85em;">Ctrl+Alt+Q</kbd>.</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ─── Footer ────────────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <a href="index.html" class="footer__brand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="footer__links">
+        <li><a href="guides/getting-started.html">Getting Started</a></li>
+        <li><a href="guides/hardware.html">Hardware</a></li>
+        <li><a href="guides/kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="guides/network-setup.html">Network</a></li>
+        <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+      <p class="footer__copy">MIT licence &middot; <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">JoeMighty</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Tab switching ────────────────────────────────────────────────────────────
+document.querySelectorAll('.dl-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.dl-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const which = tab.dataset.tab;
+    document.getElementById('tab-server').style.display = which === 'server' ? '' : 'none';
+    document.getElementById('tab-kiosk').style.display  = which === 'kiosk'  ? '' : 'none';
+  });
+});
+
+// ── OS detection — highlight the relevant card ───────────────────────────────
+(function () {
+  const ua = navigator.userAgent;
+  let os = null, label = '', cardId = '';
+  if (/Windows/.test(ua))       { os = 'win';   label = 'Windows detected';       cardId = 'card-win-server';   }
+  else if (/Mac OS X/.test(ua)) { os = 'mac';   label = 'macOS detected';         cardId = 'card-mac-server';   }
+  else if (/Linux/.test(ua))    { os = 'linux'; label = 'Linux detected';         cardId = 'card-linux-server'; }
+
+  if (!os) return;
+
+  // Show banner
+  const banner = document.getElementById('dl-detected-banner');
+  document.getElementById('dl-detected-text').textContent = label;
+  banner.style.display = 'inline-flex';
+
+  // Highlight card
+  const card = document.getElementById(cardId);
+  if (card) card.classList.add('recommended');
+})();
+
+// ── Animated canvas (same as main page) ──────────────────────────────────────
+(function () {
+  const canvas = document.getElementById('dl-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CELL = 48, DOT_R = 1.5, GLOW_R = 6, PULSE_COUNT = 5, BEAM_COUNT = 2, FPS_CAP = 50;
+  let W, H, cols, rows, dots, beams, raf, lastT = 0;
+
+  function resize() {
+    W = canvas.offsetWidth; H = canvas.offsetHeight;
+    canvas.width = W * devicePixelRatio; canvas.height = H * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio); init();
+  }
+  function init() {
+    cols = Math.ceil(W / CELL) + 1; rows = Math.ceil(H / CELL) + 1;
+    const offX = (W - (cols - 1) * CELL) / 2, offY = (H - (rows - 1) * CELL) / 2;
+    dots = [];
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+      dots.push({ x: offX + c * CELL, y: offY + r * CELL, pulse: 0, speed: 0, active: false });
+    for (let i = 0; i < PULSE_COUNT; i++) activateDot();
+    beams = [];
+    for (let i = 0; i < BEAM_COUNT; i++) {
+      const row = Math.floor(Math.random() * rows);
+      beams.push({ row, x: Math.random() * W, dir: Math.random() < 0.5 ? 1 : -1,
+        speed: 60 + Math.random() * 80, len: 60 + Math.random() * 80, alpha: 0.3 + Math.random() * 0.3 });
+    }
+  }
+  function activateDot() {
+    const idle = dots.filter(d => !d.active); if (!idle.length) return;
+    const d = idle[Math.floor(Math.random() * idle.length)];
+    d.active = true; d.pulse = 0; d.speed = 0.4 + Math.random() * 0.6;
+  }
+  function draw(ts) {
+    raf = requestAnimationFrame(draw);
+    if (ts - lastT < 1000 / FPS_CAP) return;
+    const dt = Math.min((ts - lastT) / 1000, 0.05); lastT = ts;
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(30,41,59,0.7)'; ctx.lineWidth = 1; ctx.beginPath();
+    for (const d of dots) {
+      if (d.x + CELL <= W) { ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + CELL, d.y); }
+      if (d.y + CELL <= H) { ctx.moveTo(d.x, d.y); ctx.lineTo(d.x, d.y + CELL); }
+    }
+    ctx.stroke();
+    for (const b of beams) {
+      const y = dots.find(d => d.y === dots[b.row * cols]?.y)?.y ?? b.row * CELL;
+      b.x += b.dir * b.speed * dt;
+      if (b.x > W + b.len) b.x = -b.len; if (b.x < -b.len) b.x = W + b.len;
+      const x0 = b.dir > 0 ? b.x - b.len : b.x, x1 = b.dir > 0 ? b.x : b.x + b.len;
+      const g = ctx.createLinearGradient(x0, 0, x1, 0);
+      g.addColorStop(0, 'rgba(59,130,246,0)'); g.addColorStop(0.5, `rgba(59,130,246,${b.alpha})`); g.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.strokeStyle = g; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+    }
+    let reactivate = 0;
+    for (const d of dots) {
+      if (d.active) {
+        d.pulse += d.speed * dt; if (d.pulse >= 1) { d.active = false; d.pulse = 0; reactivate++; continue; }
+        const glow = Math.sin(d.pulse * Math.PI);
+        const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, GLOW_R * 3 * glow);
+        grad.addColorStop(0, `rgba(59,130,246,${0.35 * glow})`); grad.addColorStop(0.5, `rgba(99,102,241,${0.12 * glow})`); grad.addColorStop(1, 'rgba(59,130,246,0)');
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(d.x, d.y, GLOW_R * 3 * glow, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = `rgba(99,179,246,${0.9 * glow + 0.1})`; ctx.beginPath(); ctx.arc(d.x, d.y, DOT_R + GLOW_R * 0.4 * glow, 0, Math.PI * 2); ctx.fill();
+      } else {
+        ctx.fillStyle = 'rgba(51,65,85,0.6)'; ctx.beginPath(); ctx.arc(d.x, d.y, DOT_R, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    for (let i = 0; i < reactivate; i++) activateDot();
+  }
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  resize(); new ResizeObserver(resize).observe(canvas.parentElement); raf = requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

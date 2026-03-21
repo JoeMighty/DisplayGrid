@@ -135,6 +135,12 @@ code:not(pre code) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.nav__cta .btn {
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.875rem;
 }
 
 /* ─── Buttons ────────────────────────────────────────────────────────────── */
@@ -168,8 +174,24 @@ code:not(pre code) {
 
 /* ─── Hero ───────────────────────────────────────────────────────────────── */
 .hero {
+  position: relative;
   text-align: center;
   padding: 6rem 1.5rem 4rem;
+  overflow: hidden;
+}
+
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero > *:not(#hero-canvas) {
+  position: relative;
+  z-index: 1;
 }
 
 .hero__badge {
