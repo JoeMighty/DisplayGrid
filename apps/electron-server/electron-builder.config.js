@@ -60,6 +60,7 @@ module.exports = {
   },
 
   linux: {
+    executableName: 'displaygrid-server',
     target: [
       { target: 'AppImage', arch: ['x64', 'arm64'] },
       { target: 'deb',      arch: ['x64', 'arm64'] },

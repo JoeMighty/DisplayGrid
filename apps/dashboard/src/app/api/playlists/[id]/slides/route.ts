@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 }
 
 // PUT — reorder all slides (bulk update sortOrder)
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

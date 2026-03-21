@@ -46,6 +46,7 @@ module.exports = {
   },
 
   linux: {
+    executableName: 'displaygrid-kiosk',
     target: [
       // x64 for standard PCs, arm64 for Raspberry Pi 4B/5
       { target: 'AppImage', arch: ['x64', 'arm64'] },
