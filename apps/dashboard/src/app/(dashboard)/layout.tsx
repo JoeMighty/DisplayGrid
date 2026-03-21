@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth'
 import { isSetupComplete, getAppName } from '@/lib/settings'
 import Sidebar from '@/components/layout/Sidebar'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardLayout({
   children,
 }: {
