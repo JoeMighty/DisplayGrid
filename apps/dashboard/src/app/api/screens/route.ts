@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db, screens, zones, screenSessions } from '@/lib/db';
-import { eq, and, ne } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { generateScreenToken } from '@/lib/tokens';
 import { DEFAULT_RESOLUTION_W, DEFAULT_RESOLUTION_H, DEFAULT_REFRESH_RATE } from '@displaygrid/shared';
 

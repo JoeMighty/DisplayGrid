@@ -215,7 +215,7 @@ function DropZone({ onFiles }: { onFiles: (files: FileList) => void }) {
 export default function AssetsPage() {
   const [assetList, setAssetList] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
+  const [_uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string[]>([]);
   const [deleting, setDeleting] = useState<number | null>(null);
   const [preview, setPreview] = useState<Asset | null>(null);

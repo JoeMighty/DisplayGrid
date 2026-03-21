@@ -34,7 +34,6 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const playlistId = parseInt(params.id);
   const { order } = await req.json() as { order: number[] };
 
   for (let i = 0; i < order.length; i++) {

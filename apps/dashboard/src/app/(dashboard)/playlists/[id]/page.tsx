@@ -159,10 +159,6 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
     onSave();
   }
 
-  const filteredAssets = assets.filter(a =>
-    contentType === 'asset' ? true : false
-  );
-
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4 py-8 overflow-y-auto">
       <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md p-6 my-auto">

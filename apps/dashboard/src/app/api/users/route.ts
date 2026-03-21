@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db, users } from '@/lib/db';
-import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 
 export async function GET() {
