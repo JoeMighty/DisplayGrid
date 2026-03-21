@@ -24,6 +24,7 @@
         DisplayGrid
       </a>
       <ul class="nav__links">
+        <li><a href="#downloads">Download</a></li>
         <li><a href="guides/getting-started.html">Getting Started</a></li>
         <li><a href="guides/hardware.html">Hardware</a></li>
         <li><a href="guides/kiosk-setup.html">Kiosk Setup</a></li>
@@ -159,6 +160,92 @@
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ─── Downloads ────────────────────────────────────────────────────────── -->
+<section class="section section--alt" id="downloads">
+  <div class="container">
+    <span class="section__label">Standalone apps</span>
+    <h2 class="section__heading">Download &amp; run — no Node.js required</h2>
+    <p class="section__sub">Native installers for every platform. The server app runs in your system tray; the kiosk app boots displays fullscreen with no browser setup.</p>
+
+    <div class="dl-grid">
+      <!-- Server App -->
+      <div class="dl-card">
+        <div class="dl-card__header">
+          <div class="dl-card__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><circle cx="18.5" cy="5.5" r="2" fill="currentColor" stroke="none" opacity="0.5"/></svg>
+          </div>
+          <div>
+            <h3 class="dl-card__title">Server App</h3>
+            <p class="dl-card__sub">Dashboard + WebSocket server — system tray</p>
+          </div>
+        </div>
+        <div class="dl-btns">
+          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-Setup.exe" class="dl-btn dl-btn--win">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+            Windows
+            <span class="dl-btn__ext">.exe</span>
+          </a>
+          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.dmg" class="dl-btn dl-btn--mac">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+            macOS
+            <span class="dl-btn__ext">.dmg</span>
+          </a>
+          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.AppImage" class="dl-btn dl-btn--linux">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00.11.28c.12.12.289.19.464.19.394 0 .694-.321.644-.714-.06-.44-.01-.9.115-1.386.26-1.023.74-2.003 1.36-2.87.99-1.402 1.73-2.83 1.945-4.403.175-1.29.154-2.578.334-3.852.165-1.174.574-2.24 1.585-2.65.313-.124.67-.176 1.068-.17 1.05-.012 2.222.444 2.97 1.244.73.78 1.1 1.847 1.1 2.98 0 .77-.193 1.574-.523 2.246-.354.717-.866 1.336-1.462 1.83-.86.71-1.8 1.357-2.7 2.027-.9.67-1.6 1.41-1.77 2.275-.068.35-.075.71-.03 1.07.047.347.15.682.3 1.01.3.647.77 1.27 1.315 1.872.54.6 1.13 1.17 1.717 1.714.58.54 1.14 1.05 1.637 1.53.5.485.916.94 1.178 1.375.262.433.38.848.302 1.233-.077.384-.343.697-.74.894-.39.19-.88.27-1.38.19-.49-.077-.97-.3-1.38-.62-.4-.32-.74-.73-.98-1.185-.236-.455-.367-.948-.38-1.45-.013-.5.097-1.008.278-1.495.36-.973 1.01-1.847 1.71-2.697.7-.85 1.44-1.7 1.98-2.576.54-.875.9-1.797.95-2.78.04-.63-.078-1.277-.36-1.878-.282-.6-.73-1.15-1.284-1.574-.553-.424-1.21-.72-1.905-.863C13.37.045 12.93 0 12.504 0z"/></svg>
+            Linux
+            <span class="dl-btn__ext">.AppImage</span>
+          </a>
+          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-arm64.AppImage" class="dl-btn dl-btn--pi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="14" x2="22" y2="14"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="14" x2="4" y2="14"/></svg>
+            Raspberry Pi
+            <span class="dl-btn__ext">ARM64</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Kiosk App -->
+      <div class="dl-card">
+        <div class="dl-card__header">
+          <div class="dl-card__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          </div>
+          <div>
+            <h3 class="dl-card__title">Kiosk App</h3>
+            <p class="dl-card__sub">Display client — fullscreen, no browser needed</p>
+          </div>
+        </div>
+        <div class="dl-btns">
+          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-Setup.exe" class="dl-btn dl-btn--win">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+            Windows
+            <span class="dl-btn__ext">.exe</span>
+          </a>
+          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.dmg" class="dl-btn dl-btn--mac">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+            macOS
+            <span class="dl-btn__ext">.dmg</span>
+          </a>
+          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.AppImage" class="dl-btn dl-btn--linux">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00.11.28c.12.12.289.19.464.19.394 0 .694-.321.644-.714-.06-.44-.01-.9.115-1.386.26-1.023.74-2.003 1.36-2.87.99-1.402 1.73-2.83 1.945-4.403.175-1.29.154-2.578.334-3.852.165-1.174.574-2.24 1.585-2.65.313-.124.67-.176 1.068-.17 1.05-.012 2.222.444 2.97 1.244.73.78 1.1 1.847 1.1 2.98 0 .77-.193 1.574-.523 2.246-.354.717-.866 1.336-1.462 1.83-.86.71-1.8 1.357-2.7 2.027-.9.67-1.6 1.41-1.77 2.275-.068.35-.075.71-.03 1.07.047.347.15.682.3 1.01.3.647.77 1.27 1.315 1.872.54.6 1.13 1.17 1.717 1.714.58.54 1.14 1.05 1.637 1.53.5.485.916.94 1.178 1.375.262.433.38.848.302 1.233-.077.384-.343.697-.74.894-.39.19-.88.27-1.38.19-.49-.077-.97-.3-1.38-.62-.4-.32-.74-.73-.98-1.185-.236-.455-.367-.948-.38-1.45-.013-.5.097-1.008.278-1.495.36-.973 1.01-1.847 1.71-2.697.7-.85 1.44-1.7 1.98-2.576.54-.875.9-1.797.95-2.78.04-.63-.078-1.277-.36-1.878-.282-.6-.73-1.15-1.284-1.574-.553-.424-1.21-.72-1.905-.863C13.37.045 12.93 0 12.504 0z"/></svg>
+            Linux
+            <span class="dl-btn__ext">.AppImage</span>
+          </a>
+          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-arm64.AppImage" class="dl-btn dl-btn--pi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="14" x2="22" y2="14"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="14" x2="4" y2="14"/></svg>
+            Raspberry Pi
+            <span class="dl-btn__ext">ARM64</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <p class="dl-note">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Files are available once a release is published. Until then, <a href="guides/getting-started.html">run from source</a> — it only takes a few minutes.
+    </p>
   </div>
 </section>
 

@@ -12,9 +12,35 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 [![pnpm](https://img.shields.io/badge/pnpm-9-orange.svg)](https://pnpm.io)
 [![SQLite](https://img.shields.io/badge/database-SQLite-lightblue.svg)](https://sqlite.org)
 
-**[Website](https://joemighty.github.io/DisplayGrid/) · [Setup Guide](docs/SETUP.md) · [Report a Bug](https://github.com/JoeMighty/DisplayGrid/issues)**
+**[Website](https://joemighty.github.io/DisplayGrid/) · [Download](https://github.com/JoeMighty/DisplayGrid/releases/latest) · [Setup Guide](docs/SETUP.md) · [Report a Bug](https://github.com/JoeMighty/DisplayGrid/issues)**
 
 </div>
+
+---
+
+## Downloads
+
+Native installers are published automatically on each release via GitHub Actions.
+
+### Server App — Dashboard + WebSocket server (system tray)
+
+| Platform | Download |
+|----------|----------|
+| Windows | [DisplayGrid-Server-Setup.exe](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-Setup.exe) |
+| macOS | [DisplayGrid-Server.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.dmg) |
+| Linux x64 | [DisplayGrid-Server.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.AppImage) |
+| Linux ARM64 (Raspberry Pi 4B/5) | [DisplayGrid-Server-arm64.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-arm64.AppImage) |
+
+### Kiosk App — Fullscreen display client
+
+| Platform | Download |
+|----------|----------|
+| Windows | [DisplayGrid-Kiosk-Setup.exe](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-Setup.exe) |
+| macOS | [DisplayGrid-Kiosk.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.dmg) |
+| Linux x64 | [DisplayGrid-Kiosk.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.AppImage) |
+| Linux ARM64 (Raspberry Pi 4B/5) | [DisplayGrid-Kiosk-arm64.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-arm64.AppImage) |
+
+> No release published yet? [Run from source](#quick-start) — it only takes a few minutes.
 
 ---
 

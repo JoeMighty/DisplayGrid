@@ -105,6 +105,9 @@ function ScreenFormModal({ screen, zones, onSave, onClose }: {
   const [panelGridCols, setPanelGridCols] = useState(screen?.panelGridCols ?? 1);
   const [panelGridRows, setPanelGridRows] = useState(screen?.panelGridRows ?? 1);
   const [colourProfile, setColourProfile] = useState(screen?.colourProfile ?? 'srgb');
+  const [tokenMode, setTokenMode] = useState<'auto' | 'custom'>('auto');
+  const [customToken, setCustomToken] = useState(screen?.token ?? '');
+  const [regenerateToken, setRegenerateToken] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -134,6 +137,8 @@ function ScreenFormModal({ screen, zones, onSave, onClose }: {
         name, zoneId: zoneId ? parseInt(zoneId) : null,
         resolutionW, resolutionH, refreshRate, rotation,
         panelGridCols, panelGridRows, colourProfile,
+        customToken: tokenMode === 'custom' ? customToken : undefined,
+        regenerateToken: screen && regenerateToken ? true : undefined,
       }),
     });
     setLoading(false);
@@ -149,6 +154,64 @@ function ScreenFormModal({ screen, zones, onSave, onClose }: {
         <FieldRow label="Name">
           <input value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Lobby Left" className={inputCls} />
         </FieldRow>
+
+        {/* Token */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+            Screen Token
+          </label>
+          {screen ? (
+            // Edit mode: show current token with change options
+            <div className="space-y-2">
+              <div className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 flex items-center gap-2">
+                <code className="text-xs text-blue-300 font-mono flex-1 truncate">{customToken || screen.token}</code>
+                <span className="text-xs text-gray-600 shrink-0">current</span>
+              </div>
+              <div className="flex gap-3 text-sm">
+                <label className="flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-200">
+                  <input type="radio" name="tokenMode" checked={!regenerateToken && tokenMode === 'auto'} onChange={() => { setRegenerateToken(false); setTokenMode('auto'); setCustomToken(screen.token); }} className="accent-blue-500" />
+                  Keep current
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-200">
+                  <input type="radio" name="tokenMode" checked={!regenerateToken && tokenMode === 'custom'} onChange={() => { setRegenerateToken(false); setTokenMode('custom'); setCustomToken(''); }} className="accent-blue-500" />
+                  Set custom
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-200">
+                  <input type="radio" name="tokenMode" checked={regenerateToken} onChange={() => { setRegenerateToken(true); setTokenMode('auto'); }} className="accent-blue-500" />
+                  Regenerate
+                </label>
+              </div>
+              {!regenerateToken && tokenMode === 'custom' && (
+                <input value={customToken} onChange={e => setCustomToken(e.target.value.toLowerCase().replace(/[^a-z0-9\-_]/g, ''))}
+                  placeholder="e.g. lobby-left, reception, screen-1" className={inputCls} />
+              )}
+            </div>
+          ) : (
+            // Create mode: auto or custom
+            <div className="space-y-2">
+              <div className="flex gap-4 text-sm">
+                <label className="flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-200">
+                  <input type="radio" name="tokenMode" checked={tokenMode === 'auto'} onChange={() => setTokenMode('auto')} className="accent-blue-500" />
+                  Auto-generate
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-gray-400 hover:text-gray-200">
+                  <input type="radio" name="tokenMode" checked={tokenMode === 'custom'} onChange={() => setTokenMode('custom')} className="accent-blue-500" />
+                  Custom token
+                </label>
+              </div>
+              {tokenMode === 'auto' && (
+                <p className="text-xs text-gray-600">A secure random token will be generated automatically.</p>
+              )}
+              {tokenMode === 'custom' && (
+                <input value={customToken} onChange={e => setCustomToken(e.target.value.toLowerCase().replace(/[^a-z0-9\-_]/g, ''))}
+                  placeholder="e.g. lobby-left, reception, screen-1" className={inputCls} />
+              )}
+              {tokenMode === 'custom' && (
+                <p className="text-xs text-gray-600">Letters, numbers, hyphens, underscores only. Min 2 characters.</p>
+              )}
+            </div>
+          )}
+        </div>
 
         <FieldRow label="Zone">
           <select value={zoneId} onChange={e => setZoneId(e.target.value)} className={selectCls}>
