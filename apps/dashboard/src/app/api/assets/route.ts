@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
   const ext     = path.extname(file.name) || '.bin';
   const stem    = crypto.randomBytes(12).toString('hex');
-  const buffer  = Buffer.from(await file.arrayBuffer());
+  const buffer  = Buffer.from(await file.arrayBuffer()) as Buffer;
 
   let finalBuffer = buffer;
   let finalMime   = mimeType;
