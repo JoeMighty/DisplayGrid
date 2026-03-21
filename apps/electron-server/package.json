@@ -1,0 +1,23 @@
+{
+  "name": "@displaygrid/electron-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DisplayGrid server — runs the dashboard and WebSocket server in your system tray",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build:next": "pnpm --filter @displaygrid/dashboard build",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "dependencies": {
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}

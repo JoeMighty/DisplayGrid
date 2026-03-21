@@ -1,0 +1,21 @@
+{
+  "name": "@displaygrid/electron-kiosk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DisplayGrid kiosk — fullscreen display client for signage screens",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build:client": "pnpm --filter @displaygrid/display-client build",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux",
+    "dist:arm64": "electron-builder --linux --arm64"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}

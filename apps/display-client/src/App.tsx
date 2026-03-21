@@ -4,9 +4,14 @@ import KioskLock from './KioskLock';
 import { useWS } from './useWS';
 import { HEARTBEAT_INTERVAL_MS, FALLBACK_POLL_MS, DEFAULT_KIOSK_KEY_COMBO, KIOSK_COMBO_HOLD_MS } from '@displaygrid/shared';
 
-const API_BASE    = import.meta.env.VITE_API_BASE    ?? '';
-const WS_BASE     = import.meta.env.VITE_WS_BASE     ?? 'ws://localhost:3001';
-const SCREEN_TOKEN = import.meta.env.VITE_SCREEN_TOKEN ?? '';
+// When running inside the Electron kiosk app, the preload script exposes
+// window.__displaygrid with runtime config (server URL, token, etc.).
+// Fall back to Vite env vars for browser / dev mode.
+const _elCfg = (typeof window !== 'undefined' && (window as any).__displaygrid) || {};
+
+const API_BASE    = _elCfg.apiBase     ?? import.meta.env.VITE_API_BASE    ?? '';
+const WS_BASE     = _elCfg.wsBase      ?? import.meta.env.VITE_WS_BASE     ?? 'ws://localhost:3001';
+const SCREEN_TOKEN = _elCfg.screenToken ?? import.meta.env.VITE_SCREEN_TOKEN ?? '';
 
 type AppState = 'setup' | 'loading' | 'playing' | 'error';
 

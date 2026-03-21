@@ -1,0 +1,63 @@
+/**
+ * electron-builder configuration for DisplayGrid Kiosk app.
+ *
+ * Before building, run:
+ *   pnpm --filter @displaygrid/display-client build
+ *
+ * The built display-client (apps/display-client/dist/) is bundled as
+ * extra resources under "renderer/".
+ */
+
+const path = require('path');
+
+const ROOT = path.resolve(__dirname, '../..');
+
+/** @type {import('electron-builder').Configuration} */
+module.exports = {
+  appId: 'io.displaygrid.kiosk',
+  productName: 'DisplayGrid Kiosk',
+  copyright: 'Copyright © 2024 JoeMighty',
+
+  directories: {
+    output: path.join(ROOT, 'dist/electron-kiosk'),
+    buildResources: path.join(__dirname, 'build-resources'),
+  },
+
+  // Bundle the built Vite display-client as renderer resources
+  extraResources: [
+    {
+      from: path.join(ROOT, 'apps/display-client/dist'),
+      to: 'renderer',
+      filter: ['**/*'],
+    },
+  ],
+
+  win: {
+    target: [{ target: 'nsis', arch: ['x64'] }],
+    icon: path.join(__dirname, 'build-resources/icon.ico'),
+  },
+
+  mac: {
+    target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],
+    icon: path.join(__dirname, 'build-resources/icon.icns'),
+    category: 'public.app-category.utilities',
+  },
+
+  linux: {
+    target: [
+      // x64 for standard PCs, arm64 for Raspberry Pi 4B/5
+      { target: 'AppImage', arch: ['x64', 'arm64'] },
+      { target: 'deb',      arch: ['x64', 'arm64'] },
+    ],
+    icon: path.join(__dirname, 'build-resources/icon.png'),
+    category: 'Utility',
+  },
+
+  nsis: {
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
+    createDesktopShortcut: true,
+    createStartMenuShortcut: true,
+    runAfterFinish: true,
+  },
+};

@@ -62,10 +62,10 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 - **LED wall support:** define panel grids (e.g. 3×2) for tiled display configurations
 - **Multi-zone layouts:** split a screen into independently controlled regions, each with its own playlist
 - **Time-based scheduling:** restrict slides to specific days and time windows; server re-evaluates every minute
+- **Standalone apps:** native installers for Windows, macOS, and Linux — a tray-based server app manages the dashboard and WebSocket server; a dedicated kiosk app runs displays fullscreen with no browser configuration required; ARM64 AppImage for Raspberry Pi 4B/5
 
 ### Coming Soon
 
-- **Standalone apps:** native installers for Windows, macOS, and Linux — a tray-based server app manages the dashboard and WebSocket server, and a dedicated kiosk app runs displays fullscreen with no browser configuration required. ARM64 support for Raspberry Pi 4B/5 included.
 - **NDI source support:** stream live video from NDI devices on the network directly to any display
 
 ---
