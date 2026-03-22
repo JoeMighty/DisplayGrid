@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raspberry Pi Setup — DisplayGrid</title>
+  <meta name="description" content="Set up DisplayGrid on a Raspberry Pi 4B or Pi 5 as a fullscreen kiosk display. Covers OS configuration, Chromium autostart, and auto-login." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="../index.html" class="nav__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="nav__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+      </ul>
+      <div class="nav__cta">
+        <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="container--narrow">
+    <span class="section__label">Guide</span>
+    <h1>Raspberry Pi Setup</h1>
+    <p>Turn a Raspberry Pi 4B or Pi 5 into a dedicated fullscreen display — no keyboard, no desktop, just your signage content from boot.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="guide-layout">
+
+    <aside class="guide-toc">
+      <p class="guide-toc__title">On this page</p>
+      <ul class="guide-toc__links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#requirements">Requirements</a></li>
+        <li><a href="#os-setup">OS setup</a></li>
+        <li><a href="#auto-login">Auto-login</a></li>
+        <li><a href="#kiosk-autostart">Kiosk autostart</a></li>
+        <li><a href="#hide-cursor">Hide the cursor</a></li>
+        <li><a href="#disable-screensaver">Disable screensaver</a></li>
+        <li><a href="#watchdog">Auto-restart on crash</a></li>
+        <li><a href="#tips">Tips &amp; troubleshooting</a></li>
+      </ul>
+    </aside>
+
+    <article class="guide-body">
+
+      <h2 id="overview">Overview</h2>
+      <p>On Raspberry Pi, DisplayGrid uses <strong>Chromium in kiosk mode</strong> rather than the standalone Electron app. This gives excellent performance on ARM hardware with no extra installation — Chromium ships with Raspberry Pi OS by default.</p>
+      <p>The architecture is simple:</p>
+      <ul>
+        <li><strong>Server machine</strong> (any PC, Mac, or Linux box): runs the <a href="../download.html">DisplayGrid Server App</a>, which hosts the dashboard and WebSocket server.</li>
+        <li><strong>Raspberry Pi</strong>: boots straight into Chromium pointing at your server, displaying your signage content fullscreen.</li>
+      </ul>
+
+      <div class="callout">
+        <p>The Pi and the server must be on the same network. Note the server machine's local IP address — you'll need it below.</p>
+      </div>
+
+      <h2 id="requirements">Requirements</h2>
+      <ul>
+        <li>Raspberry Pi 4B (2 GB RAM minimum) or Raspberry Pi 5</li>
+        <li>Raspberry Pi OS (64-bit) — Bookworm or later recommended</li>
+        <li>MicroSD card (16 GB or larger, Class 10 / A1)</li>
+        <li>HDMI display and power supply</li>
+        <li>Network connection (Ethernet recommended for reliability)</li>
+      </ul>
+
+      <h2 id="os-setup">OS setup</h2>
+      <p>Flash <strong>Raspberry Pi OS Lite (64-bit)</strong> or the full desktop image using <a href="https://www.raspberrypi.com/software/" target="_blank" rel="noopener">Raspberry Pi Imager</a>. The Lite image uses fewer resources and is recommended for dedicated kiosks.</p>
+
+      <div class="callout callout--warn">
+        <p>Use the <strong>64-bit</strong> OS image. The 32-bit version won't run modern Chromium properly on Pi 4/5.</p>
+      </div>
+
+      <p>During imaging, click the settings gear and configure:</p>
+      <ul>
+        <li>Hostname (e.g. <code>displaygrid-kiosk</code>)</li>
+        <li>Wi-Fi credentials (or use Ethernet)</li>
+        <li>Enable SSH for remote management</li>
+        <li>Set username/password</li>
+      </ul>
+
+      <p>After first boot, update the system:</p>
+      <pre><code>sudo apt update && sudo apt upgrade -y</code></pre>
+
+      <p>Install Chromium and any missing dependencies:</p>
+      <pre><code>sudo apt install -y chromium-browser unclutter</code></pre>
+
+      <h2 id="auto-login">Auto-login to desktop</h2>
+      <p>The Pi needs to log in automatically so the kiosk can start without a keyboard.</p>
+
+      <h3>Using raspi-config (easiest)</h3>
+      <pre><code>sudo raspi-config</code></pre>
+      <p>Navigate to <strong>System Options → Boot / Auto Login → Desktop Autologin</strong> and confirm.</p>
+
+      <h3>Using the Lite image (console autologin + X server)</h3>
+      <p>Install a minimal X server:</p>
+      <pre><code>sudo apt install -y --no-install-recommends xserver-xorg x11-xserver-utils openbox</code></pre>
+      <p>Enable console autologin:</p>
+      <pre><code>sudo raspi-config nonint do_boot_behaviour B2</code></pre>
+
+      <h2 id="kiosk-autostart">Kiosk autostart</h2>
+      <p>Replace <code>192.168.1.10:3000</code> with your server's actual IP and port throughout.</p>
+
+      <h3>Raspberry Pi OS Desktop (LXDE / Wayland)</h3>
+      <p>Edit the LXDE autostart file:</p>
+      <pre><code>mkdir -p ~/.config/lxsession/LXDE-pi
+nano ~/.config/lxsession/LXDE-pi/autostart</code></pre>
+
+      <p>Add these lines:</p>
+      <pre><code>@xset s off
+@xset -dpms
+@xset s noblank
+@chromium-browser \
+  --kiosk \
+  --noerrdialogs \
+  --disable-infobars \
+  --disable-session-crashed-bubble \
+  --autoplay-policy=no-user-gesture-required \
+  --disable-features=TranslateUI \
+  http://192.168.1.10:3000</code></pre>
+
+      <h3>Minimal / headless (Openbox + systemd)</h3>
+      <p>Create an Openbox autostart:</p>
+      <pre><code>mkdir -p ~/.config/openbox
+nano ~/.config/openbox/autostart</code></pre>
+      <pre><code>xset s off
+xset -dpms
+xset s noblank
+chromium-browser \
+  --kiosk \
+  --noerrdialogs \
+  --disable-infobars \
+  --disable-session-crashed-bubble \
+  --autoplay-policy=no-user-gesture-required \
+  http://192.168.1.10:3000 &</code></pre>
+
+      <p>Create a systemd service to start X on boot at <code>~/.config/systemd/user/kiosk.service</code>:</p>
+      <pre><code>[Unit]
+Description=DisplayGrid Kiosk
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Environment=DISPLAY=:0
+ExecStartPre=/bin/sleep 3
+ExecStart=startx /usr/bin/openbox-session
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target</code></pre>
+
+      <pre><code>systemctl --user enable kiosk
+systemctl --user start kiosk</code></pre>
+
+      <h2 id="hide-cursor">Hide the mouse cursor</h2>
+      <p>Add <code>unclutter</code> to your autostart so the cursor disappears after 1 second of inactivity:</p>
+      <pre><code># In your autostart file, add:
+@unclutter -idle 1 -root</code></pre>
+      <p>Or if using Openbox:</p>
+      <pre><code>unclutter -idle 1 -root &</code></pre>
+
+      <h2 id="disable-screensaver">Disable screensaver &amp; blanking</h2>
+      <p>The <code>xset</code> commands in the autostart above handle this. If you're still getting a blank screen, also edit <code>/etc/lightdm/lightdm.conf</code> (if using LightDM) and add:</p>
+      <pre><code>[Seat:*]
+xserver-command=X -s 0 -dpms</code></pre>
+
+      <p>For Raspberry Pi OS Bookworm with Wayland (labwc), disable the compositor screensaver:</p>
+      <pre><code>sudo nano /etc/xdg/labwc/rc.xml</code></pre>
+      <p>Set <code>&lt;screenSaverTimeout&gt;0&lt;/screenSaverTimeout&gt;</code> inside the <code>&lt;core&gt;</code> block.</p>
+
+      <h2 id="watchdog">Auto-restart on crash</h2>
+      <p>Add a Chromium crash watchdog by wrapping the browser in a loop inside your autostart:</p>
+      <pre><code># chromium-watchdog.sh
+#!/bin/bash
+while true; do
+  chromium-browser \
+    --kiosk \
+    --noerrdialogs \
+    --disable-infobars \
+    --autoplay-policy=no-user-gesture-required \
+    http://192.168.1.10:3000
+  sleep 2
+done</code></pre>
+
+      <pre><code>chmod +x ~/chromium-watchdog.sh</code></pre>
+
+      <p>Then in your autostart, call the script instead of Chromium directly:</p>
+      <pre><code>@bash /home/pi/chromium-watchdog.sh</code></pre>
+
+      <h2 id="tips">Tips &amp; troubleshooting</h2>
+
+      <h3>Pi shows "Connection refused" on boot</h3>
+      <p>The Pi is booting faster than the server. Add a short delay before Chromium launches:</p>
+      <pre><code># At the top of your autostart:
+@sleep 10</code></pre>
+      <p>Or use the <code>Wants=network-online.target</code> in your systemd unit to wait for the network.</p>
+
+      <h3>Screen is rotated</h3>
+      <p>Add to <code>/boot/config.txt</code> (or <code>/boot/firmware/config.txt</code> on Bookworm):</p>
+      <pre><code># 0 = normal, 1 = 90°, 2 = 180°, 3 = 270°
+display_rotate=1</code></pre>
+
+      <h3>4K display runs slowly</h3>
+      <p>In <code>/boot/firmware/config.txt</code>, limit the framebuffer and enable hardware acceleration:</p>
+      <pre><code>dtoverlay=vc4-kms-v3d
+max_framebuffers=2</code></pre>
+      <p>On Pi 4, also try forcing 1080p output if the display supports it — full 4K decoding is CPU-heavy.</p>
+
+      <h3>Chromium shows "Restore pages?" dialog</h3>
+      <p>Add <code>--disable-session-crashed-bubble</code> and <code>--restore-last-session</code> flags, or delete the Chromium profile before launch:</p>
+      <pre><code>rm -f ~/.config/chromium/Default/Preferences
+rm -f ~/.config/chromium/SingletonLock</code></pre>
+
+      <h3>Use the screen token for zero-touch setup</h3>
+      <p>Append the screen token as a URL parameter so the Pi boots straight into the player without showing the token entry screen:</p>
+      <pre><code>http://192.168.1.10:3000/display?token=YOUR_SCREEN_TOKEN</code></pre>
+      <p>Get the token from the dashboard: <strong>Screens → your screen → key icon → Copy token</strong>.</p>
+
+    </article>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:4rem;">
+  <div class="container">
+    <div class="footer__inner">
+      <a href="../index.html" class="footer__brand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        DisplayGrid
+      </a>
+      <ul class="footer__links">
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+        <li><a href="network-setup.html">Network</a></li>
+        <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+      <p class="footer__copy">MIT licence &middot; <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">JoeMighty</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
