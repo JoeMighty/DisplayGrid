@@ -17,6 +17,7 @@ module.exports = {
   appId: 'io.displaygrid.server',
   productName: 'DisplayGrid Server',
   copyright: 'Copyright © 2024 JoeMighty',
+  publish: null,
 
   directories: {
     output: path.join(ROOT, 'dist/electron-server'),

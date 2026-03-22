@@ -17,6 +17,7 @@ module.exports = {
   appId: 'io.displaygrid.kiosk',
   productName: 'DisplayGrid Kiosk',
   copyright: 'Copyright © 2024 JoeMighty',
+  publish: null,
 
   directories: {
     output: path.join(ROOT, 'dist/electron-kiosk'),
