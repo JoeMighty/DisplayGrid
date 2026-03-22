@@ -47,6 +47,7 @@ module.exports = {
 
   linux: {
     executableName: 'displaygrid-kiosk',
+    maintainer: 'JoeMighty <noreply@displaygrid.io>',
     target: [
       { target: 'AppImage', arch: ['x64'] },
       { target: 'deb',      arch: ['x64'] },

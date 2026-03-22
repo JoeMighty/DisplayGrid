@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "description": "DisplayGrid server — runs the dashboard and WebSocket server in your system tray",
+  "author": {
+    "name": "JoeMighty",
+    "email": "noreply@displaygrid.io"
+  },
+  "homepage": "https://github.com/JoeMighty/DisplayGrid",
   "main": "electron/main.js",
   "scripts": {
     "dev": "electron .",
