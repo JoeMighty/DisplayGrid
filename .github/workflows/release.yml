@@ -32,15 +32,21 @@ jobs:
           NEXTAUTH_URL: http://localhost:3000
           DB_PATH: /tmp/displaygrid.db
 
+      - name: Stage dashboard build
+        run: |
+          mkdir -p /tmp/dashboard-stage/standalone
+          mkdir -p /tmp/dashboard-stage/static
+          mkdir -p /tmp/dashboard-stage/public
+          cp -r apps/dashboard/.next/standalone/. /tmp/dashboard-stage/standalone/
+          cp -r apps/dashboard/.next/static/. /tmp/dashboard-stage/static/
+          cp -r apps/dashboard/public/. /tmp/dashboard-stage/public/
+          cp apps/dashboard/ws-server.js /tmp/dashboard-stage/ws-server.js
+
       - name: Upload dashboard build
         uses: actions/upload-artifact@v4
         with:
           name: dashboard-build
-          path: |
-            apps/dashboard/.next/standalone/
-            apps/dashboard/.next/static/
-            apps/dashboard/public/
-            apps/dashboard/ws-server.js
+          path: /tmp/dashboard-stage/
           retention-days: 1
 
   # ── Build display client (Vite) ────────────────────────────────────────────
@@ -105,27 +111,25 @@ jobs:
           name: dashboard-build
           path: apps/dashboard-build/
 
-      # Copy standalone build into expected locations for electron-builder
-      # The artifact preserves the apps/dashboard/ prefix, so paths are:
-      # apps/dashboard-build/apps/dashboard/.next/standalone/ etc.
+      # Copy staged build into expected locations for electron-builder
       - name: Prepare resources (Unix)
         if: runner.os != 'Windows'
         run: |
           mkdir -p apps/dashboard/.next
-          cp -r apps/dashboard-build/apps/dashboard/.next/standalone/. apps/dashboard/.next/standalone/
-          cp -r apps/dashboard-build/apps/dashboard/.next/static/. apps/dashboard/.next/static/
-          cp -r apps/dashboard-build/apps/dashboard/public/. apps/dashboard/public/
-          cp apps/dashboard-build/apps/dashboard/ws-server.js apps/dashboard/ws-server.js
+          cp -r apps/dashboard-build/standalone/. apps/dashboard/.next/standalone/
+          cp -r apps/dashboard-build/static/. apps/dashboard/.next/static/
+          cp -r apps/dashboard-build/public/. apps/dashboard/public/
+          cp apps/dashboard-build/ws-server.js apps/dashboard/ws-server.js
 
       - name: Prepare resources (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path apps/dashboard/.next
-          Copy-Item -Recurse -Force apps/dashboard-build/apps/dashboard/.next/standalone/* apps/dashboard/.next/standalone/
-          Copy-Item -Recurse -Force apps/dashboard-build/apps/dashboard/.next/static/* apps/dashboard/.next/static/
-          Copy-Item -Recurse -Force apps/dashboard-build/apps/dashboard/public/* apps/dashboard/public/
-          Copy-Item -Force apps/dashboard-build/apps/dashboard/ws-server.js apps/dashboard/ws-server.js
+          Copy-Item -Recurse -Force apps/dashboard-build/standalone/* apps/dashboard/.next/standalone/
+          Copy-Item -Recurse -Force apps/dashboard-build/static/* apps/dashboard/.next/static/
+          Copy-Item -Recurse -Force apps/dashboard-build/public/* apps/dashboard/public/
+          Copy-Item -Force apps/dashboard-build/ws-server.js apps/dashboard/ws-server.js
 
       - name: Build Server App
         working-directory: apps/electron-server
