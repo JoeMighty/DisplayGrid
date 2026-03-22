@@ -35,11 +35,13 @@ module.exports = {
   win: {
     target: [{ target: 'nsis', arch: ['x64'] }],
     artifactName: 'DisplayGrid-Kiosk-Setup.${ext}',
+    icon: path.join(__dirname, 'build-resources/icon.png'),
   },
 
   mac: {
     target: [{ target: 'dmg', arch: ['universal'] }],
     artifactName: 'DisplayGrid-Kiosk.${ext}',
+    icon: path.join(__dirname, 'build-resources/icon.png'),
     category: 'public.app-category.utilities',
   },
 
@@ -50,6 +52,7 @@ module.exports = {
       { target: 'deb',      arch: ['x64'] },
     ],
     artifactName: 'DisplayGrid-Kiosk-${arch}.${ext}',
+    icon: path.join(__dirname, 'build-resources/icon.png'),
     category: 'Utility',
   },
 
