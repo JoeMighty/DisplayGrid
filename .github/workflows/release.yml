@@ -134,7 +134,7 @@ jobs:
 
       - name: Build Server App
         working-directory: apps/electron-server
-        run: npx electron-builder --${{ matrix.platform }} --publish never
+        run: npx electron-builder --${{ matrix.platform }} --config electron-builder.config.js --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPIMAGE_EXTRACT_AND_RUN: 1
@@ -188,7 +188,7 @@ jobs:
 
       - name: Build Kiosk App
         working-directory: apps/electron-kiosk
-        run: npx electron-builder --${{ matrix.platform }} --publish never
+        run: npx electron-builder --${{ matrix.platform }} --config electron-builder.config.js --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPIMAGE_EXTRACT_AND_RUN: 1
