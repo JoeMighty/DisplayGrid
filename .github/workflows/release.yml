@@ -39,7 +39,7 @@ jobs:
           mkdir -p /tmp/dashboard-stage/public
           cp -r apps/dashboard/.next/standalone/. /tmp/dashboard-stage/standalone/
           cp -r apps/dashboard/.next/static/. /tmp/dashboard-stage/static/
-          cp -r apps/dashboard/public/. /tmp/dashboard-stage/public/
+          [ -d apps/dashboard/public ] && cp -r apps/dashboard/public/. /tmp/dashboard-stage/public/ || true
           cp apps/dashboard/ws-server.js /tmp/dashboard-stage/ws-server.js
 
       - name: Upload dashboard build
@@ -126,9 +126,10 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path apps/dashboard/.next
+          New-Item -ItemType Directory -Force -Path apps/dashboard/public
           Copy-Item -Recurse -Force apps/dashboard-build/standalone/* apps/dashboard/.next/standalone/
           Copy-Item -Recurse -Force apps/dashboard-build/static/* apps/dashboard/.next/static/
-          Copy-Item -Recurse -Force apps/dashboard-build/public/* apps/dashboard/public/
+          if (Test-Path apps/dashboard-build/public/*) { Copy-Item -Recurse -Force apps/dashboard-build/public/* apps/dashboard/public/ }
           Copy-Item -Force apps/dashboard-build/ws-server.js apps/dashboard/ws-server.js
 
       - name: Build Server App
