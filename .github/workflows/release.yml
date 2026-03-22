@@ -118,7 +118,7 @@ jobs:
           mkdir -p apps/dashboard/.next
           cp -r apps/dashboard-build/standalone/. apps/dashboard/.next/standalone/
           cp -r apps/dashboard-build/static/. apps/dashboard/.next/static/
-          cp -r apps/dashboard-build/public/. apps/dashboard/public/
+          [ -d apps/dashboard-build/public ] && cp -r apps/dashboard-build/public/. apps/dashboard/public/ || true
           cp apps/dashboard-build/ws-server.js apps/dashboard/ws-server.js
 
       - name: Prepare resources (Windows)
@@ -137,6 +137,7 @@ jobs:
         run: npx electron-builder --${{ matrix.platform }} --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPIMAGE_EXTRACT_AND_RUN: 1
 
       - name: Upload Server App artifacts
         uses: actions/upload-artifact@v4
@@ -190,6 +191,7 @@ jobs:
         run: npx electron-builder --${{ matrix.platform }} --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPIMAGE_EXTRACT_AND_RUN: 1
 
       - name: Upload Kiosk App artifacts
         uses: actions/upload-artifact@v4
