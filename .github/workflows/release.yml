@@ -125,7 +125,8 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path apps/dashboard/.next
+          New-Item -ItemType Directory -Force -Path apps/dashboard/.next/standalone
+          New-Item -ItemType Directory -Force -Path apps/dashboard/.next/static
           New-Item -ItemType Directory -Force -Path apps/dashboard/public
           Copy-Item -Recurse -Force apps/dashboard-build/standalone/* apps/dashboard/.next/standalone/
           Copy-Item -Recurse -Force apps/dashboard-build/static/* apps/dashboard/.next/static/
