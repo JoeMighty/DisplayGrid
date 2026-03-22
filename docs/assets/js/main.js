@@ -190,6 +190,39 @@
   updateActive();
 })();
 
+// ─── Nav dropdown ─────────────────────────────────────────────────────────────
+(function () {
+  const wraps = document.querySelectorAll('.nav__dropdown-wrap');
+  if (!wraps.length) return;
+
+  function closeAll() {
+    wraps.forEach(w => {
+      w.classList.remove('open');
+      const t = w.querySelector('.nav__dropdown-trigger');
+      if (t) { t.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    });
+  }
+
+  wraps.forEach(wrap => {
+    const trigger = wrap.querySelector('.nav__dropdown-trigger');
+    if (!trigger) return;
+
+    trigger.addEventListener('click', e => {
+      e.stopPropagation();
+      const isOpen = wrap.classList.contains('open');
+      closeAll();
+      if (!isOpen) {
+        wrap.classList.add('open');
+        trigger.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  document.addEventListener('click', closeAll);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+})();
+
 // ─── Smooth-scroll anchor links ───────────────────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {

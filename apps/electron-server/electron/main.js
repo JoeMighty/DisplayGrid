@@ -29,7 +29,7 @@ let wsProcess   = null;
 function spawnNext() {
   const serverJs = isDev
     ? resPath('apps/dashboard/.next/standalone/server.js')
-    : resPath('server.js');
+    : resPath('apps/dashboard/server.js');
 
   if (!fs.existsSync(serverJs)) {
     dialog.showErrorBox(

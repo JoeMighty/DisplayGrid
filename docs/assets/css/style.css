@@ -143,6 +143,95 @@ code:not(pre code) {
   padding: 0.4rem 0.875rem;
 }
 
+/* ─── Nav dropdown ───────────────────────────────────────────────────────── */
+.nav__dropdown-wrap {
+  position: relative;
+}
+
+.nav__dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav__dropdown-trigger:hover,
+.nav__dropdown-trigger.open { color: var(--text); background: var(--bg-card2); }
+
+.nav__dropdown-trigger .nav__chevron { transition: transform 0.2s; }
+.nav__dropdown-wrap.open .nav__chevron { transform: rotate(180deg); }
+
+.nav__dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 280px;
+  background: rgba(15,23,42,0.97);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 0.375rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s, transform 0.15s;
+  transform: translateX(-50%) translateY(-4px);
+  z-index: 200;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+}
+
+.nav__dropdown-wrap.open .nav__dropdown-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.nav__dropdown-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.nav__dropdown-item:hover { background: var(--bg-card2); text-decoration: none; }
+
+.nav__dropdown-item__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border2);
+}
+
+.nav__dropdown-item__name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.125rem;
+}
+
+.nav__dropdown-item__desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
 /* ─── Buttons ────────────────────────────────────────────────────────────── */
 .btn {
   display: inline-flex;
