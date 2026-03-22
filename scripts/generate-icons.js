@@ -54,9 +54,9 @@ async function main() {
     },
     {
       dir: path.join(ROOT, 'apps/electron-kiosk/build-resources'),
-      // Teal/cyan — differentiates the kiosk app
-      stroke: '#06b6d4',
-      bg: '#0c1a1f',
+      // Pink — differentiates the kiosk app
+      stroke: '#ec4899',
+      bg: '#1a0d14',
     },
   ];
 
