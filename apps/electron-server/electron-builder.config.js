@@ -62,8 +62,8 @@ module.exports = {
   linux: {
     executableName: 'displaygrid-server',
     target: [
-      { target: 'AppImage', arch: ['x64', 'arm64'] },
-      { target: 'deb',      arch: ['x64', 'arm64'] },
+      { target: 'AppImage', arch: ['x64'] },
+      { target: 'deb',      arch: ['x64'] },
     ],
     artifactName: 'DisplayGrid-Server-${arch}.${ext}',
     icon: path.join(__dirname, 'build-resources/icon.png'),
