@@ -49,6 +49,12 @@ module.exports = {
     artifactName: 'DisplayGrid-Server.${ext}',
     icon: path.join(__dirname, 'build-resources/icon.png'),
     category: 'public.app-category.utilities',
+    // Our @electron/rebuild step pre-builds better-sqlite3 as a universal
+    // (fat) binary.  The same fat binary ends up in both the x64 and arm64
+    // temp packages, so @electron/universal sees identical content in both
+    // and throws.  x64ArchFiles tells it to accept identical native files
+    // (the fat binary is used as-is, which works on both architectures).
+    x64ArchFiles: '**/better_sqlite3.node',
   },
 
   linux: {
