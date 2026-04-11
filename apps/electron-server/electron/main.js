@@ -183,6 +183,52 @@ function showWindow() {
   mainWindow.focus();
 }
 
+// ── Application menu ────────────────────────────────────────────────────────
+
+function createAppMenu() {
+  const version = app.getVersion();
+  const isMac = process.platform === 'darwin';
+
+  const template = [
+    ...(isMac ? [{ role: 'appMenu' }] : []),
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
+      ],
+    },
+    {
+      label: 'Help',
+      submenu: [
+        { label: `DisplayGrid  v${version}`, enabled: false },
+        { type: 'separator' },
+        {
+          label: 'Website',
+          click: () => shell.openExternal('https://joemighty.github.io/DisplayGrid/'),
+        },
+        {
+          label: 'View on GitHub',
+          click: () => shell.openExternal('https://github.com/JoeMighty/DisplayGrid'),
+        },
+        { type: 'separator' },
+        {
+          label: 'View Logs',
+          click: () => shell.openPath(LOG_PATH),
+        },
+      ],
+    },
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
 // ── Tray ────────────────────────────────────────────────────────────────────
 
 let tray = null;
@@ -251,6 +297,7 @@ app.setName('DisplayGrid Server');
 app.whenReady().then(() => {
   initLog();
   log('main', `isDev=${isDev} ROOT=${ROOT}`);
+  createAppMenu();
   createTray();
   createWindow();
   spawnNext();
