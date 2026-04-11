@@ -35,47 +35,11 @@ jobs:
       - name: Stage dashboard build
         run: |
           STANDALONE="apps/dashboard/.next/standalone"
-          NM="$STANDALONE/apps/dashboard/node_modules"
 
-          # ── Flatten pnpm virtual-store symlinks ───────────────────────────────
-          # Next.js standalone traces runtime deps into node_modules/ using pnpm's
-          # virtual-store layout: top-level entries are symlinks into .pnpm/.
-          # These symlinks don't survive either the GitHub artifact pipeline on
-          # Windows or NSIS packaging.
-          #
-          # Fix: walk every top-level entry; for symlinks, replace them with a real
-          # cp -rL copy (dereferencing all inner symlinks too).  Then drop .pnpm/
-          # since all packages are now self-contained real directories.
-          find "$NM" -maxdepth 1 -type l | while read -r link; do
-            real=$(readlink -f "$link")
-            rm "$link"
-            cp -rL "$real" "$link"
-          done
-          rm -rf "$NM/.pnpm" "$NM/.modules.yaml"
-
-          # ── Ensure runtime packages that pnpm may not hoist to top-level ──────
-          # pnpm v10 strict isolation keeps transitive deps only as .pnpm siblings,
-          # not top-level entries.  next's require-hook resolves styled-jsx and
-          # @swc/helpers by name (not via a bundle), and better-sqlite3 requires
-          # bindings at runtime.  Copy them explicitly if missing.
-          node -e "
-            const fs   = require('fs');
-            const path = require('path');
-            const nm   = '$NM';
-            const src  = path.resolve('apps/dashboard/node_modules');
-            const need = ['styled-jsx', '@swc/helpers', 'bindings', 'file-uri-to-path'];
-            for (const pkg of need) {
-              const dest = path.join(nm, pkg);
-              if (fs.existsSync(dest)) { console.log('ok  ' + pkg); continue; }
-              try {
-                const pkgJson = require.resolve(pkg + '/package.json', { paths: [src] });
-                fs.cpSync(path.dirname(pkgJson), dest, { recursive: true, dereference: true });
-                console.log('add ' + pkg);
-              } catch (e) {
-                console.log('WARN could not add ' + pkg + ': ' + e.message);
-              }
-            }
-          "
+          # node-linker=hoisted in .npmrc makes pnpm write a flat node_modules
+          # with real directories (no .pnpm/ virtual store, no symlinks).
+          # The Next.js standalone traces deps into that same flat layout, so
+          # the artifact is already portable — no post-processing required.
 
           # ── static / public / ws ──────────────────────────────────────────────
           mkdir -p "$STANDALONE/apps/dashboard/.next/static"
