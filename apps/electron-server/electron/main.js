@@ -27,11 +27,13 @@ let nextProcess = null;
 let wsProcess   = null;
 
 function spawnNext() {
-  // In dev: standalone is at <repo root>/apps/dashboard/.next/standalone/server.js
-  // In prod: electron-builder copies .next/standalone/* to resources root, so server.js is at resources/server.js
+  // In dev: standalone is at <repo root>/apps/dashboard/.next/standalone/apps/dashboard/server.js
+  // In prod: electron-builder copies .next/standalone/* to resources root.
+  //          pnpm monorepo standalone mirrors the workspace structure, so server.js lands at
+  //          resources/apps/dashboard/server.js (not resources/server.js).
   const serverJs = isDev
-    ? resPath('apps/dashboard/.next/standalone/server.js')
-    : resPath('server.js');
+    ? resPath('apps/dashboard/.next/standalone/apps/dashboard/server.js')
+    : resPath('apps/dashboard/server.js');
 
   if (!fs.existsSync(serverJs)) {
     dialog.showErrorBox(
