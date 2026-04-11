@@ -53,8 +53,10 @@ jobs:
 
           # 4. Copy the ws module explicitly — not traced by Next.js standalone
           #    (only Next.js's own imports are traced, not ws-server.js imports)
+          #    Resolve from the dashboard package since ws is not hoisted to workspace root
+          WS_DIR=$(cd apps/dashboard && node -e "console.log(require('path').dirname(require.resolve('ws/package.json')))")
           mkdir -p "$STANDALONE/node_modules"
-          cp -rL node_modules/ws "$STANDALONE/node_modules/ws"
+          cp -rL "$WS_DIR" "$STANDALONE/node_modules/ws"
 
           # 5. Stage the full standalone, using rsync --copy-links to dereference
           #    all pnpm symlinks so packages are real files on the target machine
