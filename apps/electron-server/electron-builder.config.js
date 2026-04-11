@@ -54,7 +54,7 @@ module.exports = {
     // temp packages, so @electron/universal sees identical content in both
     // and throws.  x64ArchFiles tells it to accept identical native files
     // (the fat binary is used as-is, which works on both architectures).
-    x64ArchFiles: '**/better-sqlite3.node',
+    x64ArchFiles: '**/*.node',
   },
 
   linux: {
