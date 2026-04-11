@@ -27,9 +27,11 @@ let nextProcess = null;
 let wsProcess   = null;
 
 function spawnNext() {
+  // In dev: standalone is at <repo root>/apps/dashboard/.next/standalone/server.js
+  // In prod: electron-builder copies .next/standalone/* to resources root, so server.js is at resources/server.js
   const serverJs = isDev
     ? resPath('apps/dashboard/.next/standalone/server.js')
-    : resPath('apps/dashboard/server.js');
+    : resPath('server.js');
 
   if (!fs.existsSync(serverJs)) {
     dialog.showErrorBox(
@@ -45,10 +47,10 @@ function spawnNext() {
     NODE_ENV: 'production',
     DB_PATH,
     NEXTAUTH_URL: 'http://localhost:3000',
-    // Copy .next/standalone static files path
+    // Next.js standalone bundles its own node_modules including sharp
     NEXT_SHARP_PATH: isDev
       ? resPath('node_modules/sharp')
-      : resPath('sharp'),
+      : resPath('node_modules/sharp'),
   };
 
   const cwd = isDev

@@ -83,10 +83,13 @@ jobs:
         include:
           - os: windows-latest
             platform: win
+            arch: --x64
           - os: macos-latest
             platform: mac
+            arch: --universal
           - os: ubuntu-latest
             platform: linux
+            arch: --x64
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -135,7 +138,7 @@ jobs:
 
       - name: Build Server App
         working-directory: apps/electron-server
-        run: npx electron-builder --${{ matrix.platform }} --x64 --config electron-builder.config.js --publish never
+        run: npx electron-builder --${{ matrix.platform }} ${{ matrix.arch }} --config electron-builder.config.js --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPIMAGE_EXTRACT_AND_RUN: 1
@@ -159,10 +162,13 @@ jobs:
         include:
           - os: windows-latest
             platform: win
+            arch: --x64
           - os: macos-latest
             platform: mac
+            arch: --universal
           - os: ubuntu-latest
             platform: linux
+            arch: --x64
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -189,7 +195,7 @@ jobs:
 
       - name: Build Kiosk App
         working-directory: apps/electron-kiosk
-        run: npx electron-builder --${{ matrix.platform }} --x64 --config electron-builder.config.js --publish never
+        run: npx electron-builder --${{ matrix.platform }} ${{ matrix.arch }} --config electron-builder.config.js --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPIMAGE_EXTRACT_AND_RUN: 1
@@ -231,20 +237,22 @@ jobs:
 
             | Platform | Download |
             |----------|----------|
-            | Windows  | `DisplayGrid-Server-Setup-*.exe` |
-            | macOS    | `DisplayGrid-Server-*.dmg` |
-            | Linux x64 | `DisplayGrid-Server-*.AppImage` |
-            | Linux ARM64 (Raspberry Pi) | `DisplayGrid-Server-*-arm64.AppImage` |
+            | Windows  | `DisplayGrid-Server-Setup.exe` |
+            | macOS (Universal) | `DisplayGrid-Server.dmg` |
+            | Linux x64 AppImage | `DisplayGrid-Server-x86_64.AppImage` |
+            | Linux x64 Debian | `DisplayGrid-Server-amd64.deb` |
 
             ### Kiosk App (Display client)
             Fullscreen kiosk display for your signage screens.
 
             | Platform | Download |
             |----------|----------|
-            | Windows  | `DisplayGrid-Kiosk-Setup-*.exe` |
-            | macOS    | `DisplayGrid-Kiosk-*.dmg` |
-            | Linux x64 | `DisplayGrid-Kiosk-*.AppImage` |
-            | Linux ARM64 (Raspberry Pi) | `DisplayGrid-Kiosk-*-arm64.AppImage` |
+            | Windows  | `DisplayGrid-Kiosk-Setup.exe` |
+            | macOS (Universal) | `DisplayGrid-Kiosk.dmg` |
+            | Linux x64 AppImage | `DisplayGrid-Kiosk-x86_64.AppImage` |
+            | Linux x64 Debian | `DisplayGrid-Kiosk-amd64.deb` |
+
+            > **Raspberry Pi**: See the [Raspberry Pi Setup Guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html) to run the kiosk using Chromium in kiosk mode.
 
           files: release-artifacts/**/*
           draft: false
