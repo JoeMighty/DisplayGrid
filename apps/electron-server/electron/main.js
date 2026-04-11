@@ -1,5 +1,6 @@
 const { app, Tray, Menu, shell, nativeImage, dialog, Notification } = require('electron');
 const { spawn } = require('child_process');
+const { randomBytes } = require('crypto');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
@@ -18,8 +19,39 @@ function resPath(...parts) {
   return path.join(ROOT, ...parts);
 }
 
-// User data dir — where the SQLite db lives at runtime
-const DB_PATH = path.join(app.getPath('userData'), 'displaygrid.db');
+// User data dir — where the SQLite db and secrets live at runtime
+const userData = app.getPath('userData');
+const DB_PATH  = path.join(userData, 'displaygrid.db');
+
+// ── Logging ──────────────────────────────────────────────────────────────────
+
+const LOG_PATH = path.join(userData, 'displaygrid-server.log');
+
+function initLog() {
+  fs.mkdirSync(userData, { recursive: true });
+  fs.writeFileSync(LOG_PATH, `--- DisplayGrid Server started ${new Date().toISOString()} ---\n`);
+}
+
+function log(tag, msg) {
+  const line = `[${new Date().toISOString()}] [${tag}] ${msg}\n`;
+  process.stdout.write(line);
+  try { fs.appendFileSync(LOG_PATH, line); } catch {}
+}
+
+// ── Auth secret ───────────────────────────────────────────────────────────────
+
+const SECRET_PATH = path.join(userData, 'auth-secret');
+
+function getOrCreateSecret() {
+  try {
+    const existing = fs.readFileSync(SECRET_PATH, 'utf8').trim();
+    if (existing.length > 0) return existing;
+  } catch {}
+  const secret = randomBytes(32).toString('hex');
+  fs.mkdirSync(userData, { recursive: true });
+  fs.writeFileSync(SECRET_PATH, secret, { mode: 0o600 });
+  return secret;
+}
 
 // ── Child processes ─────────────────────────────────────────────────────────
 
@@ -35,7 +67,10 @@ function spawnNext() {
     ? resPath('apps/dashboard/.next/standalone/apps/dashboard/server.js')
     : resPath('apps/dashboard/server.js');
 
+  log('main', `Starting Next.js server: ${serverJs}`);
+
   if (!fs.existsSync(serverJs)) {
+    log('main', `ERROR: server.js not found at ${serverJs}`);
     dialog.showErrorBox(
       'Build required',
       `Dashboard not built yet.\n\nRun: pnpm --filter @displaygrid/dashboard build\n\nExpected: ${serverJs}`
@@ -45,10 +80,14 @@ function spawnNext() {
 
   const env = {
     ...process.env,
+    // ELECTRON_RUN_AS_NODE makes the Electron binary behave like Node.js
+    // when used as a child process — required on all platforms
+    ELECTRON_RUN_AS_NODE: '1',
     PORT: '5555',
     NODE_ENV: 'production',
     DB_PATH,
     NEXTAUTH_URL: 'http://localhost:5555',
+    NEXTAUTH_SECRET: getOrCreateSecret(),
     // Next.js standalone bundles its own node_modules including sharp
     NEXT_SHARP_PATH: isDev
       ? resPath('node_modules/sharp')
@@ -59,10 +98,12 @@ function spawnNext() {
     ? resPath('apps/dashboard/.next/standalone')
     : ROOT;
 
+  log('main', `CWD: ${cwd}`);
+
   nextProcess = spawn(process.execPath, [serverJs], { env, cwd, stdio: 'pipe' });
-  nextProcess.stdout.on('data', d => console.log('[next]', d.toString().trim()));
-  nextProcess.stderr.on('data', d => console.error('[next]', d.toString().trim()));
-  nextProcess.on('exit', code => console.log('[next] exited', code));
+  nextProcess.stdout.on('data', d => log('next', d.toString().trim()));
+  nextProcess.stderr.on('data', d => log('next:err', d.toString().trim()));
+  nextProcess.on('exit', code => log('next', `exited with code ${code}`));
 }
 
 function spawnWs() {
@@ -70,17 +111,23 @@ function spawnWs() {
     ? resPath('apps/dashboard/ws-server.js')
     : resPath('ws-server.js');
 
+  log('main', `Starting WS server: ${wsJs}`);
+
   if (!fs.existsSync(wsJs)) {
-    console.error('ws-server.js not found at', wsJs);
+    log('main', `ERROR: ws-server.js not found at ${wsJs}`);
     return;
   }
 
-  const env = { ...process.env, DB_PATH };
+  const env = {
+    ...process.env,
+    ELECTRON_RUN_AS_NODE: '1',
+    DB_PATH,
+  };
 
   wsProcess = spawn(process.execPath, [wsJs], { env, stdio: 'pipe' });
-  wsProcess.stdout.on('data', d => console.log('[ws]', d.toString().trim()));
-  wsProcess.stderr.on('data', d => console.error('[ws]', d.toString().trim()));
-  wsProcess.on('exit', code => console.log('[ws] exited', code));
+  wsProcess.stdout.on('data', d => log('ws', d.toString().trim()));
+  wsProcess.stderr.on('data', d => log('ws:err', d.toString().trim()));
+  wsProcess.on('exit', code => log('ws', `exited with code ${code}`));
 }
 
 function killAll() {
@@ -111,10 +158,7 @@ function createTray() {
 function refreshTrayMenu() {
   if (!tray) return;
   tray.setContextMenu(Menu.buildFromTemplate([
-    {
-      label: 'DisplayGrid Server',
-      enabled: false,
-    },
+    { label: 'DisplayGrid Server', enabled: false },
     { type: 'separator' },
     {
       label: 'Open Dashboard',
@@ -131,6 +175,10 @@ function refreshTrayMenu() {
         restartAll();
         new Notification({ title: 'DisplayGrid', body: 'Services restarting…' }).show();
       },
+    },
+    {
+      label: 'View Logs',
+      click: () => shell.openPath(LOG_PATH),
     },
     { type: 'separator' },
     {
@@ -155,17 +203,22 @@ app.setName('DisplayGrid Server');
 if (process.platform === 'darwin') app.dock.hide();
 
 app.whenReady().then(() => {
+  initLog();
+  log('main', `isDev=${isDev} ROOT=${ROOT}`);
   createTray();
   spawnNext();
   spawnWs();
 
   // Wait for Next.js to be ready, then show notification
   waitForPort(5555, 60_000).then(() => {
+    log('main', 'Next.js ready on port 5555');
     new Notification({
       title: 'DisplayGrid',
       body: 'Server is running — open http://localhost:5555',
     }).show();
-  }).catch(() => {});
+  }).catch(() => {
+    log('main', 'Timed out waiting for port 5555');
+  });
 });
 
 app.on('window-all-closed', (e) => {

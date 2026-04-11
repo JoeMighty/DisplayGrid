@@ -35,14 +35,16 @@ module.exports = {
       from: path.join(ROOT, 'apps/dashboard/ws-server.js'),
       to: 'ws-server.js',
     },
+    // Static files and public must live alongside server.js inside the
+    // monorepo workspace path so Next.js can find them via __dirname
     {
       from: path.join(ROOT, 'apps/dashboard/.next/static'),
-      to: '.next/static',
+      to: 'apps/dashboard/.next/static',
       filter: ['**/*'],
     },
     {
       from: path.join(ROOT, 'apps/dashboard/public'),
-      to: 'public',
+      to: 'apps/dashboard/public',
       filter: ['**/*'],
     },
   ],
