@@ -1,4 +1,4 @@
-const { app, Tray, Menu, shell, nativeImage, dialog, Notification } = require('electron');
+const { app, BrowserWindow, Tray, Menu, shell, nativeImage, dialog, Notification } = require('electron');
 const { spawn } = require('child_process');
 const { randomBytes } = require('crypto');
 const path = require('path');
@@ -145,6 +145,44 @@ function restartAll() {
   setTimeout(() => { spawnNext(); spawnWs(); }, 500);
 }
 
+// ── Main window ─────────────────────────────────────────────────────────────
+
+let mainWindow = null;
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 820,
+    minWidth: 900,
+    minHeight: 600,
+    title: 'DisplayGrid',
+    icon: path.join(__dirname, 'icon.png'),
+    show: false, // revealed once the server is ready
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  mainWindow.loadURL('http://localhost:5555');
+
+  // Hide instead of close so the server keeps running
+  mainWindow.on('close', (e) => {
+    if (!app.isQuiting) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
+  });
+
+  mainWindow.on('closed', () => { mainWindow = null; });
+}
+
+function showWindow() {
+  if (!mainWindow) createWindow();
+  mainWindow.show();
+  mainWindow.focus();
+}
+
 // ── Tray ────────────────────────────────────────────────────────────────────
 
 let tray = null;
@@ -157,6 +195,7 @@ function createTray() {
 
   tray = new Tray(icon.resize({ width: 16, height: 16 }));
   tray.setToolTip('DisplayGrid');
+  tray.on('double-click', () => showWindow());
   refreshTrayMenu();
 }
 
@@ -167,11 +206,11 @@ function refreshTrayMenu() {
     { type: 'separator' },
     {
       label: 'Open Dashboard',
-      click: () => shell.openExternal('http://localhost:5555'),
+      click: () => showWindow(),
     },
     {
-      label: 'Open Display Client',
-      click: () => shell.openExternal('http://localhost:5173'),
+      label: 'Open in Browser',
+      click: () => shell.openExternal('http://localhost:5555'),
     },
     { type: 'separator' },
     {
@@ -188,50 +227,54 @@ function refreshTrayMenu() {
     { type: 'separator' },
     {
       label: 'Quit',
-      click: () => { killAll(); app.quit(); },
+      click: () => { app.isQuiting = true; killAll(); app.quit(); },
     },
   ]));
 }
 
 // ── App lifecycle ───────────────────────────────────────────────────────────
 
-// Single instance lock — only one server app at a time
+// Single instance lock — focus existing window if a second instance is launched
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
   process.exit(0);
 }
 
+app.on('second-instance', () => showWindow());
+
 app.setName('DisplayGrid Server');
 
-// Don't show in macOS dock
-if (process.platform === 'darwin') app.dock.hide();
+// macOS: app.dock is always visible — the dock icon lets users re-open the window
+// even when it has been closed/hidden to the background.
 
 app.whenReady().then(() => {
   initLog();
   log('main', `isDev=${isDev} ROOT=${ROOT}`);
   createTray();
+  createWindow();
   spawnNext();
   spawnWs();
 
-  // Wait for Next.js to be ready, then show notification
+  // Show the window once the server is ready
   waitForPort(5555, 60_000).then(() => {
     log('main', 'Next.js ready on port 5555');
-    new Notification({
-      title: 'DisplayGrid',
-      body: 'Server is running — open http://localhost:5555',
-    }).show();
+    showWindow();
   }).catch(() => {
     log('main', 'Timed out waiting for port 5555');
   });
 });
 
-app.on('window-all-closed', (e) => {
-  // Keep running even with no windows open
-  e.preventDefault?.();
+// Keep the app alive when the window is closed (still in tray)
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    // On non-mac, keep running in tray — do NOT quit
+  }
 });
 
-app.on('before-quit', killAll);
+app.on('activate', () => showWindow()); // macOS dock click
+
+app.on('before-quit', () => { app.isQuiting = true; killAll(); });
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
