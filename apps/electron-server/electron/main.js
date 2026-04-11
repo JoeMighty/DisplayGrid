@@ -45,10 +45,10 @@ function spawnNext() {
 
   const env = {
     ...process.env,
-    PORT: '3000',
+    PORT: '5555',
     NODE_ENV: 'production',
     DB_PATH,
-    NEXTAUTH_URL: 'http://localhost:3000',
+    NEXTAUTH_URL: 'http://localhost:5555',
     // Next.js standalone bundles its own node_modules including sharp
     NEXT_SHARP_PATH: isDev
       ? resPath('node_modules/sharp')
@@ -118,7 +118,7 @@ function refreshTrayMenu() {
     { type: 'separator' },
     {
       label: 'Open Dashboard',
-      click: () => shell.openExternal('http://localhost:3000'),
+      click: () => shell.openExternal('http://localhost:5555'),
     },
     {
       label: 'Open Display Client',
@@ -160,10 +160,10 @@ app.whenReady().then(() => {
   spawnWs();
 
   // Wait for Next.js to be ready, then show notification
-  waitForPort(3000, 60_000).then(() => {
+  waitForPort(5555, 60_000).then(() => {
     new Notification({
       title: 'DisplayGrid',
-      body: 'Server is running — open http://localhost:3000',
+      body: 'Server is running — open http://localhost:5555',
     }).show();
   }).catch(() => {});
 });

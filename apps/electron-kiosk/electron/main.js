@@ -15,7 +15,7 @@ function loadConfig() {
     return JSON.parse(fs.readFileSync(configPath, 'utf8'));
   } catch {
     return {
-      apiBase:     'http://localhost:3000',
+      apiBase:     'http://localhost:5555',
       wsBase:      'ws://localhost:3001',
       screenToken: '',
     };
