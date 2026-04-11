@@ -34,13 +34,35 @@ jobs:
 
       - name: Stage dashboard build
         run: |
-          mkdir -p /tmp/dashboard-stage/standalone
-          mkdir -p /tmp/dashboard-stage/static
-          mkdir -p /tmp/dashboard-stage/public
-          cp -r apps/dashboard/.next/standalone/. /tmp/dashboard-stage/standalone/
-          cp -r apps/dashboard/.next/static/. /tmp/dashboard-stage/static/
-          [ -d apps/dashboard/public ] && cp -r apps/dashboard/public/. /tmp/dashboard-stage/public/ || true
-          cp apps/dashboard/ws-server.js /tmp/dashboard-stage/ws-server.js
+          STANDALONE="apps/dashboard/.next/standalone"
+
+          # 1. Embed static files at the path Next.js resolves via __dirname
+          #    (resources/apps/dashboard/.next/static after bundling)
+          mkdir -p "$STANDALONE/apps/dashboard/.next/static"
+          cp -r apps/dashboard/.next/static/. "$STANDALONE/apps/dashboard/.next/static/"
+
+          # 2. Embed public assets alongside server.js
+          if [ -d apps/dashboard/public ] && [ "$(ls -A apps/dashboard/public)" ]; then
+            mkdir -p "$STANDALONE/apps/dashboard/public"
+            cp -r apps/dashboard/public/. "$STANDALONE/apps/dashboard/public/"
+          fi
+
+          # 3. Put ws-server.js at the standalone root so it resolves modules
+          #    from resources/node_modules/ after bundling
+          cp apps/dashboard/ws-server.js "$STANDALONE/ws-server.js"
+
+          # 4. Copy the ws module explicitly — not traced by Next.js standalone
+          #    (only Next.js's own imports are traced, not ws-server.js imports)
+          mkdir -p "$STANDALONE/node_modules"
+          cp -rL node_modules/ws "$STANDALONE/node_modules/ws"
+
+          # 5. Stage the full standalone, using rsync --copy-links to dereference
+          #    all pnpm symlinks so packages are real files on the target machine
+          mkdir -p /tmp/dashboard-stage
+          rsync -a --copy-links "$STANDALONE/" /tmp/dashboard-stage/
+
+          # 6. Remove the pnpm virtual store (redundant after dereference, saves space)
+          find /tmp/dashboard-stage -type d -name '.pnpm' -exec rm -rf {} + 2>/dev/null || true
 
       - name: Upload dashboard build
         uses: actions/upload-artifact@v4
@@ -114,27 +136,20 @@ jobs:
           name: dashboard-build
           path: apps/dashboard-build/
 
-      # Copy staged build into expected locations for electron-builder
+      # The artifact is now the full standalone root (with static, public,
+      # ws-server.js, and ws module already embedded). Just place it.
       - name: Prepare resources (Unix)
         if: runner.os != 'Windows'
         run: |
-          mkdir -p apps/dashboard/.next
-          cp -r apps/dashboard-build/standalone/. apps/dashboard/.next/standalone/
-          cp -r apps/dashboard-build/static/. apps/dashboard/.next/static/
-          [ -d apps/dashboard-build/public ] && cp -r apps/dashboard-build/public/. apps/dashboard/public/ || true
-          cp apps/dashboard-build/ws-server.js apps/dashboard/ws-server.js
+          mkdir -p apps/dashboard/.next/standalone
+          cp -r apps/dashboard-build/. apps/dashboard/.next/standalone/
 
       - name: Prepare resources (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path apps/dashboard/.next/standalone
-          New-Item -ItemType Directory -Force -Path apps/dashboard/.next/static
-          New-Item -ItemType Directory -Force -Path apps/dashboard/public
-          Copy-Item -Recurse -Force apps/dashboard-build/standalone/* apps/dashboard/.next/standalone/
-          Copy-Item -Recurse -Force apps/dashboard-build/static/* apps/dashboard/.next/static/
-          if (Test-Path apps/dashboard-build/public/*) { Copy-Item -Recurse -Force apps/dashboard-build/public/* apps/dashboard/public/ }
-          Copy-Item -Force apps/dashboard-build/ws-server.js apps/dashboard/ws-server.js
+          Copy-Item -Path apps/dashboard-build/* -Destination apps/dashboard/.next/standalone/ -Recurse -Force
 
       - name: Build Server App
         working-directory: apps/electron-server

@@ -24,27 +24,16 @@ module.exports = {
     buildResources: path.join(__dirname, 'build-resources'),
   },
 
-  // Bundle the Next.js standalone build + ws-server as extra resources
+  // The standalone directory already contains everything needed:
+  // - apps/dashboard/server.js       (Next.js server entry)
+  // - apps/dashboard/.next/static/   (CSS/JS assets)
+  // - apps/dashboard/public/         (public assets)
+  // - node_modules/                  (all deps, pnpm symlinks dereferenced in CI)
+  // - ws-server.js                   (WebSocket server at standalone root)
   extraResources: [
     {
       from: path.join(ROOT, 'apps/dashboard/.next/standalone'),
       to: '.',
-      filter: ['**/*'],
-    },
-    {
-      from: path.join(ROOT, 'apps/dashboard/ws-server.js'),
-      to: 'ws-server.js',
-    },
-    // Static files and public must live alongside server.js inside the
-    // monorepo workspace path so Next.js can find them via __dirname
-    {
-      from: path.join(ROOT, 'apps/dashboard/.next/static'),
-      to: 'apps/dashboard/.next/static',
-      filter: ['**/*'],
-    },
-    {
-      from: path.join(ROOT, 'apps/dashboard/public'),
-      to: 'apps/dashboard/public',
       filter: ['**/*'],
     },
   ],
