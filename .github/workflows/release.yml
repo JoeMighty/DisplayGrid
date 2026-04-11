@@ -22,14 +22,6 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      # Hoist ALL transitive deps to the workspace root node_modules so they survive
-      # the rsync --copy-links + .pnpm deletion in the staging step.  Without this,
-      # packages like @swc/helpers and bindings (deps-of-deps) only exist as siblings
-      # inside .pnpm/pkg@.../node_modules/ and vanish when we remove .pnpm, causing
-      # MODULE_NOT_FOUND at runtime.  Appending here avoids changing the committed file.
-      - name: Enable shameful hoisting for standalone packaging
-        run: echo "shamefully-hoist=true" >> .npmrc
-
       - run: pnpm install --frozen-lockfile
 
       - name: Build dashboard (standalone)
@@ -62,20 +54,31 @@ jobs:
           # 4. ws-server.js lives at the standalone root, so Node.js resolution never
           #    walks into apps/dashboard/node_modules/.  Copy ws explicitly so it's
           #    found at resources/node_modules/ws after bundling.
-          #    All other transitive deps (@swc/helpers, styled-jsx, bindings, …) are
-          #    handled by the shameful-hoist step above — they land at the workspace root
-          #    node_modules/ and are preserved through rsync + .pnpm deletion.
           WS_DIR=$(cd apps/dashboard && node -e "console.log(require('path').dirname(require.resolve('ws/package.json')))")
           mkdir -p "$STANDALONE/node_modules"
           cp -rL "$WS_DIR" "$STANDALONE/node_modules/ws"
 
-          # 5. Stage the full standalone, using rsync --copy-links to dereference
-          #    all pnpm symlinks so packages are real files on the target machine
+          # 5. Stage with --copy-unsafe-links (NOT --copy-links).
+          #
+          #    The pnpm virtual store works via RELATIVE symlinks:
+          #      apps/dashboard/node_modules/next
+          #        → ../../../node_modules/.pnpm/next@.../node_modules/next
+          #    styled-jsx/@swc/helpers/bindings/… are siblings of next inside that
+          #    .pnpm bucket and are found by Node.js resolution when next is accessed
+          #    THROUGH the symlink (i.e. its __dirname is inside .pnpm).
+          #
+          #    --copy-links (the old approach) dereferenced the symlink for `next`,
+          #    making it a bare real directory no longer adjacent to its pnpm siblings.
+          #    That broke all transitive-dep resolution no matter how much we hoisted.
+          #
+          #    --copy-unsafe-links only dereferences symlinks whose target is OUTSIDE
+          #    the source tree (e.g. workspace packages like ../../../packages/db).
+          #    Internal pnpm symlinks (→ .pnpm/…) are preserved as-is.  Their relative
+          #    targets all resolve correctly at any absolute install path, so they work
+          #    on the end-user machine without any pnpm tooling.
           mkdir -p /tmp/dashboard-stage
-          rsync -a --copy-links "$STANDALONE/" /tmp/dashboard-stage/
-
-          # 6. Remove the pnpm virtual store (redundant after dereference, saves space)
-          find /tmp/dashboard-stage -type d -name '.pnpm' -exec rm -rf {} + 2>/dev/null || true
+          rsync -a --copy-unsafe-links "$STANDALONE/" /tmp/dashboard-stage/
+          # Do NOT remove .pnpm — it is the virtual store that makes the above work.
 
       - name: Upload dashboard build
         uses: actions/upload-artifact@v4
