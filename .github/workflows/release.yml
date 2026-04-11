@@ -36,49 +36,47 @@ jobs:
         run: |
           STANDALONE="apps/dashboard/.next/standalone"
 
-          # 1. Embed static files at the path Next.js resolves via __dirname
-          #    (resources/apps/dashboard/.next/static after bundling)
+          # ── node_modules ──────────────────────────────────────────────────────
+          # pnpm deploy resolves ALL production dependencies (including transitives
+          # like styled-jsx, @swc/helpers, bindings) into a hoisted npm-style
+          # node_modules with NO symlinks — every package is a real directory.
+          #
+          # The pnpm virtual store approach (symlinks to .pnpm/) fundamentally does
+          # not survive the GitHub artifact pipeline on Windows: upload-artifact
+          # dereferences or drops symlinks, and NSIS doesn't support them either.
+          # pnpm deploy sidesteps all of that by producing a layout that works on
+          # any OS without any pnpm tooling on the target machine.
+          pnpm --filter @displaygrid/dashboard deploy --prod /tmp/dashboard-deploy
+          rm -rf "$STANDALONE/apps/dashboard/node_modules"
+          mv /tmp/dashboard-deploy/node_modules "$STANDALONE/apps/dashboard/node_modules"
+
+          # ── static / public / ws ──────────────────────────────────────────────
+          # 1. Embed static files (Next.js resolves __dirname → .next/static)
           mkdir -p "$STANDALONE/apps/dashboard/.next/static"
           cp -r apps/dashboard/.next/static/. "$STANDALONE/apps/dashboard/.next/static/"
 
-          # 2. Embed public assets alongside server.js
+          # 2. Embed public assets
           if [ -d apps/dashboard/public ] && [ "$(ls -A apps/dashboard/public)" ]; then
             mkdir -p "$STANDALONE/apps/dashboard/public"
             cp -r apps/dashboard/public/. "$STANDALONE/apps/dashboard/public/"
           fi
 
-          # 3. Put ws-server.js at the standalone root so it resolves modules
-          #    from resources/node_modules/ after bundling
+          # 3. ws-server.js at the standalone root
           cp apps/dashboard/ws-server.js "$STANDALONE/ws-server.js"
 
-          # 4. ws-server.js lives at the standalone root, so Node.js resolution never
-          #    walks into apps/dashboard/node_modules/.  Copy ws explicitly so it's
-          #    found at resources/node_modules/ws after bundling.
-          WS_DIR=$(cd apps/dashboard && node -e "console.log(require('path').dirname(require.resolve('ws/package.json')))")
-          mkdir -p "$STANDALONE/node_modules"
-          cp -rL "$WS_DIR" "$STANDALONE/node_modules/ws"
-
-          # 5. Stage with --copy-unsafe-links (NOT --copy-links).
-          #
-          #    The pnpm virtual store works via RELATIVE symlinks:
-          #      apps/dashboard/node_modules/next
-          #        → ../../../node_modules/.pnpm/next@.../node_modules/next
-          #    styled-jsx/@swc/helpers/bindings/… are siblings of next inside that
-          #    .pnpm bucket and are found by Node.js resolution when next is accessed
-          #    THROUGH the symlink (i.e. its __dirname is inside .pnpm).
-          #
-          #    --copy-links (the old approach) dereferenced the symlink for `next`,
-          #    making it a bare real directory no longer adjacent to its pnpm siblings.
-          #    That broke all transitive-dep resolution no matter how much we hoisted.
-          #
-          #    --copy-unsafe-links only dereferences symlinks whose target is OUTSIDE
-          #    the source tree (e.g. workspace packages like ../../../packages/db).
-          #    Internal pnpm symlinks (→ .pnpm/…) are preserved as-is.  Their relative
-          #    targets all resolve correctly at any absolute install path, so they work
-          #    on the end-user machine without any pnpm tooling.
+          # ── rsync to stage ────────────────────────────────────────────────────
+          # Exclude the workspace-root node_modules (pnpm virtual store — not needed
+          # since apps/dashboard/node_modules is now the flat deploy above).
+          # apps/dashboard/node_modules is inside STANDALONE so it IS included.
           mkdir -p /tmp/dashboard-stage
-          rsync -a --copy-unsafe-links "$STANDALONE/" /tmp/dashboard-stage/
-          # Do NOT remove .pnpm — it is the virtual store that makes the above work.
+          rsync -a --exclude='/node_modules' "$STANDALONE/" /tmp/dashboard-stage/
+
+          # ws lives in apps/dashboard/node_modules/ws (pnpm deploy includes it as
+          # a direct dep).  ws-server.js is at the resources/ root, so Node.js
+          # resolution can't walk there — copy ws to the stage root node_modules too.
+          WS_DIR=$(cd apps/dashboard && node -e "console.log(require('path').dirname(require.resolve('ws/package.json')))")
+          mkdir -p /tmp/dashboard-stage/node_modules
+          cp -rL "$WS_DIR" /tmp/dashboard-stage/node_modules/ws
 
       - name: Upload dashboard build
         uses: actions/upload-artifact@v4
