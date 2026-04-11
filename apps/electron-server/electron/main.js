@@ -122,6 +122,11 @@ function spawnWs() {
     ...process.env,
     ELECTRON_RUN_AS_NODE: '1',
     DB_PATH,
+    // ws-server.js sits at the resources root, so Node.js module resolution
+    // walks up away from the dashboard subtree.  NODE_PATH bridges the gap:
+    // better-sqlite3 (rebuilt for Electron by CI) lives in
+    // resources/apps/dashboard/node_modules/ alongside next's other deps.
+    NODE_PATH: resPath('apps/dashboard/node_modules'),
   };
 
   wsProcess = spawn(process.execPath, [wsJs], { env, stdio: 'pipe' });

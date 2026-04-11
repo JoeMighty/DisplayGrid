@@ -51,12 +51,22 @@ jobs:
           #    from resources/node_modules/ after bundling
           cp apps/dashboard/ws-server.js "$STANDALONE/ws-server.js"
 
-          # 4. Copy the ws module explicitly — not traced by Next.js standalone
-          #    (only Next.js's own imports are traced, not ws-server.js imports)
-          #    Resolve from the dashboard package since ws is not hoisted to workspace root
+          # 4. Copy ws and styled-jsx explicitly — not traced / not hoisted by pnpm.
+          #    ws is needed by ws-server.js (at the standalone root, not a Next.js file).
+          #    styled-jsx is a dep of next but only lives as a sibling inside pnpm's
+          #    virtual store (.pnpm/next@.../node_modules/styled-jsx).  After rsync +
+          #    .pnpm removal it disappears; Next.js's require-hook.js needs it at runtime.
           WS_DIR=$(cd apps/dashboard && node -e "console.log(require('path').dirname(require.resolve('ws/package.json')))")
+          # styled-jsx is not a direct dep of dashboard — resolve it via next's location
+          # (pnpm places it as a sibling of next inside .pnpm/next@.../node_modules/)
+          STYLED_JSX_DIR=$(node -e "
+            const path = require('path');
+            const nextDir = path.dirname(require.resolve('next/package.json', {paths: [path.resolve('apps/dashboard')]}));
+            console.log(path.dirname(require.resolve('styled-jsx/package.json', {paths: [nextDir]})));
+          ")
           mkdir -p "$STANDALONE/node_modules"
           cp -rL "$WS_DIR" "$STANDALONE/node_modules/ws"
+          cp -rL "$STYLED_JSX_DIR" "$STANDALONE/node_modules/styled-jsx"
 
           # 5. Stage the full standalone, using rsync --copy-links to dereference
           #    all pnpm symlinks so packages are real files on the target machine
@@ -152,6 +162,22 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path apps/dashboard/.next/standalone
           Copy-Item -Path apps/dashboard-build/* -Destination apps/dashboard/.next/standalone/ -Recurse -Force
+
+      - name: Rebuild native modules for Electron
+        shell: bash
+        run: |
+          # Get the exact Electron version that was installed (resolves the ^ range)
+          ELECTRON_VERSION=$(node -e "console.log(require('./apps/electron-server/node_modules/electron/package.json').version)")
+          # Map matrix arch to @electron/rebuild --arch value
+          REBUILD_ARCH="${{ matrix.platform == 'mac' && 'universal' || 'x64' }}"
+          echo "Rebuilding native modules for Electron $ELECTRON_VERSION arch=$REBUILD_ARCH"
+          # Rebuild all native .node binaries inside the staged dashboard package so
+          # they use Electron's ABI instead of the Node.js ABI from the build machine.
+          npx --yes @electron/rebuild \
+            --force \
+            --module-dir "apps/dashboard/.next/standalone/apps/dashboard" \
+            --version "$ELECTRON_VERSION" \
+            --arch "$REBUILD_ARCH"
 
       - name: Build Server App
         working-directory: apps/electron-server
