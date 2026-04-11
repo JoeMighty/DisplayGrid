@@ -180,6 +180,15 @@ jobs:
             --module-dir "apps/dashboard/.next/standalone/apps/dashboard" \
             --version "$ELECTRON_VERSION" \
             --arch "$REBUILD_ARCH"
+          # Strip node-gyp build intermediates (obj.target/, .deps/, *.o, *.a).
+          # These are produced by the rebuild above but are not needed at runtime.
+          # On macOS they also cause @electron/universal to fail when building the
+          # universal DMG because the same intermediate file appears in both the
+          # x64 and arm64 temp packages and is flagged as an ambiguous native file.
+          NATIVE_MODS="apps/dashboard/.next/standalone/apps/dashboard/node_modules"
+          find "$NATIVE_MODS" -type d -name "obj.target" -exec rm -rf {} + 2>/dev/null || true
+          find "$NATIVE_MODS" -type d -name ".deps"      -exec rm -rf {} + 2>/dev/null || true
+          find "$NATIVE_MODS" -type f \( -name "*.o" -o -name "*.a" \) -delete 2>/dev/null || true
 
       - name: Build Server App
         working-directory: apps/electron-server
