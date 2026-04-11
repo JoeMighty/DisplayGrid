@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Download — DisplayGrid</title>
-  <meta name="description" content="Download DisplayGrid native apps for Windows, macOS, Linux, and Raspberry Pi. Server tray app and fullscreen kiosk app." />
+  <meta name="description" content="Download DisplayGrid native apps for Windows, macOS, Linux, and Raspberry Pi. Windowed server app with system tray and fullscreen kiosk app." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -488,15 +488,15 @@
             <li style="display:flex; gap:1rem; counter-increment:step;">
               <div style="width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">2</div>
               <div>
-                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Wait for the tray icon</div>
-                <div style="font-size:0.875rem; color:var(--text-muted);">A DisplayGrid icon appears in your system tray. A notification pops when the server is ready (usually within 10 seconds).</div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Dashboard opens automatically</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">The dashboard opens in a native window once the server is ready (usually within 10 seconds). A DisplayGrid icon also appears in your system tray — on macOS it stays in the dock too.</div>
               </div>
             </li>
             <li style="display:flex; gap:1rem; counter-increment:step;">
               <div style="width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">3</div>
               <div>
-                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Open the dashboard</div>
-                <div style="font-size:0.875rem; color:var(--text-muted);">Click the tray icon and select "Open Dashboard". Your browser opens at <code>http://localhost:3000</code>. Complete the first-run setup wizard to create your admin account.</div>
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Complete the setup wizard</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">The dashboard window opens at <code>http://localhost:5555</code>. Complete the first-run setup wizard to create your admin account. You can also open the dashboard in your browser or re-open the window anytime from the tray icon or macOS dock.</div>
               </div>
             </li>
             <li style="display:flex; gap:1rem; counter-increment:step;">

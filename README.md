@@ -88,7 +88,7 @@ Native installers are published automatically on each release via GitHub Actions
 - **LED wall support:** define panel grids (e.g. 3×2) for tiled display configurations
 - **Multi-zone layouts:** split a screen into independently controlled regions, each with its own playlist
 - **Time-based scheduling:** restrict slides to specific days and time windows; server re-evaluates every minute
-- **Standalone apps:** native installers for Windows, macOS (Universal), and Linux — a tray-based server app manages the dashboard and WebSocket server; a dedicated kiosk app runs displays fullscreen with no browser configuration required; Raspberry Pi users can follow the [RPi setup guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html)
+- **Standalone apps:** native installers for Windows, macOS (Universal), and Linux — the server app opens the dashboard in a native window and keeps running in the background via the system tray and macOS dock when the window is closed; a dedicated kiosk app runs displays fullscreen with no browser configuration required; Raspberry Pi users can follow the [RPi setup guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html)
 
 ### Coming Soon
 
