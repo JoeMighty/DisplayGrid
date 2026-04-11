@@ -27,20 +27,20 @@ Native installers are published automatically on each release via GitHub Actions
 | Platform | Download |
 |----------|----------|
 | Windows | [DisplayGrid-Server-Setup.exe](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-Setup.exe) |
-| macOS | [DisplayGrid-Server.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.dmg) |
-| Linux x64 | [DisplayGrid-Server.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.AppImage) |
-| Linux ARM64 (Raspberry Pi 4B/5) | [DisplayGrid-Server-arm64.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-arm64.AppImage) |
+| macOS (Universal) | [DisplayGrid-Server.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.dmg) |
+| Linux x64 AppImage | [DisplayGrid-Server-x86_64.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-x86_64.AppImage) |
+| Linux x64 Debian | [DisplayGrid-Server-amd64.deb](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-amd64.deb) |
 
 ### Kiosk App — Fullscreen display client
 
 | Platform | Download |
 |----------|----------|
 | Windows | [DisplayGrid-Kiosk-Setup.exe](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-Setup.exe) |
-| macOS | [DisplayGrid-Kiosk.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.dmg) |
-| Linux x64 | [DisplayGrid-Kiosk.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.AppImage) |
-| Linux ARM64 (Raspberry Pi 4B/5) | [DisplayGrid-Kiosk-arm64.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-arm64.AppImage) |
+| macOS (Universal) | [DisplayGrid-Kiosk.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.dmg) |
+| Linux x64 AppImage | [DisplayGrid-Kiosk-x86_64.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-x86_64.AppImage) |
+| Linux x64 Debian | [DisplayGrid-Kiosk-amd64.deb](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-amd64.deb) |
 
-> No release published yet? [Run from source](#quick-start) — it only takes a few minutes.
+> **Raspberry Pi:** See the [Raspberry Pi Setup Guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html) to run the kiosk using Chromium in kiosk mode.
 
 ---
 
@@ -88,7 +88,7 @@ Native installers are published automatically on each release via GitHub Actions
 - **LED wall support:** define panel grids (e.g. 3×2) for tiled display configurations
 - **Multi-zone layouts:** split a screen into independently controlled regions, each with its own playlist
 - **Time-based scheduling:** restrict slides to specific days and time windows; server re-evaluates every minute
-- **Standalone apps:** native installers for Windows, macOS, and Linux — a tray-based server app manages the dashboard and WebSocket server; a dedicated kiosk app runs displays fullscreen with no browser configuration required; ARM64 AppImage for Raspberry Pi 4B/5
+- **Standalone apps:** native installers for Windows, macOS (Universal), and Linux — a tray-based server app manages the dashboard and WebSocket server; a dedicated kiosk app runs displays fullscreen with no browser configuration required; Raspberry Pi users can follow the [RPi setup guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html)
 
 ### Coming Soon
 
