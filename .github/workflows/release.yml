@@ -46,7 +46,7 @@ jobs:
           # dereferences or drops symlinks, and NSIS doesn't support them either.
           # pnpm deploy sidesteps all of that by producing a layout that works on
           # any OS without any pnpm tooling on the target machine.
-          pnpm --filter @displaygrid/dashboard deploy --prod /tmp/dashboard-deploy
+          pnpm --filter @displaygrid/dashboard deploy --prod --legacy /tmp/dashboard-deploy
           rm -rf "$STANDALONE/apps/dashboard/node_modules"
           mv /tmp/dashboard-deploy/node_modules "$STANDALONE/apps/dashboard/node_modules"
 
