@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*'
+  # Manual runs build everything but skip the publish job — lets us verify
+  # all build stages without cutting a release.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -53,14 +56,18 @@ jobs:
           cp apps/dashboard/ws-server.js "$STANDALONE/ws-server.js"
 
           # ── rsync to stage ────────────────────────────────────────────────────
+          # With the hoisted layout the standalone ROOT node_modules holds all
+          # traced runtime deps (next, react, better-sqlite3, …) — include it.
           mkdir -p /tmp/dashboard-stage
-          rsync -a --exclude='/node_modules' "$STANDALONE/" /tmp/dashboard-stage/
+          rsync -a "$STANDALONE/" /tmp/dashboard-stage/
 
-          # ws-server.js sits at the resources root; copy ws alongside it so
-          # require('ws') resolves without NODE_PATH tricks.
-          WS_DIR=$(node -e "console.log(require('path').dirname(require.resolve('ws/package.json',{paths:['$PWD/apps/dashboard/node_modules']})))")
-          mkdir -p /tmp/dashboard-stage/node_modules
-          cp -rL "$WS_DIR" /tmp/dashboard-stage/node_modules/ws
+          # ws-server.js sits at the resources root; ws is not traced by the Next
+          # build (only ws-server.js uses it), so copy it in if missing.
+          if [ ! -d /tmp/dashboard-stage/node_modules/ws ]; then
+            WS_DIR=$(node -e "console.log(require('path').dirname(require.resolve('ws/package.json',{paths:[process.cwd()+'/apps/dashboard']})))")
+            mkdir -p /tmp/dashboard-stage/node_modules
+            cp -rL "$WS_DIR" /tmp/dashboard-stage/node_modules/ws
+          fi
 
       - name: Upload dashboard build
         uses: actions/upload-artifact@v4
@@ -152,16 +159,33 @@ jobs:
       - name: Rebuild native modules for Electron
         shell: bash
         run: |
-          # Get the exact Electron version that was installed (resolves the ^ range)
-          ELECTRON_VERSION=$(node -e "console.log(require('./apps/electron-server/node_modules/electron/package.json').version)")
+          # Get the exact Electron version that was installed (resolves the ^ range).
+          # node-linker=hoisted puts electron in the root node_modules; require.resolve
+          # walks up from the app dir, so this works in any layout.
+          ELECTRON_VERSION=$(node -p "require(require.resolve('electron/package.json',{paths:[process.cwd()+'/apps/electron-server']})).version")
           # Map matrix arch to @electron/rebuild --arch value
           REBUILD_ARCH="${{ matrix.platform == 'mac' && 'universal' || 'x64' }}"
           echo "Rebuilding native modules for Electron $ELECTRON_VERSION arch=$REBUILD_ARCH"
-          # Rebuild all native .node binaries inside the staged dashboard package so
-          # they use Electron's ABI instead of the Node.js ABI from the build machine.
+          # Rebuild better-sqlite3 inside the staged dashboard package so it uses
+          # Electron's ABI instead of the Node.js ABI from the build machine.
+          # (sharp is N-API and ABI-stable — no rebuild needed.)
+          # With the hoisted layout the traced deps live at the standalone ROOT
+          # node_modules. The package.json next to it is the monorepo root one,
+          # which declares no runtime deps — and @electron/rebuild only rebuilds
+          # modules reachable from the module-dir package.json's dependencies.
+          # Patch better-sqlite3 in so the walker picks it up.
+          STANDALONE="apps/dashboard/.next/standalone"
+          node -e "
+            const fs = require('fs');
+            const p  = '$STANDALONE/package.json';
+            const j  = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8'))
+                                        : { name: 'dashboard-standalone', version: '0.0.0' };
+            j.dependencies = { ...(j.dependencies || {}), 'better-sqlite3': '*' };
+            fs.writeFileSync(p, JSON.stringify(j, null, 2));
+          "
           npx --yes @electron/rebuild \
             --force \
-            --module-dir "apps/dashboard/.next/standalone/apps/dashboard" \
+            --module-dir "$STANDALONE" \
             --version "$ELECTRON_VERSION" \
             --arch "$REBUILD_ARCH"
           # Strip node-gyp build intermediates (obj.target/, .deps/, *.o, *.a).
@@ -169,7 +193,7 @@ jobs:
           # On macOS they also cause @electron/universal to fail when building the
           # universal DMG because the same intermediate file appears in both the
           # x64 and arm64 temp packages and is flagged as an ambiguous native file.
-          NATIVE_MODS="apps/dashboard/.next/standalone/apps/dashboard/node_modules"
+          NATIVE_MODS="$STANDALONE/node_modules"
           find "$NATIVE_MODS" -type d -name "obj.target" -exec rm -rf {} + 2>/dev/null || true
           find "$NATIVE_MODS" -type d -name ".deps"      -exec rm -rf {} + 2>/dev/null || true
           find "$NATIVE_MODS" -type f \( -name "*.o" -o -name "*.a" \) -delete 2>/dev/null || true
@@ -252,6 +276,7 @@ jobs:
   # ── Publish GitHub Release ─────────────────────────────────────────────────
   publish:
     needs: [build-server-app, build-kiosk-app]
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

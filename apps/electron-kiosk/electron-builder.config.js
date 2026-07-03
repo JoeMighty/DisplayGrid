@@ -19,6 +19,11 @@ module.exports = {
   copyright: 'Copyright © 2024 JoeMighty',
   publish: null,
 
+  // node-linker=hoisted puts electron in the monorepo root node_modules, where
+  // electron-builder's own lookup (appDir/node_modules/electron) can't see it.
+  // Resolve the installed version via Node resolution, which walks up to root.
+  electronVersion: require('electron/package.json').version,
+
   directories: {
     output: path.join(ROOT, 'dist/electron-kiosk'),
     buildResources: path.join(__dirname, 'build-resources'),

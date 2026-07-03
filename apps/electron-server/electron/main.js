@@ -53,6 +53,44 @@ function getOrCreateSecret() {
   return secret;
 }
 
+// ── Database migrations ─────────────────────────────────────────────────────
+//
+// The dashboard never creates its own schema — tables come from the drizzle
+// migration SQL in packages/db/drizzle (bundled as resources/drizzle).  Run
+// any unapplied migrations against the userData DB before starting the
+// servers.  Dev installs keep using `pnpm db:migrate`.
+
+function runMigrations() {
+  if (isDev) return;
+  try {
+    // resources/node_modules/better-sqlite3 is rebuilt for Electron's ABI by
+    // CI, so the main process can load it directly.
+    const Database = require(resPath('node_modules/better-sqlite3'));
+    const dir = resPath('drizzle');
+    const journal = JSON.parse(fs.readFileSync(path.join(dir, 'meta', '_journal.json'), 'utf8'));
+    fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+    const sqlite = new Database(DB_PATH);
+    try {
+      sqlite.pragma('journal_mode = WAL');
+      sqlite.exec('CREATE TABLE IF NOT EXISTS displaygrid_migrations (tag TEXT PRIMARY KEY, applied_at INTEGER NOT NULL)');
+      const applied = new Set(sqlite.prepare('SELECT tag FROM displaygrid_migrations').all().map(r => r.tag));
+      for (const entry of journal.entries) {
+        if (applied.has(entry.tag)) continue;
+        const sql = fs.readFileSync(path.join(dir, `${entry.tag}.sql`), 'utf8');
+        sqlite.transaction(() => {
+          sqlite.exec(sql);
+          sqlite.prepare('INSERT INTO displaygrid_migrations (tag, applied_at) VALUES (?, ?)').run(entry.tag, Date.now());
+        })();
+        log('main', `DB migration applied: ${entry.tag}`);
+      }
+    } finally {
+      sqlite.close();
+    }
+  } catch (e) {
+    log('main', `DB migration FAILED: ${e.message}`);
+  }
+}
+
 // ── Child processes ─────────────────────────────────────────────────────────
 
 let nextProcess = null;
@@ -88,6 +126,9 @@ function spawnNext() {
     DB_PATH,
     NEXTAUTH_URL: 'http://localhost:5555',
     NEXTAUTH_SECRET: getOrCreateSecret(),
+    // Auth.js v5 rejects requests in production unless the host is trusted;
+    // the server only binds localhost, so trusting it is safe.
+    AUTH_TRUST_HOST: 'true',
     // Next.js standalone bundles its own node_modules including sharp
     NEXT_SHARP_PATH: isDev
       ? resPath('node_modules/sharp')
@@ -297,6 +338,7 @@ app.setName('DisplayGrid Server');
 app.whenReady().then(() => {
   initLog();
   log('main', `isDev=${isDev} ROOT=${ROOT}`);
+  runMigrations();
   createAppMenu();
   createTray();
   createWindow();
