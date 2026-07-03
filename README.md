@@ -9,7 +9,7 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org)
-[![pnpm](https://img.shields.io/badge/pnpm-9-orange.svg)](https://pnpm.io)
+[![pnpm](https://img.shields.io/badge/pnpm-10-orange.svg)](https://pnpm.io)
 [![SQLite](https://img.shields.io/badge/database-SQLite-lightblue.svg)](https://sqlite.org)
 
 **[Website](https://joemighty.github.io/DisplayGrid/) · [Download](https://github.com/JoeMighty/DisplayGrid/releases/latest) · [Setup Guide](docs/SETUP.md) · [Report a Bug](https://github.com/JoeMighty/DisplayGrid/issues)**
@@ -21,6 +21,8 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 ## Downloads
 
 Native installers are published automatically on each release via GitHub Actions.
+
+The Server App is fully self-contained: on first launch it creates its database automatically and opens the dashboard in a native window — no Node.js, terminal, or manual setup required.
 
 ### Server App — Dashboard + WebSocket server (system tray)
 
@@ -113,7 +115,7 @@ Native installers are published automatically on each release via GitHub Actions
 ## Requirements
 
 - **Node.js** 18 or 20 LTS
-- **pnpm** 9+
+- **pnpm** 10+
 - **Chromium or Google Chrome** on display client machines
 - A machine to act as the server (Raspberry Pi 4/5, mini PC, or any always-on device)
 

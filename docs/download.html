@@ -364,6 +364,7 @@
         </span>
         <span class="dl-platform__btn-ext">.AppImage</span>
       </a>
+      <p style="margin-top:0.6rem; font-size:0.78rem; color:var(--text-dim);">Debian/Ubuntu: <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-amd64.deb" style="color:var(--text-muted); text-decoration:underline;">.deb package</a></p>
     </div>
 
     <div class="dl-platform" id="card-pi-server">
@@ -431,6 +432,7 @@
         </span>
         <span class="dl-platform__btn-ext">.AppImage</span>
       </a>
+      <p style="margin-top:0.6rem; font-size:0.78rem; color:var(--text-dim);">Debian/Ubuntu: <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-amd64.deb" style="color:var(--text-muted); text-decoration:underline;">.deb package</a></p>
     </div>
 
     <div class="dl-platform">
@@ -482,7 +484,7 @@
               <div style="width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">1</div>
               <div>
                 <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Download and install</div>
-                <div style="font-size:0.875rem; color:var(--text-muted);">Run the installer for your platform. On Linux, make the AppImage executable: <code>chmod +x DisplayGrid-Server.AppImage</code> then double-click it.</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">Run the installer for your platform. On Linux, make the AppImage executable: <code>chmod +x DisplayGrid-Server-x86_64.AppImage</code> then double-click it — or install the <code>.deb</code> package on Debian/Ubuntu.</div>
               </div>
             </li>
             <li style="display:flex; gap:1rem; counter-increment:step;">
@@ -496,7 +498,7 @@
               <div style="width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">3</div>
               <div>
                 <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Complete the setup wizard</div>
-                <div style="font-size:0.875rem; color:var(--text-muted);">The dashboard window opens at <code>http://localhost:5555</code>. Complete the first-run setup wizard to create your admin account. You can also open the dashboard in your browser or re-open the window anytime from the tray icon or macOS dock.</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">The dashboard window opens at <code>http://localhost:5555</code>. DisplayGrid creates its database automatically on first launch — just complete the setup wizard to create your admin account. You can also open the dashboard in your browser or re-open the window anytime from the tray icon or macOS dock.</div>
               </div>
             </li>
             <li style="display:flex; gap:1rem; counter-increment:step;">
@@ -527,14 +529,14 @@
               <div style="width:28px; height:28px; border-radius:50%; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); color:#a855f7; font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">1</div>
               <div>
                 <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Download and install on each display device</div>
-                <div style="font-size:0.875rem; color:var(--text-muted);">Use the ARM64 AppImage for Raspberry Pi 4B/5. On Linux, run <code>chmod +x DisplayGrid-Kiosk.AppImage</code> before launching.</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">On Linux, run <code>chmod +x DisplayGrid-Kiosk-x86_64.AppImage</code> before launching, or install the <code>.deb</code> package. For Raspberry Pi displays, follow the <a href="guides/raspberry-pi.html" style="color:var(--text-muted); text-decoration:underline;">Chromium kiosk guide</a> instead — no app install needed.</div>
               </div>
             </li>
             <li style="display:flex; gap:1rem;">
               <div style="width:28px; height:28px; border-radius:50%; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); color:#a855f7; font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">2</div>
               <div>
                 <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Edit the config file</div>
-                <div style="font-size:0.875rem; color:var(--text-muted);">On first launch, a config file is created at <code>~/AppData/Roaming/DisplayGrid Kiosk/kiosk-config.json</code> (Windows) or <code>~/.config/DisplayGrid Kiosk/kiosk-config.json</code> (Linux/Pi). Edit it with your server's IP and screen token:</div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">On first launch, a config file is created at <code>%APPDATA%\@displaygrid\electron-kiosk\kiosk-config.json</code> (Windows) or <code>~/.config/@displaygrid/electron-kiosk/kiosk-config.json</code> (Linux). Edit it with your server's IP and screen token:</div>
                 <pre style="margin-top:0.5rem; font-size:0.8rem; background:var(--bg-card2); border:1px solid var(--border2); border-radius:6px; padding:0.75rem; overflow-x:auto;"><code>{
   "apiBase": "http://192.168.1.10:3000",
   "wsBase":  "ws://192.168.1.10:3001",
