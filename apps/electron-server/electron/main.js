@@ -4,6 +4,7 @@ const { randomBytes } = require('crypto');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
+const { autoUpdater } = require('electron-updater');
 
 // ── Path helpers ────────────────────────────────────────────────────────────
 
@@ -88,6 +89,91 @@ function runMigrations() {
     }
   } catch (e) {
     log('main', `DB migration FAILED: ${e.message}`);
+  }
+}
+
+// ── Auto-update ─────────────────────────────────────────────────────────────
+//
+// electron-updater can self-update the NSIS install (Windows) and the
+// AppImage (Linux). The unsigned macOS build and the .deb cannot — those get
+// a manual "Check for Updates" that compares against the latest GitHub
+// release and opens the download page.
+
+const RELEASES_URL = 'https://github.com/JoeMighty/DisplayGrid/releases/latest';
+
+// Set when an update has been downloaded and is ready to install on restart.
+let updateReadyVersion = null;
+
+function autoUpdateSupported() {
+  return process.platform === 'win32' ||
+         (process.platform === 'linux' && !!process.env.APPIMAGE);
+}
+
+function initAutoUpdate() {
+  if (isDev || !autoUpdateSupported()) return;
+  autoUpdater.channel = 'server';
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.on('update-downloaded', (info) => {
+    updateReadyVersion = info.version;
+    log('updater', `Update v${info.version} downloaded — will install on restart`);
+    refreshTrayMenu();
+    new Notification({
+      title: 'DisplayGrid',
+      body: `Update v${info.version} downloaded. Restart DisplayGrid to apply it.`,
+    }).show();
+  });
+  autoUpdater.on('error', (e) => log('updater', `Error: ${e.message}`));
+  const check = () => autoUpdater.checkForUpdates().catch(e => log('updater', `Check failed: ${e.message}`));
+  check();
+  setInterval(check, 4 * 60 * 60 * 1000);
+}
+
+// Compare dotted versions: returns true when b is newer than a.
+function isNewerVersion(a, b) {
+  const pa = String(a).split('.').map(n => parseInt(n, 10) || 0);
+  const pb = String(b).split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < 3; i++) {
+    if ((pb[i] || 0) > (pa[i] || 0)) return true;
+    if ((pb[i] || 0) < (pa[i] || 0)) return false;
+  }
+  return false;
+}
+
+async function manualUpdateCheck() {
+  try {
+    const res = await fetch('https://api.github.com/repos/JoeMighty/DisplayGrid/releases/latest', {
+      headers: { 'User-Agent': 'DisplayGrid-Server' },
+    });
+    const latest = String((await res.json()).tag_name || '').replace(/^v/, '');
+    if (latest && isNewerVersion(app.getVersion(), latest)) {
+      const { response } = await dialog.showMessageBox({
+        type: 'info',
+        message: `DisplayGrid v${latest} is available (you have v${app.getVersion()}).`,
+        buttons: ['Open download page', 'Later'],
+      });
+      if (response === 0) shell.openExternal(RELEASES_URL);
+    } else {
+      dialog.showMessageBox({ type: 'info', message: `DisplayGrid is up to date (v${app.getVersion()}).` });
+    }
+  } catch (e) {
+    log('updater', `Manual check failed: ${e.message}`);
+    dialog.showMessageBox({ type: 'warning', message: 'Could not check for updates. Are you online?' });
+  }
+}
+
+function checkForUpdatesInteractive() {
+  if (autoUpdateSupported() && !isDev) {
+    autoUpdater.checkForUpdates()
+      .then(r => {
+        if (!r || !r.updateInfo || !isNewerVersion(app.getVersion(), r.updateInfo.version)) {
+          dialog.showMessageBox({ type: 'info', message: `DisplayGrid is up to date (v${app.getVersion()}).` });
+        }
+        // If newer, the update-downloaded handler takes over.
+      })
+      .catch(() => manualUpdateCheck());
+  } else {
+    manualUpdateCheck();
   }
 }
 
@@ -249,6 +335,10 @@ function createAppMenu() {
       label: 'Help',
       submenu: [
         { label: `DisplayGrid  v${version}`, enabled: false },
+        {
+          label: 'Check for Updates…',
+          click: () => checkForUpdatesInteractive(),
+        },
         { type: 'separator' },
         {
           label: 'Website',
@@ -290,6 +380,10 @@ function refreshTrayMenu() {
   if (!tray) return;
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: 'DisplayGrid Server', enabled: false },
+    ...(updateReadyVersion ? [{
+      label: `Restart to update (v${updateReadyVersion})`,
+      click: () => { app.isQuiting = true; killAll(); autoUpdater.quitAndInstall(); },
+    }] : []),
     { type: 'separator' },
     {
       label: 'Open Dashboard',
@@ -344,6 +438,7 @@ app.whenReady().then(() => {
   createWindow();
   spawnNext();
   spawnWs();
+  initAutoUpdate();
 
   // Show the window once the server is ready
   waitForPort(5555, 60_000).then(() => {

@@ -17,7 +17,13 @@ module.exports = {
   appId: 'io.displaygrid.server',
   productName: 'DisplayGrid Server',
   copyright: 'Copyright © 2024 JoeMighty',
-  publish: null,
+  // Update metadata (server.yml / server-linux.yml) for electron-updater.
+  // Channel is per-app because both apps share one GitHub release, where
+  // the default latest.yml names would collide. CI still uploads release
+  // assets itself (--publish never); this config only drives metadata
+  // generation. mac overrides publish to null below: the unsigned dmg-only
+  // build can neither auto-update nor generate update info (needs zip).
+  publish: { provider: 'github', owner: 'JoeMighty', repo: 'DisplayGrid', channel: 'server' },
 
   // node-linker=hoisted puts electron in the monorepo root node_modules, where
   // electron-builder's own lookup (appDir/node_modules/electron) can't see it.
@@ -67,6 +73,9 @@ module.exports = {
     // and throws.  x64ArchFiles tells it to accept identical native files
     // (the fat binary is used as-is, which works on both architectures).
     x64ArchFiles: '**/*.node',
+    // No auto-update on mac: unsigned builds can't self-update, and update
+    // info generation requires a zip target the dmg-only build lacks.
+    publish: null,
   },
 
   linux: {

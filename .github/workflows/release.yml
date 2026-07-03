@@ -219,6 +219,14 @@ jobs:
           find "$NATIVE_MODS" -type d -name ".deps"      -exec rm -rf {} + 2>/dev/null || true
           find "$NATIVE_MODS" -type f \( -name "*.o" -o -name "*.a" \) -delete 2>/dev/null || true
 
+      # electron-updater compares the packaged app's version against the
+      # update feed, so the app must carry the release version (the repo
+      # package.json stays at a dev version).
+      - name: Stamp app version from tag
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: npm pkg set version="${GITHUB_REF_NAME#v}" --prefix apps/electron-server
+
       - name: Build Server App
         working-directory: apps/electron-server
         run: npx electron-builder --${{ matrix.platform }} ${{ matrix.arch }} --config electron-builder.config.js --publish never
@@ -235,6 +243,8 @@ jobs:
             dist/electron-server/*.dmg
             dist/electron-server/*.AppImage
             dist/electron-server/*.deb
+            dist/electron-server/*.yml
+            dist/electron-server/*.blockmap
           retention-days: 1
 
   # ── Build Kiosk App ────────────────────────────────────────────────────────
@@ -276,6 +286,13 @@ jobs:
           name: display-client-build
           path: apps/display-client/dist/
 
+      # See the server job — packaged version must match the release tag for
+      # electron-updater.
+      - name: Stamp app version from tag
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: npm pkg set version="${GITHUB_REF_NAME#v}" --prefix apps/electron-kiosk
+
       - name: Build Kiosk App
         working-directory: apps/electron-kiosk
         run: npx electron-builder --${{ matrix.platform }} ${{ matrix.arch }} --config electron-builder.config.js --publish never
@@ -292,6 +309,8 @@ jobs:
             dist/electron-kiosk/*.dmg
             dist/electron-kiosk/*.AppImage
             dist/electron-kiosk/*.deb
+            dist/electron-kiosk/*.yml
+            dist/electron-kiosk/*.blockmap
           retention-days: 1
 
   # ── Publish GitHub Release ─────────────────────────────────────────────────

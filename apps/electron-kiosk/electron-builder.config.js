@@ -17,7 +17,13 @@ module.exports = {
   appId: 'io.displaygrid.kiosk',
   productName: 'DisplayGrid Kiosk',
   copyright: 'Copyright © 2024 JoeMighty',
-  publish: null,
+  // Update metadata (kiosk.yml / kiosk-linux.yml) for electron-updater.
+  // Channel is per-app because both apps share one GitHub release, where
+  // the default latest.yml names would collide. CI still uploads release
+  // assets itself (--publish never); this config only drives metadata
+  // generation. mac overrides publish to null below: the unsigned dmg-only
+  // build can neither auto-update nor generate update info (needs zip).
+  publish: { provider: 'github', owner: 'JoeMighty', repo: 'DisplayGrid', channel: 'kiosk' },
 
   // node-linker=hoisted puts electron in the monorepo root node_modules, where
   // electron-builder's own lookup (appDir/node_modules/electron) can't see it.
@@ -49,6 +55,9 @@ module.exports = {
     artifactName: 'DisplayGrid-Kiosk.${ext}',
     icon: path.join(__dirname, 'build-resources/icon.png'),
     category: 'public.app-category.utilities',
+    // No auto-update on mac: unsigned builds can't self-update, and update
+    // info generation requires a zip target the dmg-only build lacks.
+    publish: null,
   },
 
   linux: {

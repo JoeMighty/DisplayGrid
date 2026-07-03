@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, globalShortcut, screen } = require('electron');
 const path = require('path');
 const fs   = require('fs');
+const { autoUpdater } = require('electron-updater');
 
 // ── Paths ───────────────────────────────────────────────────────────────────
 
@@ -85,6 +86,27 @@ ipcMain.on('save-token', (_event, token) => {
   saveConfig(config);
 });
 
+// ── Auto-update ─────────────────────────────────────────────────────────────
+//
+// Silent policy for signage: download updates in the background and install
+// them on the next app restart — never interrupt a live display. Supported on
+// Windows (NSIS) and Linux AppImage; the unsigned macOS build and .deb are
+// updated manually.
+
+function initAutoUpdate() {
+  if (isDev) return;
+  const supported = process.platform === 'win32' ||
+                    (process.platform === 'linux' && !!process.env.APPIMAGE);
+  if (!supported) return;
+  autoUpdater.channel = 'kiosk';
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.on('error', (e) => console.error('[updater]', e.message));
+  const check = () => autoUpdater.checkForUpdates().catch(e => console.error('[updater]', e.message));
+  check();
+  setInterval(check, 6 * 60 * 60 * 1000);
+}
+
 // ── Shortcuts ───────────────────────────────────────────────────────────────
 
 // Ctrl+Alt+Q or Cmd+Alt+Q — emergency quit (for dev/setup)
@@ -113,6 +135,7 @@ app.setName('DisplayGrid Kiosk');
 app.whenReady().then(() => {
   createWindow();
   registerShortcuts();
+  initAutoUpdate();
 });
 
 app.on('window-all-closed', () => app.quit());
