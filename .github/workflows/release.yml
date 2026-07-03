@@ -178,19 +178,37 @@ jobs:
           # modules reachable from the module-dir package.json's dependencies.
           # Patch better-sqlite3 in so the walker picks it up.
           STANDALONE="apps/dashboard/.next/standalone"
-          node -e "
-            const fs = require('fs');
-            const p  = '$STANDALONE/package.json';
-            const j  = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8'))
-                                        : { name: 'dashboard-standalone', version: '0.0.0' };
-            j.dependencies = { ...(j.dependencies || {}), 'better-sqlite3': '*' };
-            fs.writeFileSync(p, JSON.stringify(j, null, 2));
-          "
-          npx --yes @electron/rebuild \
-            --force \
-            --module-dir "$STANDALONE" \
-            --version "$ELECTRON_VERSION" \
-            --arch "$REBUILD_ARCH"
+          if [ "${{ matrix.platform }}" = "mac" ]; then
+            # No universal prebuilds exist, and letting @electron/rebuild
+            # compile from source takes 20+ minutes (it also picks up the
+            # hoisted repo-root copy). Instead: fetch the official x64 and
+            # arm64 Electron prebuilds and lipo them into one fat binary.
+            # electron-builder's x64ArchFiles already accepts the identical
+            # fat binary in both slices of the universal build.
+            BSQ="$STANDALONE/node_modules/better-sqlite3"
+            cd "$BSQ"
+            npx --yes prebuild-install --runtime=electron --target="$ELECTRON_VERSION" --arch=x64 --force
+            mv build/Release/better_sqlite3.node /tmp/bsq-x64.node
+            npx --yes prebuild-install --runtime=electron --target="$ELECTRON_VERSION" --arch=arm64 --force
+            mv build/Release/better_sqlite3.node /tmp/bsq-arm64.node
+            lipo -create /tmp/bsq-x64.node /tmp/bsq-arm64.node -output build/Release/better_sqlite3.node
+            lipo -info build/Release/better_sqlite3.node
+            cd - > /dev/null
+          else
+            node -e "
+              const fs = require('fs');
+              const p  = '$STANDALONE/package.json';
+              const j  = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8'))
+                                          : { name: 'dashboard-standalone', version: '0.0.0' };
+              j.dependencies = { ...(j.dependencies || {}), 'better-sqlite3': '*' };
+              fs.writeFileSync(p, JSON.stringify(j, null, 2));
+            "
+            npx --yes @electron/rebuild \
+              --force \
+              --module-dir "$STANDALONE" \
+              --version "$ELECTRON_VERSION" \
+              --arch "$REBUILD_ARCH"
+          fi
           # Strip node-gyp build intermediates (obj.target/, .deps/, *.o, *.a).
           # These are produced by the rebuild above but are not needed at runtime.
           # On macOS they also cause @electron/universal to fail when building the
