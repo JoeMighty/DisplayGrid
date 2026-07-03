@@ -75,6 +75,9 @@ jobs:
           name: dashboard-build
           path: /tmp/dashboard-stage/
           retention-days: 1
+          # v4 excludes dot-paths by default, which would silently drop the
+          # entire apps/dashboard/.next tree (server chunks + static assets).
+          include-hidden-files: true
 
   # ── Build display client (Vite) ────────────────────────────────────────────
   build-display-client:
