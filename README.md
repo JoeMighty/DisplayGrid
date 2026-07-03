@@ -2,11 +2,11 @@
 
 # DisplayGrid
 
-**Open-source, self-hosted digital signage for the places people gather.**
+**Source-available, self-hosted digital signage for the places people gather.**
 
 Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGrid gives you full control over your screens without a cloud subscription, recurring fees, or vendor lock-in.
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Hippocratic License HL3-LAW-MIL-SV](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-LAW-MIL-SV&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/law-mil-sv.html)
 [![Node.js](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org)
 [![pnpm](https://img.shields.io/badge/pnpm-10-orange.svg)](https://pnpm.io)
@@ -302,12 +302,16 @@ Issues and pull requests are welcome. Please open an issue before starting signi
 
 ## Ethical Use
 
-DisplayGrid is designed for community gathering places: restaurants, churches, schools, and event venues. It is not intended for surveillance, military use, law enforcement monitoring, or facial recognition systems.
+DisplayGrid is designed for community gathering places: restaurants, churches, schools, and event venues.
+
+These aren't just intentions — they are binding license terms. DisplayGrid is licensed under the [Hippocratic License 3.0](LICENSE) with the **Mass Surveillance**, **Military Activities**, and **Law Enforcement** modules, which prohibit using it for surveillance programs, military activities, or providing services to law enforcement agencies. Facial recognition and other biometric monitoring fall under the license's privacy and mass-surveillance clauses.
 
 ---
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE)
+[Hippocratic License 3.0](LICENSE) (HL3-LAW-MIL-SV) — free to use, modify, and distribute, including commercially, subject to the ethical conditions above. This makes DisplayGrid source-available rather than OSI open source.
+
+Releases up to and including v1.0.18 were published under the MIT License and remain available under it.
 
 *By [JoeMighty](https://github.com/JoeMighty)*
