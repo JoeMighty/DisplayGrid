@@ -3,541 +3,394 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DisplayGrid: Source-Available Digital Signage</title>
-  <meta name="description" content="Self-hosted digital signage for restaurants, churches, schools, and community spaces. No cloud subscription. No vendor lock-in." />
+  <title>DisplayGrid — Digital signage, without the subscription</title>
+  <meta name="description" content="Source-available, self-hosted digital signage for restaurants, churches, schools, and community spaces. No cloud subscription. No vendor lock-in." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/site.css" />
 </head>
 <body>
 
-<!-- ─── Nav ──────────────────────────────────────────────────────────────── -->
-<nav class="nav">
-  <div class="container">
-    <div class="nav__inner">
-      <a href="index.html" class="nav__brand">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-        </svg>
-        DisplayGrid
+<div class="mesh" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ═══ Island nav ═══ -->
+<div class="nav-wrap">
+  <nav class="nav" aria-label="Main">
+    <a href="index.html" class="nav-brand">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+      DisplayGrid
+    </a>
+    <ul class="nav-links">
+      <li><a href="download.html">Download</a></li>
+      <li><a href="guides/getting-started.html">Guides</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="https://github.com/JoeMighty/DisplayGrid" class="gh" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
       </a>
-      <ul class="nav__links">
-        <li><a href="download.html">Download</a></li>
-        <li><a href="guides/getting-started.html">Getting Started</a></li>
-        <li class="nav__dropdown-wrap">
-          <button class="nav__dropdown-trigger" aria-haspopup="true" aria-expanded="false">
-            Manual Setup
-            <svg class="nav__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="nav__dropdown-panel">
-            <a href="guides/hardware.html" class="nav__dropdown-item">
-              <div class="nav__dropdown-item__icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="15" x2="4" y2="15"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="15" x2="22" y2="15"/></svg>
-              </div>
-              <div>
-                <div class="nav__dropdown-item__name">Hardware</div>
-                <div class="nav__dropdown-item__desc">Recommended displays, players, and mounts</div>
-              </div>
-            </a>
-            <a href="guides/kiosk-setup.html" class="nav__dropdown-item">
-              <div class="nav__dropdown-item__icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              </div>
-              <div>
-                <div class="nav__dropdown-item__name">Kiosk Setup</div>
-                <div class="nav__dropdown-item__desc">Configure fullscreen kiosk display mode</div>
-              </div>
-            </a>
-            <a href="guides/network-setup.html" class="nav__dropdown-item">
-              <div class="nav__dropdown-item__icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              </div>
-              <div>
-                <div class="nav__dropdown-item__name">Network</div>
-                <div class="nav__dropdown-item__desc">Network config and connectivity setup</div>
-              </div>
-            </a>
-            <a href="guides/raspberry-pi.html" class="nav__dropdown-item">
-              <div class="nav__dropdown-item__icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-              </div>
-              <div>
-                <div class="nav__dropdown-item__name">Raspberry Pi</div>
-                <div class="nav__dropdown-item__desc">Set up a Pi 4B or Pi 5 as a kiosk display</div>
-              </div>
-            </a>
-          </div>
-        </li>
-      </ul>
-      <div class="nav__cta">
-        <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost" target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
-        </a>
-        <a href="download.html" class="btn btn--primary">
-          Get started
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-      </div>
-    </div>
-  </div>
-</nav>
-
-<!-- ─── Hero ──────────────────────────────────────────────────────────────── -->
-<section class="hero">
-  <canvas id="hero-canvas" aria-hidden="true"></canvas>
-  <div class="container">
-    <div class="hero__badge">
-      <span class="hero__badge-dot"></span>
-      Free &amp; source-available &middot; Hippocratic licence 3.0
-    </div>
-
-    <h1>Digital signage,<br>without the subscription</h1>
-
-    <p class="hero__sub">
-      Self-hosted digital signage for restaurants, churches, schools, and community spaces.
-      Manage screens from a central dashboard. No cloud. No fees. No lock-in.
-    </p>
-
-    <div class="hero__actions">
-      <a href="download.html" class="btn btn--primary btn--lg">
+      <a href="download.html" class="btn btn-primary">
         Get started
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="orb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
       </a>
-      <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost btn--lg" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-        View on GitHub
-      </a>
+      <button class="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
     </div>
+  </nav>
+</div>
 
-    <!-- Dashboard mockup -->
-    <div class="mockup">
-      <div class="mockup__bar">
-        <div class="mockup__dots">
-          <div class="mockup__dot mockup__dot--red"></div>
-          <div class="mockup__dot mockup__dot--yellow"></div>
-          <div class="mockup__dot mockup__dot--green"></div>
-        </div>
-        <div class="mockup__url">displaygrid.test / Screens</div>
-      </div>
-      <div class="mockup__screen">
-        <div class="dash">
-          <!-- Sidebar -->
-          <div class="dash__sidebar">
-            <div class="dash__logo">
-              <svg class="dash__logo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-              </svg>
-              <span class="dash__logo-text">DisplayGrid</span>
-            </div>
-            <div class="dash__nav-item">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-              Overview
-            </div>
-            <div class="dash__nav-item dash__nav-item--active">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              Screens
-            </div>
-            <div class="dash__nav-item">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M3 14h7v7H3z"/><path d="M14 14h7v7h-7z"/></svg>
-              Zones
-            </div>
-            <div class="dash__nav-item">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              Playlists
-            </div>
-            <div class="dash__nav-item">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              Assets
-            </div>
-          </div>
-          <!-- Content area -->
-          <div class="dash__content">
-            <div class="dash__header">
-              <span class="dash__title">Screens &nbsp;<span style="font-size:0.6rem;font-weight:400;color:#22c55e;">2</span><span style="font-size:0.6rem;font-weight:400;color:#475569;"> / 3 online</span></span>
-              <button class="dash__btn">+ New Screen</button>
-            </div>
-            <div class="dash__cards">
-              <div class="dash__card">
-                <div class="dash__card-name">Lobby Left</div>
-                <div class="dash__card-zone">Main Lobby</div>
-                <div class="dash__status">
-                  <div class="dash__dot dash__dot--online"></div>
-                  <span class="dash__status-text dash__status-text--online">Online</span>
-                </div>
-                <div class="dash__tags">
-                  <span class="dash__tag">1920&times;1080</span>
-                  <span class="dash__tag">60 Hz</span>
-                </div>
-              </div>
-              <div class="dash__card">
-                <div class="dash__card-name">Reception</div>
-                <div class="dash__card-zone">Front Desk</div>
-                <div class="dash__status">
-                  <div class="dash__dot dash__dot--online"></div>
-                  <span class="dash__status-text dash__status-text--online">Online</span>
-                </div>
-                <div class="dash__tags">
-                  <span class="dash__tag">1920&times;1080</span>
-                  <span class="dash__tag">60 Hz</span>
-                </div>
-              </div>
-              <div class="dash__card">
-                <div class="dash__card-name">Corridor B</div>
-                <div class="dash__card-zone">East Wing</div>
-                <div class="dash__status">
-                  <div class="dash__dot dash__dot--offline"></div>
-                  <span class="dash__status-text dash__status-text--offline">Offline 5m ago</span>
-                </div>
-                <div class="dash__tags">
-                  <span class="dash__tag">3840&times;2160</span>
-                  <span class="dash__tag">4K</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<div class="menu" aria-hidden="true">
+  <a href="download.html">Download <small>Apps, Docker, and source</small></a>
+  <a href="guides/getting-started.html">Getting Started <small>Zero to first screen</small></a>
+  <a href="guides/hardware.html">Hardware <small>Displays, players, mounts</small></a>
+  <a href="roadmap.html">Roadmap <small>Shipped and what’s next</small></a>
+  <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub <small>Source & releases</small></a>
+</div>
 
-<!-- ─── Downloads ────────────────────────────────────────────────────────── -->
-<section class="section section--alt" id="downloads">
+<!-- ═══ Hero ═══ -->
+<header class="hero">
   <div class="container">
-    <span class="section__label">Standalone apps</span>
-    <h2 class="section__heading">Download &amp; run — no Node.js required</h2>
-    <p class="section__sub">Native installers for every platform. The server app opens the dashboard in a native window and stays accessible from the system tray and macOS dock when the window is closed. The kiosk app boots displays fullscreen with no browser setup.</p>
+    <div class="eyebrow rv"><span class="dot"></span> Free &amp; source-available · Hippocratic licence 3.0</div>
+    <h1 class="display-xl rv" data-d="1"><span class="grad-text">Digital signage,</span><br /><span class="grad-accent">without the subscription</span></h1>
+    <p class="lede rv" data-d="2">
+      Self-hosted signage for restaurants, churches, schools, and community spaces.
+      Manage every screen from one dashboard — no cloud, no fees, no lock-in.
+    </p>
+    <div class="hero-actions rv" data-d="3">
+      <a href="download.html" class="btn btn-primary">
+        Download for free
+        <span class="orb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></span>
+      </a>
+      <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn-glass" target="_blank" rel="noopener">
+        View on GitHub
+        <span class="orb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span>
+      </a>
+    </div>
 
-    <div class="dl-grid">
-      <!-- Server App -->
-      <div class="dl-card">
-        <div class="dl-card__header">
-          <div class="dl-card__icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><circle cx="18.5" cy="5.5" r="2" fill="currentColor" stroke="none" opacity="0.5"/></svg>
+    <div class="mock-wrap rv" data-d="3">
+      <div class="mock-glow" aria-hidden="true"></div>
+      <div class="shell">
+        <div class="core">
+          <div class="mock-bar">
+            <div class="mock-dots"><i></i><i></i><i></i></div>
+            <div class="mock-url">displaygrid.local / screens</div>
           </div>
-          <div>
-            <h3 class="dl-card__title">Server App</h3>
-            <p class="dl-card__sub">Dashboard + WebSocket server — native window &amp; tray</p>
+          <div class="mock-body">
+            <div class="mock-side">
+              <div class="brand">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                DisplayGrid
+              </div>
+              <div class="item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg> Overview</div>
+              <div class="item on"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg> Screens</div>
+              <div class="item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Zones</div>
+              <div class="item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> Playlists</div>
+              <div class="item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg> Assets</div>
+            </div>
+            <div class="mock-main">
+              <div class="mock-head">
+                <span class="t">Screens &nbsp;<em>2</em> <i>/ 3 online</i></span>
+                <span class="add">+ New screen</span>
+              </div>
+              <div class="mock-cards">
+                <div class="mock-card">
+                  <div class="n">Lobby Left</div><div class="z">Main Lobby</div>
+                  <div class="st ok"><i></i> Online</div>
+                  <div class="tags"><b>1920×1080</b><b>60 Hz</b></div>
+                </div>
+                <div class="mock-card">
+                  <div class="n">Reception</div><div class="z">Front Desk</div>
+                  <div class="st ok"><i></i> Online</div>
+                  <div class="tags"><b>1920×1080</b><b>60 Hz</b></div>
+                </div>
+                <div class="mock-card">
+                  <div class="n">Corridor B</div><div class="z">East Wing</div>
+                  <div class="st off"><i></i> Offline 5m</div>
+                  <div class="tags"><b>3840×2160</b><b>4K</b></div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="dl-btns">
-          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-Setup.exe" class="dl-btn dl-btn--win">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-            Windows
-            <span class="dl-btn__ext">.exe</span>
-          </a>
-          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.dmg" class="dl-btn dl-btn--mac">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-            macOS
-            <span class="dl-btn__ext">.dmg</span>
-          </a>
-          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-x86_64.AppImage" class="dl-btn dl-btn--linux">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00.11.28c.12.12.289.19.464.19.394 0 .694-.321.644-.714-.06-.44-.01-.9.115-1.386.26-1.023.74-2.003 1.36-2.87.99-1.402 1.73-2.83 1.945-4.403.175-1.29.154-2.578.334-3.852.165-1.174.574-2.24 1.585-2.65.313-.124.67-.176 1.068-.17 1.05-.012 2.222.444 2.97 1.244.73.78 1.1 1.847 1.1 2.98 0 .77-.193 1.574-.523 2.246-.354.717-.866 1.336-1.462 1.83-.86.71-1.8 1.357-2.7 2.027-.9.67-1.6 1.41-1.77 2.275-.068.35-.075.71-.03 1.07.047.347.15.682.3 1.01.3.647.77 1.27 1.315 1.872.54.6 1.13 1.17 1.717 1.714.58.54 1.14 1.05 1.637 1.53.5.485.916.94 1.178 1.375.262.433.38.848.302 1.233-.077.384-.343.697-.74.894-.39.19-.88.27-1.38.19-.49-.077-.97-.3-1.38-.62-.4-.32-.74-.73-.98-1.185-.236-.455-.367-.948-.38-1.45-.013-.5.097-1.008.278-1.495.36-.973 1.01-1.847 1.71-2.697.7-.85 1.44-1.7 1.98-2.576.54-.875.9-1.797.95-2.78.04-.63-.078-1.277-.36-1.878-.282-.6-.73-1.15-1.284-1.574-.553-.424-1.21-.72-1.905-.863C13.37.045 12.93 0 12.504 0z"/></svg>
-            Linux
-            <span class="dl-btn__ext">.AppImage</span>
-          </a>
-          <a href="guides/raspberry-pi.html" class="dl-btn dl-btn--pi">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="14" x2="22" y2="14"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="14" x2="4" y2="14"/></svg>
-            Raspberry Pi
-            <span class="dl-btn__ext">Guide</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Kiosk App -->
-      <div class="dl-card">
-        <div class="dl-card__header">
-          <div class="dl-card__icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
-          </div>
-          <div>
-            <h3 class="dl-card__title">Kiosk App</h3>
-            <p class="dl-card__sub">Display client — fullscreen, no browser needed</p>
-          </div>
-        </div>
-        <div class="dl-btns">
-          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-Setup.exe" class="dl-btn dl-btn--win">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-            Windows
-            <span class="dl-btn__ext">.exe</span>
-          </a>
-          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.dmg" class="dl-btn dl-btn--mac">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-            macOS
-            <span class="dl-btn__ext">.dmg</span>
-          </a>
-          <a href="https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-x86_64.AppImage" class="dl-btn dl-btn--linux">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00.11.28c.12.12.289.19.464.19.394 0 .694-.321.644-.714-.06-.44-.01-.9.115-1.386.26-1.023.74-2.003 1.36-2.87.99-1.402 1.73-2.83 1.945-4.403.175-1.29.154-2.578.334-3.852.165-1.174.574-2.24 1.585-2.65.313-.124.67-.176 1.068-.17 1.05-.012 2.222.444 2.97 1.244.73.78 1.1 1.847 1.1 2.98 0 .77-.193 1.574-.523 2.246-.354.717-.866 1.336-1.462 1.83-.86.71-1.8 1.357-2.7 2.027-.9.67-1.6 1.41-1.77 2.275-.068.35-.075.71-.03 1.07.047.347.15.682.3 1.01.3.647.77 1.27 1.315 1.872.54.6 1.13 1.17 1.717 1.714.58.54 1.14 1.05 1.637 1.53.5.485.916.94 1.178 1.375.262.433.38.848.302 1.233-.077.384-.343.697-.74.894-.39.19-.88.27-1.38.19-.49-.077-.97-.3-1.38-.62-.4-.32-.74-.73-.98-1.185-.236-.455-.367-.948-.38-1.45-.013-.5.097-1.008.278-1.495.36-.973 1.01-1.847 1.71-2.697.7-.85 1.44-1.7 1.98-2.576.54-.875.9-1.797.95-2.78.04-.63-.078-1.277-.36-1.878-.282-.6-.73-1.15-1.284-1.574-.553-.424-1.21-.72-1.905-.863C13.37.045 12.93 0 12.504 0z"/></svg>
-            Linux
-            <span class="dl-btn__ext">.AppImage</span>
-          </a>
-          <a href="guides/raspberry-pi.html" class="dl-btn dl-btn--pi">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="14" x2="22" y2="14"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="14" x2="4" y2="14"/></svg>
-            Raspberry Pi
-            <span class="dl-btn__ext">Guide</span>
-          </a>
         </div>
       </div>
     </div>
 
-    <p class="dl-note">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Debian packages and all previous versions are on the <a href="https://github.com/JoeMighty/DisplayGrid/releases" target="_blank" rel="noopener">GitHub releases page</a>. Prefer the terminal? <a href="guides/getting-started.html">Run from source</a>.
-      &nbsp;<a href="download.html" style="color:var(--blue);">Full setup guide &rarr;</a>
-    </p>
+    <div class="hero-meta rv" data-d="4">
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Free forever</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Your hardware, your data</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Auto-updating apps</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Windows · macOS · Linux · Pi · Docker</span>
+    </div>
   </div>
-</section>
+</header>
 
-<!-- ─── Features ──────────────────────────────────────────────────────────── -->
+<!-- ═══ Features (bento) ═══ -->
 <section class="section" id="features">
   <div class="container">
-    <span class="section__label">Features</span>
-    <h2 class="section__heading">Everything you need to run your screens</h2>
-    <p class="section__sub">Built for operators who need reliability, not a SaaS dashboard with a monthly bill.</p>
+    <div class="section-head rv">
+      <span class="eyebrow">Features</span>
+      <h2 class="display-lg grad-text">Everything you need to run your screens</h2>
+      <p class="lede">Built for operators who need reliability — not another SaaS dashboard with a monthly bill.</p>
+    </div>
 
-    <div class="features">
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        </div>
-        <h3>Multi-screen management</h3>
-        <p>Configure resolution, refresh rate, rotation, colour profile, and LED panel grids per screen.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <h3>Real-time delivery</h3>
-        <p>WebSocket server pushes playlist changes to all displays instantly, with no polling or page reloads.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        </div>
-        <h3>Playlist builder</h3>
-        <p>Drag-and-drop slides with per-slide durations, transitions, and day/time scheduling.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </div>
-        <h3>Asset library</h3>
-        <p>Upload images, videos, and PDFs. Automatic WebP optimisation via Sharp, with configurable quality and dimensions.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <h3>Screen health monitoring</h3>
-        <p>Live online/offline status, last-seen timestamps, and client IP, updated every 30 seconds.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <h3>Emergency override</h3>
-        <p>Broadcast a full-screen urgent message to every display simultaneously with one click.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <h3>Kiosk lock</h3>
-        <p>PIN-protected overlay prevents tampering. Unlock with a configurable key combination.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <h3>Role-based access</h3>
-        <p>Super Admin, Admin, Operator, and Viewer roles with granular permission controls.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
-        <h3>Offline resilience</h3>
-        <p>Display clients cache their last playlist and keep playing through network outages.</p>
-      </div>
-
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        </div>
+    <div class="bento">
+      <div class="cell cell-6 rv"><div class="shell"><div class="core">
+        <div class="f-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
         <h3>Multi-zone layouts</h3>
-        <p>Split any screen into independently controlled regions, each running its own playlist. Define regions by percentage coordinates.</p>
-      </div>
+        <p>Split any screen into independently controlled regions, each running its own playlist simultaneously. Define regions by percentage coordinates — perfect for menu boards with a live footer, or a lobby wall mixing announcements with video.</p>
+      </div></div></div>
 
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
+      <div class="cell rv" data-d="1"><div class="shell"><div class="core">
+        <div class="f-icon violet"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <h3>Real-time delivery</h3>
+        <p>WebSocket pushes playlist changes to every display instantly — no polling, no reloads.</p>
+      </div></div></div>
+
+      <div class="cell rv" data-d="2"><div class="shell"><div class="core">
+        <div class="f-icon emerald"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+        <h3>Playlist builder</h3>
+        <p>Drag-and-drop slides with per-slide durations, transitions, and scheduling.</p>
+      </div></div></div>
+
+      <div class="cell rv"><div class="shell"><div class="core">
+        <div class="f-icon amber"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>
+        <h3>Asset library</h3>
+        <p>Images, videos, and PDFs with automatic WebP optimisation via Sharp.</p>
+      </div></div></div>
+
+      <div class="cell rv" data-d="1"><div class="shell"><div class="core">
+        <div class="f-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <h3>Screen health</h3>
+        <p>Live online/offline status, last-seen timestamps, and client IPs at a glance.</p>
+      </div></div></div>
+
+      <div class="cell rv" data-d="2"><div class="shell"><div class="core">
+        <div class="f-icon rose"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+        <h3>Emergency override</h3>
+        <p>Broadcast a full-screen urgent message to every display with one click.</p>
+      </div></div></div>
+
+      <div class="cell rv" data-d="3"><div class="shell"><div class="core">
+        <div class="f-icon violet"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h3>Kiosk lock</h3>
+        <p>PIN-protected overlay prevents tampering; unlock with a configurable key combo.</p>
+      </div></div></div>
+
+      <div class="cell cell-6 rv"><div class="shell"><div class="core">
+        <div class="f-icon emerald"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg></div>
+        <h3>Live streams <span class="badge-new">New</span></h3>
+        <p>Play HLS (<code style="font-family:var(--font-mono);font-size:0.82em;">.m3u8</code>) or WebRTC (WHEP) sources as slides. Pair with go2rtc or MediaMTX to put IP cameras and OBS feeds on any screen — the foundation for NDI support on the <a href="roadmap.html" style="color:#93b4ff;">roadmap</a>.</p>
+      </div></div></div>
+
+      <div class="cell rv" data-d="1"><div class="shell"><div class="core">
+        <div class="f-icon amber"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
         <h3>Time-based scheduling</h3>
-        <p>Restrict slides to specific days and time windows. The server re-evaluates schedules every minute and updates displays automatically.</p>
-      </div>
+        <p>Restrict slides to specific days and time windows — re-evaluated every minute, automatically.</p>
+      </div></div></div>
 
-      <div class="feature">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><circle cx="18" cy="5" r="3" fill="currentColor" stroke="none" opacity="0.4"/></svg>
-        </div>
+      <div class="cell rv" data-d="2"><div class="shell"><div class="core">
+        <div class="f-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22M9 9a3 3 0 0 0 4.2 4.2M5.1 5.1A10 10 0 0 0 2 12c1.7 4 5.5 7 10 7 1.7 0 3.3-.4 4.7-1.2M12 5c4.5 0 8.3 3 10 7a10.9 10.9 0 0 1-1.7 2.9"/></svg></div>
+        <h3>Offline resilience</h3>
+        <p>Displays cache their last playlist and keep playing through network outages.</p>
+      </div></div></div>
+
+      <div class="cell rv"><div class="shell"><div class="core">
+        <div class="f-icon rose"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Role-based access</h3>
+        <p>Super Admin, Admin, Operator, and Viewer roles with granular permissions.</p>
+      </div></div></div>
+
+      <div class="cell rv" data-d="1"><div class="shell"><div class="core">
+        <div class="f-icon violet"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></div>
+        <h3>Multi-screen management</h3>
+        <p>Resolution, refresh rate, rotation, colour profile, and LED panel grids per screen.</p>
+      </div></div></div>
+
+      <div class="cell rv" data-d="2"><div class="shell"><div class="core">
+        <div class="f-icon emerald"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        <h3>Auto-updates <span class="badge-new">New</span></h3>
+        <p>Server and kiosk apps keep themselves current from GitHub Releases — kiosks update silently on restart.</p>
+      </div></div></div>
+
+      <div class="cell rv" data-d="3"><div class="shell"><div class="core">
+        <div class="f-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12.5a5.5 5.5 0 0 0-5.24-5.49 7 7 0 0 0-13.5 1.72A4.5 4.5 0 0 0 5 17.5h11.5a5.5 5.5 0 0 0 5.5-5z"/></svg></div>
+        <h3>Docker <span class="badge-new">New</span></h3>
+        <p>One container runs everything: <code style="font-family:var(--font-mono);font-size:0.82em;">docker compose up -d</code>, state in a single volume.</p>
+      </div></div></div>
+
+      <div class="cell cell-4 rv"><div class="shell"><div class="core">
+        <div class="f-icon amber"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><circle cx="18.5" cy="5.5" r="2"/></svg></div>
         <h3>Standalone apps</h3>
-        <p>Native installers for Windows, macOS, and Linux. Server app opens the dashboard in a native window; close it and the server keeps running via the system tray and macOS dock. Kiosk app boots displays fullscreen with no browser config.</p>
-      </div>
+        <p>Native installers for Windows, macOS (Universal), and Linux. The server lives in your tray; the kiosk app boots displays fullscreen with zero browser setup.</p>
+      </div></div></div>
 
-      <div class="feature feature--soon">
-        <div class="feature__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.894L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
-        </div>
-        <div class="feature__soon-label">Coming soon</div>
+      <div class="cell cell-4 rv" data-d="1"><div class="shell"><div class="core">
+        <div class="f-icon violet"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg></div>
+        <h3>Raspberry Pi friendly</h3>
+        <p>Run displays on a £35 Pi with Chromium in kiosk mode — server updates reach every Pi instantly, no device maintenance.</p>
+      </div></div></div>
+
+      <div class="cell cell-4 rv" data-d="2"><div class="shell"><div class="core">
+        <span class="badge-soon">On the roadmap</span>
         <h3>NDI source support</h3>
-        <p>Stream live video from NDI devices on the local network directly to any display region.</p>
-      </div>
+        <p>Stream live video from NDI devices on the local network to any display region — building on the live-stream foundation. <a href="roadmap.html" style="color:#93b4ff;">See the roadmap →</a></p>
+      </div></div></div>
     </div>
   </div>
 </section>
 
-<!-- ─── How it works ───────────────────────────────────────────────────────── -->
-<section class="section section--alt" id="how-it-works">
+<!-- ═══ How it works ═══ -->
+<section class="section" id="how-it-works">
   <div class="container">
-    <span class="section__label">How it works</span>
-    <h2 class="section__heading">Up and running in minutes</h2>
-    <p class="section__sub">No cloud account. No credit card. Just a server, a browser, and your content.</p>
-
-    <div class="steps">
-      <div class="step">
-        <h3>Install on any machine</h3>
-        <p>Clone the repo, run <code>pnpm install</code> and <code>pnpm db:migrate</code>. Works on Windows, macOS, and Linux, including Raspberry Pi.</p>
-      </div>
-      <div class="step">
-        <h3>Run the setup wizard</h3>
-        <p>Open the dashboard in your browser. Set your app name, create a Super Admin account, and configure the kiosk PIN.</p>
-      </div>
-      <div class="step">
-        <h3>Add screens &amp; zones</h3>
-        <p>Create zones to group your displays, then add screens. Each screen gets a unique pairing token.</p>
-      </div>
-      <div class="step">
-        <h3>Build playlists</h3>
-        <p>Upload images, videos, and PDFs to the asset library. Create playlists and add slides with custom durations and transitions.</p>
-      </div>
-      <div class="step">
-        <h3>Pair your displays</h3>
-        <p>Open the display client on any browser-capable device and enter the screen token. It connects and starts&nbsp;playing.</p>
-      </div>
-      <div class="step">
-        <h3>Manage from anywhere</h3>
-        <p>Update playlists from the dashboard. Changes are pushed to all paired displays in real time via&nbsp;WebSocket.</p>
-      </div>
-      <div class="step">
-        <h3>Set up multi-zone layouts</h3>
-        <p>Split a single screen into independently controlled regions, each playing its own playlist simultaneously. Define regions by percentage coordinates in the dashboard.</p>
-      </div>
-      <div class="step">
-        <h3>Schedule slides by time</h3>
-        <p>Restrict individual slides to specific days and times. The server enforces the schedule automatically and refreshes displays every minute.</p>
-      </div>
-      <div class="step">
-        <h3>Install standalone apps</h3>
-        <p>Download a native installer for Windows, macOS (Universal), or Linux. A tray-based server app manages the dashboard and WebSocket server, while a dedicated kiosk app runs displays fullscreen — no browser setup required. Raspberry Pi users can follow the <a href="guides/raspberry-pi.html">RPi setup guide</a>.</p>
-      </div>
-      <div class="step step--soon">
-        <span class="step__soon-badge">Coming soon</span>
-        <h3>And more&hellip;</h3>
-        <p>NDI live source support, analytics, user audit logs, content approval workflows, and remote screen management on the roadmap.</p>
-      </div>
+    <div class="section-head rv">
+      <span class="eyebrow">How it works</span>
+      <h2 class="display-lg grad-text">Up and running in minutes</h2>
+      <p class="lede">No cloud account. No credit card. Download an app — or run one Docker command — and follow the wizard.</p>
     </div>
+
+    <div class="shell rv" data-d="1"><div class="core">
+      <div class="steps">
+        <div class="step">
+          <h3>Install the Server App</h3>
+          <p>Download for Windows, macOS, or Linux — or run <code>docker compose up -d</code>. The database sets itself up on first launch.</p>
+        </div>
+        <div class="step">
+          <h3>Run the setup wizard</h3>
+          <p>The dashboard opens automatically. Name your app, create the Super Admin account, and set a kiosk PIN.</p>
+        </div>
+        <div class="step">
+          <h3>Add zones &amp; screens</h3>
+          <p>Group displays into zones (lobby, corridor, reception), then add screens. Each screen gets a unique pairing token.</p>
+        </div>
+        <div class="step">
+          <h3>Build playlists</h3>
+          <p>Upload images, videos, and PDFs, then arrange slides with custom durations, transitions, and schedules.</p>
+        </div>
+        <div class="step">
+          <h3>Pair your displays</h3>
+          <p>Install the Kiosk App on each display device — or open the display client in any browser — and enter the screen token. It connects and starts playing.</p>
+        </div>
+        <div class="step">
+          <h3>Manage from anywhere</h3>
+          <p>Update playlists from the dashboard; changes are pushed to every paired display in real time via WebSocket.</p>
+        </div>
+        <div class="step">
+          <h3>Go further</h3>
+          <p>Split screens into multi-zone layouts, schedule slides by day and time, and drop live camera or OBS feeds onto any screen.</p>
+        </div>
+        <div class="step">
+          <h3>Stay current, automatically</h3>
+          <p>The apps keep themselves updated from GitHub Releases. Kiosks apply updates silently on restart — never mid-show.</p>
+        </div>
+      </div>
+    </div></div>
   </div>
 </section>
 
-<!-- ─── Roles ──────────────────────────────────────────────────────────────── -->
+<!-- ═══ Roles ═══ -->
 <section class="section" id="roles">
   <div class="container">
-    <span class="section__label">Access control</span>
-    <h2 class="section__heading">The right access for every team member</h2>
-    <p class="section__sub">From the IT admin who manages everything to the volunteer who uploads the weekly schedule.</p>
+    <div class="section-head rv">
+      <span class="eyebrow">Access control</span>
+      <h2 class="display-lg grad-text">The right access for every team member</h2>
+      <p class="lede">From the IT admin who manages everything to the volunteer who uploads the weekly schedule.</p>
+    </div>
 
     <div class="roles">
-      <div class="role">
-        <span class="role__badge role__badge--sa">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Super Admin
-        </span>
+      <div class="rv"><div class="shell" style="height:100%;"><div class="core">
+        <span class="role-chip sa">★ Super Admin</span>
         <h3>Full control</h3>
-        <p>Manage everything: users, screens, content, and settings. Can assign any role including Super Admin.</p>
-      </div>
-      <div class="role">
-        <span class="role__badge role__badge--a">Admin</span>
+        <p>Manage everything: users, screens, content, and settings. Can assign any role, including Super Admin.</p>
+      </div></div></div>
+      <div class="rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
+        <span class="role-chip ad">Admin</span>
         <h3>Content &amp; users</h3>
-        <p>Manage all screens, playlists, assets, and user accounts. Cannot delete users or assign the Super Admin role.</p>
-      </div>
-      <div class="role">
-        <span class="role__badge role__badge--op">Operator</span>
+        <p>Manage all screens, playlists, assets, and user accounts. Cannot delete users or assign Super Admin.</p>
+      </div></div></div>
+      <div class="rv" data-d="2"><div class="shell" style="height:100%;"><div class="core">
+        <span class="role-chip op">Operator</span>
         <h3>Content only</h3>
         <p>Day-to-day content management: screens, zones, playlists, assets. No access to user management.</p>
-      </div>
-      <div class="role">
-        <span class="role__badge role__badge--v">Viewer</span>
+      </div></div></div>
+      <div class="rv" data-d="3"><div class="shell" style="height:100%;"><div class="core">
+        <span class="role-chip vw">Viewer</span>
         <h3>Read only</h3>
         <p>View all content pages without being able to create, edit, or delete anything.</p>
-      </div>
+      </div></div></div>
     </div>
   </div>
 </section>
 
-<!-- ─── CTA ───────────────────────────────────────────────────────────────── -->
-<section class="cta">
-  <div class="container--narrow">
-    <h2>Ready to run your own signage?</h2>
-    <p>Free forever. Self-hosted. No accounts to create, no subscriptions to manage.</p>
-    <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
-      <a href="download.html" class="btn btn--primary btn--lg">
+<!-- ═══ CTA ═══ -->
+<section class="section cta">
+  <div class="container-narrow">
+    <span class="eyebrow rv"><span class="dot"></span> Ready when you are</span>
+    <h2 class="display-lg grad-text rv" data-d="1" style="margin-top:1.4rem;">Run your own signage tonight</h2>
+    <p class="lede rv" data-d="2">Free forever. Self-hosted. No accounts to create, no subscriptions to manage.</p>
+    <div class="cta-actions rv" data-d="3">
+      <a href="download.html" class="btn btn-primary">
         Get started
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="orb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
       </a>
-      <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost btn--lg" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn-glass" target="_blank" rel="noopener">
         Star on GitHub
+        <span class="orb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
       </a>
     </div>
   </div>
 </section>
 
-<!-- ─── Footer ────────────────────────────────────────────────────────────── -->
+<!-- ═══ Footer ═══ -->
 <footer class="footer">
   <div class="container">
-    <div class="footer__inner">
-      <a href="index.html" class="footer__brand">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-        </svg>
-        DisplayGrid
-      </a>
-      <ul class="footer__links">
-        <li><a href="guides/getting-started.html">Getting Started</a></li>
-        <li><a href="guides/hardware.html">Hardware</a></li>
-        <li><a href="guides/kiosk-setup.html">Kiosk Setup</a></li>
-        <li><a href="guides/network-setup.html">Network</a></li>
-        <li><a href="guides/raspberry-pi.html">Raspberry Pi</a></li>
-        <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
-      </ul>
-      <p class="footer__copy"><a href="https://github.com/JoeMighty/DisplayGrid/blob/main/LICENSE" target="_blank" rel="noopener">Hippocratic licence 3.0</a> &middot; <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">JoeMighty</a></p>
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="footer-brand">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          DisplayGrid
+        </a>
+        <p class="tag">Source-available digital signage for the places people gather.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/releases" target="_blank" rel="noopener">Releases</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Guides</h4>
+        <ul>
+          <li><a href="guides/getting-started.html">Getting Started</a></li>
+          <li><a href="guides/hardware.html">Hardware</a></li>
+          <li><a href="guides/kiosk-setup.html">Kiosk Setup</a></li>
+          <li><a href="guides/network-setup.html">Network</a></li>
+          <li><a href="guides/raspberry-pi.html">Raspberry Pi</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/blob/main/LICENSE" target="_blank" rel="noopener">Licence (HL3)</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/issues" target="_blank" rel="noopener">Report a bug</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/blob/main/README.md" target="_blank" rel="noopener">Run from source</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-base">
+      <span>© 2026 DisplayGrid · <a href="https://github.com/JoeMighty/DisplayGrid/blob/main/LICENSE" target="_blank" rel="noopener">Hippocratic licence 3.0</a></span>
+      <span>Built by <a href="https://github.com/JoeMighty" target="_blank" rel="noopener">JoeMighty</a></span>
     </div>
   </div>
 </footer>
 
-<script src="assets/js/main.js"></script>
+<script src="assets/js/site.js"></script>
 </body>
 </html>

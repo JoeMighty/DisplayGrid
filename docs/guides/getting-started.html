@@ -7,94 +7,63 @@
   <meta name="description" content="Install DisplayGrid and get your first screen displaying content in minutes." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/site.css" />
 </head>
 <body>
 
-<nav class="nav">
-  <div class="container">
-    <div class="nav__inner">
-      <a href="../index.html" class="nav__brand">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-        </svg>
-        DisplayGrid
-      </a>
-      <ul class="nav__links">
-        <li><a href="../download.html">Download</a></li>
-        <li><a href="getting-started.html" class="active">Getting Started</a></li>
-        <li class="nav__dropdown-wrap">
-          <button class="nav__dropdown-trigger" aria-haspopup="true" aria-expanded="false">
-            Manual Setup
-            <svg class="nav__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="nav__dropdown-panel">
-            <a href="hardware.html" class="nav__dropdown-item">
-              <div class="nav__dropdown-item__icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="15" x2="4" y2="15"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="15" x2="22" y2="15"/></svg>
-              </div>
-              <div>
-                <div class="nav__dropdown-item__name">Hardware</div>
-                <div class="nav__dropdown-item__desc">Recommended displays, players, and mounts</div>
-              </div>
-            </a>
-            <a href="kiosk-setup.html" class="nav__dropdown-item">
-              <div class="nav__dropdown-item__icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              </div>
-              <div>
-                <div class="nav__dropdown-item__name">Kiosk Setup</div>
-                <div class="nav__dropdown-item__desc">Configure fullscreen kiosk display mode</div>
-              </div>
-            </a>
-            <a href="network-setup.html" class="nav__dropdown-item">
-              <div class="nav__dropdown-item__icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              </div>
-              <div>
-                <div class="nav__dropdown-item__name">Network</div>
-                <div class="nav__dropdown-item__desc">Network config and connectivity setup</div>
-              </div>
-            </a>
-            <a href="raspberry-pi.html" class="nav__dropdown-item">
-              <div class="nav__dropdown-item__icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-              </div>
-              <div>
-                <div class="nav__dropdown-item__name">Raspberry Pi</div>
-                <div class="nav__dropdown-item__desc">Set up a Pi 4B or Pi 5 as a kiosk display</div>
-              </div>
-            </a>
-          </div>
-        </li>
-      </ul>
-      <div class="nav__cta">
-        <a href="https://github.com/JoeMighty/DisplayGrid" class="btn btn--ghost" target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
-        </a>
-      </div>
-    </div>
-  </div>
-</nav>
+<div class="mesh" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
-<div class="page-header">
-  <div class="container--narrow">
-    <span class="section__label">Guide</span>
-    <h1>Getting Started</h1>
-    <p>Install DisplayGrid and get your first screen displaying content in under 10 minutes.</p>
-  </div>
+<div class="nav-wrap">
+  <nav class="nav" aria-label="Main">
+    <a href="../index.html" class="nav-brand">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+      DisplayGrid
+    </a>
+    <ul class="nav-links">
+      <li><a href="../download.html">Download</a></li>
+      <li><a href="getting-started.html" class="active">Guides</a></li>
+      <li><a href="../roadmap.html">Roadmap</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="https://github.com/JoeMighty/DisplayGrid" class="gh" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+      <a href="../download.html" class="btn btn-primary">
+        Get started
+        <span class="orb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      </a>
+      <button class="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </nav>
 </div>
+
+<div class="menu" aria-hidden="true">
+  <a href="../index.html">Home <small>What DisplayGrid does</small></a>
+  <a href="../download.html">Download <small>Apps, Docker, and source</small></a>
+  <a href="getting-started.html">Getting Started <small>Zero to first screen</small></a>
+  <a href="../roadmap.html">Roadmap <small>Shipped and what&rsquo;s next</small></a>
+  <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub <small>Source &amp; releases</small></a>
+</div>
+
+<header class="page-head">
+  <div class="container">
+    <span class="eyebrow rv">Guide</span>
+    <h1 class="grad-text rv" data-d="1">Getting Started</h1>
+    <p class="lede rv" data-d="2">Install DisplayGrid and get your first screen displaying content in under 10 minutes.</p>
+  </div>
+</header>
 
 <div class="container">
   <div class="guide-layout">
-
-    <!-- TOC -->
-    <aside class="guide-toc">
-      <p class="guide-toc__title">On this page</p>
-      <ul class="guide-toc__links">
+    <aside class="guide-toc rv" data-d="2">
+      <p class="label">On this page</p>
+      <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#install">Install</a></li>
         <li><a href="#configure">Configure</a></li>
@@ -106,17 +75,14 @@
         <li><a href="#local-domain">Local domain</a></li>
       </ul>
     </aside>
-
-    <!-- Body -->
-    <article class="guide-body">
-
-      <h2 id="prerequisites">Prerequisites</h2>
+    <article class="prose rv" data-d="3">
+<h2 id="prerequisites">Prerequisites</h2>
       <p>Install these on the machine that will run the server:</p>
       <table>
         <thead><tr><th>Tool</th><th>Version</th><th>Download</th></tr></thead>
         <tbody>
           <tr><td>Node.js</td><td>18 or 20 LTS</td><td><a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a></td></tr>
-          <tr><td>pnpm</td><td>9+</td><td><code>npm install -g pnpm</code></td></tr>
+          <tr><td>pnpm</td><td>10+</td><td><code>npm install -g pnpm</code></td></tr>
           <tr><td>Git</td><td>any</td><td><a href="https://git-scm.com" target="_blank" rel="noopener">git-scm.com</a></td></tr>
         </tbody>
       </table>
@@ -206,34 +172,55 @@ pnpm db:migrate</code></pre>
 
       <p>Then update <code>NEXTAUTH_URL</code> in your <code>.env.local</code> to <code>http://displaygrid.test:3000</code>.</p>
       <p>For truly clean URLs with no port number, use <a href="https://caddyserver.com" target="_blank" rel="noopener">Caddy</a> as a reverse proxy. See the <a href="network-setup.html">Network guide</a>.</p>
-
     </article>
   </div>
 </div>
 
-<footer class="footer" style="margin-top:4rem;">
+<footer class="footer">
   <div class="container">
-    <div class="footer__inner">
-      <a href="../index.html" class="footer__brand">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-        </svg>
-        DisplayGrid
-      </a>
-      <ul class="footer__links">
-        <li><a href="getting-started.html">Getting Started</a></li>
-        <li><a href="hardware.html">Hardware</a></li>
-        <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
-        <li><a href="network-setup.html">Network</a></li>
-        <li><a href="raspberry-pi.html">Raspberry Pi</a></li>
-        <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
-      </ul>
-      <p class="footer__copy"><a href="https://github.com/JoeMighty/DisplayGrid/blob/main/LICENSE" target="_blank" rel="noopener">Hippocratic licence 3.0</a> &middot; <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">JoeMighty</a></p>
+    <div class="footer-grid">
+      <div>
+        <a href="../index.html" class="footer-brand">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          DisplayGrid
+        </a>
+        <p class="tag">Source-available digital signage for the places people gather.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="../download.html">Download</a></li>
+          <li><a href="../roadmap.html">Roadmap</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/releases" target="_blank" rel="noopener">Releases</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Guides</h4>
+        <ul>
+          <li><a href="getting-started.html">Getting Started</a></li>
+          <li><a href="hardware.html">Hardware</a></li>
+          <li><a href="kiosk-setup.html">Kiosk Setup</a></li>
+          <li><a href="network-setup.html">Network</a></li>
+          <li><a href="raspberry-pi.html">Raspberry Pi</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/blob/main/LICENSE" target="_blank" rel="noopener">Licence (HL3)</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/issues" target="_blank" rel="noopener">Report a bug</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/blob/main/README.md" target="_blank" rel="noopener">Run from source</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-base">
+      <span>&copy; 2026 DisplayGrid &middot; <a href="https://github.com/JoeMighty/DisplayGrid/blob/main/LICENSE" target="_blank" rel="noopener">Hippocratic licence 3.0</a></span>
+      <span>Built by <a href="https://github.com/JoeMighty" target="_blank" rel="noopener">JoeMighty</a></span>
     </div>
   </div>
 </footer>
 
-<script src="../assets/js/main.js"></script>
+<script src="../assets/js/site.js"></script>
 </body>
 </html>
