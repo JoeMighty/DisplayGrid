@@ -99,7 +99,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); color: var(--text-hi); font-w
   border: 1px solid var(--hairline); background: rgba(255,255,255,0.03);
   font-size: 0.625rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--text-mute);
+  transition: border-color 0.5s var(--ease), color 0.5s var(--ease), background 0.5s var(--ease);
 }
+a.eyebrow:hover { border-color: var(--hairline-hi); color: var(--text-hi); background: rgba(255,255,255,0.055); }
 .eyebrow .dot { position: relative; width: 6px; height: 6px; border-radius: 999px; background: var(--emerald); box-shadow: 0 0 12px var(--emerald); flex: none; }
 .eyebrow .dot::after {
   content: ''; position: absolute; inset: 0; border-radius: 999px;
