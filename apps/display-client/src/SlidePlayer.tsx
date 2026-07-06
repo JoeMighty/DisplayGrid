@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 
 export interface Slide {
   id: number;
-  contentType: 'asset' | 'url' | 'html' | 'clock' | 'text';
+  contentType: 'asset' | 'url' | 'html' | 'clock' | 'text' | 'stream';
   content: string | null;
   assetId: number | null;
   asset_filename: string | null;
@@ -43,10 +43,97 @@ function TextSlide({ content }: { content: string }) {
   );
 }
 
+function StreamSlide({ url }: { url: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !url) return;
+    setError(null);
+    let hls: import('hls.js').default | undefined;
+    let pc: RTCPeerConnection | undefined;
+    let cancelled = false;
+
+    // Autoplay is unreliable for MSE/WebRTC-attached sources even when muted.
+    // A watchdog keeps the stream playing: kicks off initial playback and
+    // recovers from decoder stalls — this player runs unattended on kiosks.
+    const kick = () => { video.play().catch(() => {}); };
+    const watchdog = setInterval(() => {
+      if (video.readyState >= 2 && video.paused) kick();
+    }, 1500);
+
+    async function start() {
+      if (!video) return;
+      if (/\.m3u8($|\?)/.test(url)) {
+        // HLS — native on Safari, hls.js everywhere else
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = url;
+        } else {
+          const { default: Hls } = await import('hls.js');
+          if (cancelled) return;
+          if (!Hls.isSupported()) throw new Error('HLS not supported on this device');
+          hls = new Hls({ liveDurationInfinity: true });
+          hls.loadSource(url);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.ERROR, (_e, data) => {
+            if (data?.fatal) setError('Stream unavailable');
+          });
+        }
+      } else if (/\/whep(\/|$|\?)/.test(url)) {
+        // WHEP (WebRTC-HTTP egress) — the endpoint go2rtc and MediaMTX expose
+        pc = new RTCPeerConnection();
+        pc.addTransceiver('video', { direction: 'recvonly' });
+        pc.addTransceiver('audio', { direction: 'recvonly' });
+        pc.ontrack = (ev) => { video.srcObject = ev.streams[0]; kick(); };
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/sdp' },
+          body: offer.sdp,
+        });
+        if (!res.ok) throw new Error(`Stream unavailable (${res.status})`);
+        await pc.setRemoteDescription({ type: 'answer', sdp: await res.text() });
+      } else {
+        // Direct http(s) media URL
+        video.src = url;
+      }
+    }
+    start().catch(e => { if (!cancelled) setError(e?.message ?? 'Stream error'); });
+
+    return () => {
+      cancelled = true;
+      clearInterval(watchdog);
+      hls?.destroy();
+      pc?.close();
+      video.srcObject = null;
+      video.removeAttribute('src');
+    };
+  }, [url]);
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', background: '#000' }}>
+      <video
+        ref={videoRef}
+        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        autoPlay muted playsInline
+      />
+      {error && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: '#4b5563', fontFamily: 'system-ui, sans-serif', fontSize: '1.25rem' }}>{error}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SlideContent({ slide }: { slide: Slide }) {
   const src = `${API_BASE}/api/assets/${slide.assetId}/file`;
 
   if (slide.contentType === 'clock') return <ClockSlide />;
+
+  if (slide.contentType === 'stream') return <StreamSlide url={slide.content ?? ''} />;
 
   if (slide.contentType === 'text') return <TextSlide content={slide.content ?? ''} />;
 

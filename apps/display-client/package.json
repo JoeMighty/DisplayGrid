@@ -4,20 +4,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev":   "vite",
+    "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "react":     "^18",
-    "react-dom": "^18",
-    "@displaygrid/shared": "workspace:*"
+    "@displaygrid/shared": "workspace:*",
+    "hls.js": "^1.6.16",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "@types/react":     "^18",
+    "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vitejs/plugin-react": "^4.3.1",
     "typescript": "^5",
-    "vite":       "^5.4.0"
+    "vite": "^5.4.0"
   }
 }

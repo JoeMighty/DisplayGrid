@@ -95,6 +95,7 @@ The dashboard is at `http://<host>:3000` (WebSocket server on `3001`). All state
 - **Playlist builder:** drag-and-drop slides with per-slide durations, transitions, and day/time scheduling
 - **Asset library:** upload images, videos, and PDFs with automatic WebP optimisation via Sharp
 - **Real-time delivery:** WebSocket server pushes playlist updates to displays instantly
+- **Live streams:** play HLS (`.m3u8`) or WebRTC (WHEP) sources as slides — pair with go2rtc or MediaMTX to put IP cameras and OBS feeds on any screen
 - **Screen health monitoring:** live online/offline status, last-seen timestamps, and client IP
 - **Emergency override:** broadcast a full-screen alert to every display simultaneously
 - **Kiosk lock:** PIN-protected overlay with configurable key combo; no browser chrome visible

@@ -6,7 +6,7 @@ export type UserRole = 'super_admin' | 'admin' | 'operator' | 'viewer';
 
 export type AssetType = 'image' | 'video' | 'pdf' | 'html' | 'url';
 
-export type SlideContentType = 'asset' | 'url' | 'html' | 'clock' | 'rss' | 'text';
+export type SlideContentType = 'asset' | 'url' | 'html' | 'clock' | 'rss' | 'text' | 'stream';
 
 export type Transition = 'fade' | 'slide' | 'none';
 

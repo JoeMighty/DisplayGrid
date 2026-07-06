@@ -25,6 +25,7 @@ const TRANSITIONS = ['none', 'fade', 'slide-left', 'slide-right', 'slide-up', 'z
 const CONTENT_TYPES = [
   { value: 'asset',  label: 'Asset (image/video/PDF)' },
   { value: 'url',    label: 'Web URL' },
+  { value: 'stream', label: 'Live stream' },
   { value: 'html',   label: 'Custom HTML' },
   { value: 'clock',  label: 'Clock widget' },
   { value: 'text',   label: 'Text overlay' },
@@ -54,6 +55,12 @@ function SlideIcon({ contentType }: { contentType: string }) {
       <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
     </svg>
   );
+  if (contentType === 'stream') return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
+      <circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/>
+    </svg>
+  );
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -70,6 +77,7 @@ function SortableSlide({ slide, onEdit, onDelete, deleting }: {
   const label = slide.contentType === 'asset'
     ? (slide.assetOrigName ?? `Asset #${slide.assetId}`)
     : slide.contentType === 'url' ? (slide.content?.slice(0, 40) ?? 'URL')
+    : slide.contentType === 'stream' ? (slide.content?.slice(0, 40) ?? 'Live stream')
     : slide.contentType === 'clock' ? 'Clock widget'
     : slide.contentType === 'text' ? (slide.content?.slice(0, 40) ?? 'Text')
     : 'HTML';
@@ -196,6 +204,16 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
                 {contentType === 'url' ? 'URL' : 'Text'}
               </label>
               <input value={content} onChange={e => setContent(e.target.value)} placeholder={contentType === 'url' ? 'https://…' : 'Enter text…'} className={inputCls} />
+            </div>
+          )}
+
+          {contentType === 'stream' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">Stream URL</label>
+              <input value={content} onChange={e => setContent(e.target.value)} placeholder="https://…/stream.m3u8 or https://…/api/whep?src=cam" className={inputCls} />
+              <p className="mt-1.5 text-xs text-gray-500">
+                HLS (.m3u8) or WebRTC WHEP endpoints — e.g. from go2rtc, MediaMTX, or any HLS server. Streams play muted.
+              </p>
             </div>
           )}
 
