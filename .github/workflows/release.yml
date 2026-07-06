@@ -198,14 +198,31 @@ jobs:
           fi
 
           # sharp (image processing for uploads) also ships linux-only from the
-          # artifact. Reinstall the platform's own build. macOS installs the
-          # runner-native arm64 build (Intel macs: uploads unsupported for now).
+          # artifact. Install the platform build in a scratch dir and merge it
+          # in. NEVER npm-install inside the standalone: npm reifies against
+          # the monorepo root package.json (no runtime deps) and prunes every
+          # traced package as extraneous — v1.0.22 shipped with a gutted
+          # node_modules exactly this way. macOS gets the runner-native arm64
+          # build (Intel-mac uploads unsupported for now).
           SHARP_VERSION=$(node -p "require('./$STANDALONE/node_modules/sharp/package.json').version")
+          SCRATCH=$(mktemp -d)
+          ( cd "$SCRATCH" &&
+            npm init -y > /dev/null &&
+            npm install --no-save --omit=dev "sharp@$SHARP_VERSION" > /dev/null )
           rm -rf "$STANDALONE/node_modules/sharp" "$STANDALONE/node_modules/@img"
-          ( cd "$STANDALONE" &&
-            npm install --no-save --omit=dev "sharp@$SHARP_VERSION" &&
-            rm -f package-lock.json )
+          rm -f "$SCRATCH/node_modules/.package-lock.json"
+          cp -r "$SCRATCH/node_modules/." "$STANDALONE/node_modules/"
           node -e "require(process.cwd()+'/$STANDALONE/node_modules/sharp'); console.log('sharp loads OK on this platform')"
+
+          # The standalone must still contain every traced runtime dependency —
+          # fail hard if anything essential is missing before packaging.
+          for m in next react react-dom ws better-sqlite3 styled-jsx sharp; do
+            if [ ! -d "$STANDALONE/node_modules/$m" ]; then
+              echo "::error::$m is missing from the standalone node_modules — refusing to package"
+              exit 1
+            fi
+          done
+          echo "standalone module presence check passed"
 
       # electron-updater compares the packaged app's version against the
       # update feed, so the app must carry the release version (the repo
