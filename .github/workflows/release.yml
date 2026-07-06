@@ -349,6 +349,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history + tags so the changelog can diff against the previous release
+          fetch-depth: 0
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -357,46 +360,63 @@ jobs:
           pattern: '*-app-*'
           merge-multiple: true
 
+      # This repo commits straight to main, so GitHub's PR-based release notes
+      # come out empty — build the changelog from conventional-commit subjects.
+      - name: Build release body
+        shell: bash
+        run: |
+          cat > /tmp/release-body.md <<'BODY'
+          ## Downloads
+
+          ### Server App (Dashboard + WebSocket server)
+          Runs the DisplayGrid dashboard and WebSocket server in your system tray.
+
+          | Platform | Download |
+          |----------|----------|
+          | Windows  | `DisplayGrid-Server-Setup.exe` |
+          | macOS (Universal) | `DisplayGrid-Server.dmg` |
+          | Linux x64 AppImage | `DisplayGrid-Server-x86_64.AppImage` |
+          | Linux x64 Debian | `DisplayGrid-Server-amd64.deb` |
+
+          ### Kiosk App (Display client)
+          Fullscreen kiosk display for your signage screens.
+
+          | Platform | Download |
+          |----------|----------|
+          | Windows  | `DisplayGrid-Kiosk-Setup.exe` |
+          | macOS (Universal) | `DisplayGrid-Kiosk.dmg` |
+          | Linux x64 AppImage | `DisplayGrid-Kiosk-x86_64.AppImage` |
+          | Linux x64 Debian | `DisplayGrid-Kiosk-amd64.deb` |
+
+          > **Raspberry Pi**: See the [Raspberry Pi Setup Guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html) to run the kiosk using Chromium in kiosk mode.
+
+          ### Docker (Server)
+
+          ```
+          docker pull ghcr.io/joemighty/displaygrid:latest
+          ```
+
+          BODY
+          PREV=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || echo "")
+          RANGE=${PREV:+$PREV..}$GITHUB_REF_NAME
+          feats=$(git log $RANGE --no-merges --pretty="%s" | grep -E "^feat(\(|:)"  | sed -E "s/^feat(\([^)]*\))?: /- /" || true)
+          fixes=$(git log $RANGE --no-merges --pretty="%s" | grep -E "^fix(\(|:)"   | sed -E "s/^fix(\([^)]*\))?: /- /"  || true)
+          other=$(git log $RANGE --no-merges --pretty="%s" | grep -vE "^(feat|fix)(\(|:)" | sed -E "s/^(docs|perf|design|ci|license|chore|refactor|test)(\([^)]*\))?: /- /; s/^([^-])/- \1/" || true)
+          {
+            echo "## What's changed"
+            [ -n "$feats" ] && printf "\n### Added\n%s\n" "$feats"
+            [ -n "$fixes" ] && printf "\n### Fixed\n%s\n" "$fixes"
+            [ -n "$other" ] && printf "\n### Changed\n%s\n" "$other"
+            [ -n "$PREV" ] && printf "\n**Full changelog**: https://github.com/JoeMighty/DisplayGrid/compare/%s...%s\n" "$PREV" "$GITHUB_REF_NAME"
+          } >> /tmp/release-body.md
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           name: DisplayGrid ${{ github.ref_name }}
-          body: |
-            ## Downloads
-
-            ### Server App (Dashboard + WebSocket server)
-            Runs the DisplayGrid dashboard and WebSocket server in your system tray.
-
-            | Platform | Download |
-            |----------|----------|
-            | Windows  | `DisplayGrid-Server-Setup.exe` |
-            | macOS (Universal) | `DisplayGrid-Server.dmg` |
-            | Linux x64 AppImage | `DisplayGrid-Server-x86_64.AppImage` |
-            | Linux x64 Debian | `DisplayGrid-Server-amd64.deb` |
-
-            ### Kiosk App (Display client)
-            Fullscreen kiosk display for your signage screens.
-
-            | Platform | Download |
-            |----------|----------|
-            | Windows  | `DisplayGrid-Kiosk-Setup.exe` |
-            | macOS (Universal) | `DisplayGrid-Kiosk.dmg` |
-            | Linux x64 AppImage | `DisplayGrid-Kiosk-x86_64.AppImage` |
-            | Linux x64 Debian | `DisplayGrid-Kiosk-amd64.deb` |
-
-            > **Raspberry Pi**: See the [Raspberry Pi Setup Guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html) to run the kiosk using Chromium in kiosk mode.
-
-            ### Docker (Server)
-
-            ```
-            docker pull ghcr.io/joemighty/displaygrid:latest
-            ```
-
+          body_path: /tmp/release-body.md
           files: release-artifacts/**/*
           draft: false
           prerelease: false
-          # Appends an auto-generated "What's Changed" changelog (commits
-          # since the previous tag) below the download tables above.
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
