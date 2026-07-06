@@ -12,41 +12,22 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 [![pnpm](https://img.shields.io/badge/pnpm-10-orange.svg)](https://pnpm.io)
 [![SQLite](https://img.shields.io/badge/database-SQLite-lightblue.svg)](https://sqlite.org)
 
-**[Website](https://joemighty.github.io/DisplayGrid/) · [Download](https://github.com/JoeMighty/DisplayGrid/releases/latest) · [Setup Guide](docs/SETUP.md) · [Report a Bug](https://github.com/JoeMighty/DisplayGrid/issues)**
+**[Website](https://joemighty.github.io/DisplayGrid/) · [Download](https://joemighty.github.io/DisplayGrid/download.html) · [Roadmap](https://joemighty.github.io/DisplayGrid/roadmap.html) · [Guides](https://joemighty.github.io/DisplayGrid/guides/getting-started.html) · [Report a Bug](https://github.com/JoeMighty/DisplayGrid/issues)**
 
 </div>
 
 ---
 
-## Downloads
+## Install
 
-Native installers are published automatically on each release via GitHub Actions.
+**Desktop apps** — the fastest way to run DisplayGrid. The Server App is fully self-contained: it creates its database on first launch, opens the dashboard in a native window, and keeps itself updated from GitHub Releases.
 
-The Server App is fully self-contained: on first launch it creates its database automatically and opens the dashboard in a native window — no Node.js, terminal, or manual setup required.
+| App | Windows | macOS (Universal) | Linux |
+|---|---|---|---|
+| **Server** — dashboard + WebSocket server | [.exe](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-Setup.exe) | [.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.dmg) | [.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-x86_64.AppImage) · [.deb](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-amd64.deb) |
+| **Kiosk** — fullscreen display client | [.exe](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-Setup.exe) | [.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.dmg) | [.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-x86_64.AppImage) · [.deb](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-amd64.deb) |
 
-### Server App — Dashboard + WebSocket server (system tray)
-
-| Platform | Download |
-|----------|----------|
-| Windows | [DisplayGrid-Server-Setup.exe](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-Setup.exe) |
-| macOS (Universal) | [DisplayGrid-Server.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server.dmg) |
-| Linux x64 AppImage | [DisplayGrid-Server-x86_64.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-x86_64.AppImage) |
-| Linux x64 Debian | [DisplayGrid-Server-amd64.deb](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Server-amd64.deb) |
-
-### Kiosk App — Fullscreen display client
-
-| Platform | Download |
-|----------|----------|
-| Windows | [DisplayGrid-Kiosk-Setup.exe](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-Setup.exe) |
-| macOS (Universal) | [DisplayGrid-Kiosk.dmg](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk.dmg) |
-| Linux x64 AppImage | [DisplayGrid-Kiosk-x86_64.AppImage](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-x86_64.AppImage) |
-| Linux x64 Debian | [DisplayGrid-Kiosk-amd64.deb](https://github.com/JoeMighty/DisplayGrid/releases/latest/download/DisplayGrid-Kiosk-amd64.deb) |
-
-> **Raspberry Pi:** See the [Raspberry Pi Setup Guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html) to run the kiosk using Chromium in kiosk mode.
-
-### Docker — Server
-
-Run the server on any machine with Docker; displays connect over the network:
+**Docker** — the whole server in one container; migrations run on boot and all state lives in a single volume:
 
 ```bash
 docker run -d --name displaygrid \
@@ -55,7 +36,9 @@ docker run -d --name displaygrid \
   ghcr.io/joemighty/displaygrid:latest
 ```
 
-The dashboard is at `http://<host>:3000` (WebSocket server on `3001`). All state — database, uploads, auth secret — lives in the `/data` volume. Or clone the repo and `docker compose up -d`; [compose.yaml](compose.yaml) includes an optional HTTPS proxy (`DOMAIN=signage.example.com docker compose --profile tls up -d`).
+Or `docker compose up -d` — [compose.yaml](compose.yaml) includes an optional HTTPS proxy profile.
+
+**Raspberry Pi displays** run Chromium in kiosk mode pointed at your server — see the [Raspberry Pi guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html). No app install, no device maintenance: server updates reach every Pi instantly.
 
 ---
 
@@ -90,221 +73,80 @@ The dashboard is at `http://<host>:3000` (WebSocket server on `3001`). All state
 
 ## Features
 
-- **Multi-screen management:** configure resolution, refresh rate, rotation, colour profile, and panel grid per screen
-- **Zone-based organisation:** group screens into named zones (lobby, corridor, reception)
-- **Playlist builder:** drag-and-drop slides with per-slide durations, transitions, and day/time scheduling
-- **Asset library:** upload images, videos, and PDFs with automatic WebP optimisation via Sharp
-- **Real-time delivery:** WebSocket server pushes playlist updates to displays instantly
-- **Live streams:** play HLS (`.m3u8`) or WebRTC (WHEP) sources as slides — pair with go2rtc or MediaMTX to put IP cameras and OBS feeds on any screen
-- **Screen health monitoring:** live online/offline status, last-seen timestamps, and client IP
-- **Emergency override:** broadcast a full-screen alert to every display simultaneously
-- **Kiosk lock:** PIN-protected overlay with configurable key combo; no browser chrome visible
-- **Offline resilience:** display clients cache their last playlist and keep playing through network outages
-- **Role-based access:** Super Admin, Admin, Operator, Viewer
-- **LED wall support:** define panel grids (e.g. 3×2) for tiled display configurations
-- **Multi-zone layouts:** split a screen into independently controlled regions, each with its own playlist
-- **Time-based scheduling:** restrict slides to specific days and time windows; server re-evaluates every minute
-- **Standalone apps:** native installers for Windows, macOS (Universal), and Linux — the server app opens the dashboard in a native window and keeps running in the background via the system tray and macOS dock when the window is closed; a dedicated kiosk app runs displays fullscreen with no browser configuration required; Raspberry Pi users can follow the [RPi setup guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html)
+**Content & playback**
+- Drag-and-drop playlist builder with per-slide durations, transitions, and day/time scheduling
+- Asset library for images, videos, and PDFs with automatic WebP optimisation
+- Live streams: HLS (`.m3u8`) and WebRTC (WHEP) sources as slides — pair with go2rtc or MediaMTX to put IP cameras and OBS feeds on any screen
+- Web page, custom HTML, clock, and text slides
+- Multi-zone layouts: split any screen into independently controlled regions, each with its own playlist
 
-### Coming Soon
+**Screens & operations**
+- Multi-screen management: resolution, refresh rate, rotation, colour profile, and LED panel grids per screen
+- Real-time delivery — WebSocket pushes playlist changes to every display instantly
+- Screen health monitoring: live online/offline status, last-seen, client IP
+- Emergency override: broadcast a full-screen alert to every display with one click
+- Offline resilience — displays cache their last playlist and keep playing through outages
 
-- **NDI source support:** stream live video from NDI devices on the network directly to any display
+**Platform**
+- Role-based access: Super Admin, Admin, Operator, Viewer
+- Kiosk lock: PIN-protected overlay with a configurable unlock key combo
+- Auto-updating apps — kiosks update silently on restart, never mid-show
+- Runs on Windows, macOS, Linux, Raspberry Pi, and Docker
+
+See the [roadmap](https://joemighty.github.io/DisplayGrid/roadmap.html) for what's next — Raspberry Pi disk images, a documented REST API, date-range scheduling, and NDI support.
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |-------|-----------|
 | Dashboard | Next.js 14 (App Router), Tailwind CSS |
 | Database | SQLite · Drizzle ORM · better-sqlite3 |
-| Auth | NextAuth v5 (JWT, edge-safe) |
+| Auth | Auth.js v5 (JWT, edge-safe) |
 | Real-time | Node.js `ws` WebSocket server |
-| Display client | Vite + React |
+| Display client | Vite + React (+ hls.js for streams) |
+| Desktop apps | Electron + electron-updater |
 | Monorepo | Turborepo + pnpm workspaces |
-| Image processing | Sharp (WebP, JPEG, PNG, AVIF) |
 
 ---
 
-## Requirements
-
-- **Node.js** 18 or 20 LTS
-- **pnpm** 10+
-- **Chromium or Google Chrome** on display client machines
-- A machine to act as the server (Raspberry Pi 4/5, mini PC, or any always-on device)
-
----
-
-## Quick Start
+## Run from source
 
 ```bash
 git clone https://github.com/JoeMighty/DisplayGrid.git
 cd DisplayGrid
 pnpm install
+
+cp apps/dashboard/.env.example apps/dashboard/.env.local   # then fill in values
+mkdir -p data && pnpm db:migrate
+
+pnpm dev                              # dashboard :3000 + display client :5173
+node apps/dashboard/ws-server.js      # WebSocket server :3001 (second terminal)
 ```
 
-**Configure the dashboard:**
-
-```bash
-cp apps/dashboard/.env.example apps/dashboard/.env.local
-```
-
-Edit `apps/dashboard/.env.local`:
-
-```env
-NEXTAUTH_SECRET=<node -e "console.log(require('crypto').randomBytes(32).toString('hex'))">
-NEXTAUTH_URL=http://localhost:3000
-DB_PATH=/absolute/path/to/DisplayGrid/data/displaygrid.db
-```
-
-**Create the database:**
-
-```bash
-mkdir -p data
-pnpm db:migrate
-```
-
-**Start:**
-
-```bash
-# Terminal 1: dashboard (port 3000) + display client (port 5173)
-pnpm dev
-
-# Terminal 2: WebSocket server (port 3001)
-node apps/dashboard/ws-server.js
-```
-
-Open `http://localhost:3000` and follow the first-run setup wizard.
-
----
-
-## Local Domain (Optional)
-
-For a cleaner dev URL (`http://displaygrid.test` instead of `http://localhost:3000`):
-
-```powershell
-# Windows: run PowerShell as Administrator
-.\scripts\add-hosts.ps1
-```
-
-```bash
-# macOS / Linux
-sudo ./scripts/add-hosts.sh
-```
-
-Then optionally run Caddy for clean URLs without a port number:
-
-```bash
-caddy run --config Caddyfile
-```
-
-See **[docs/SETUP.md](docs/SETUP.md)** for the complete setup guide.
-
----
-
-## Project Structure
+Open `http://localhost:3000` and follow the setup wizard. Requirements: Node.js 18/20, pnpm 10+. The full walkthrough — including environment variables, local domains, and reverse proxies — is in the [Getting Started guide](https://joemighty.github.io/DisplayGrid/guides/getting-started.html).
 
 ```
 DisplayGrid/
 ├── apps/
-│   ├── dashboard/          # Next.js dashboard (port 3000)
-│   │   ├── src/app/        # App Router pages and API routes
-│   │   └── ws-server.js    # WebSocket server (port 3001)
-│   └── display-client/     # Vite/React kiosk client (port 5173)
+│   ├── dashboard/          # Next.js dashboard + ws-server.js
+│   ├── display-client/     # Vite/React display client
+│   ├── electron-server/    # Desktop server app (tray + native window)
+│   └── electron-kiosk/     # Desktop kiosk app (fullscreen)
 ├── packages/
-│   ├── db/                 # Drizzle schema + SQLite client
-│   └── shared/             # Constants shared across apps
-├── data/                   # SQLite database + uploaded assets (gitignored)
-├── docs/                   # GitHub Pages site + setup guides
-├── scripts/                # Hosts file setup (add-hosts.ps1 / .sh)
-└── Caddyfile               # Optional reverse proxy for clean URLs
+│   ├── db/                 # Drizzle schema, migrations, SQLite client
+│   └── shared/             # Types and constants shared across apps
+├── docker/                 # Container entrypoint + Caddyfile
+├── docs/                   # Website (GitHub Pages) + guides
+└── compose.yaml            # Docker Compose (optional TLS profile)
 ```
 
 ---
 
-## Hardware
+## Documentation
 
-### Server
-
-| | Minimum | Recommended |
-|---|---|---|
-| Device | Raspberry Pi 4 (2 GB) | Raspberry Pi 5 (4 GB+) or mini PC |
-| OS | Any Linux, macOS, Windows | Same |
-| Storage | 8 GB+ SD / SSD | 32 GB+ SSD |
-
-### Display Client
-
-Any device running Chromium in kiosk mode:
-
-| Device | Suitable for |
-|--------|-------------|
-| Raspberry Pi 5 | 4K content, smooth video |
-| Raspberry Pi 4 | 1080p images and web slides |
-| Mini PC / NUC | Any resolution |
-| Old laptop or Mac mini | Any resolution |
-
----
-
-## Kiosk Setup
-
-### Linux / Raspberry Pi
-
-```bash
-chromium-browser --kiosk --noerrdialogs --disable-infobars \
-  http://<server>:5173
-```
-
-Add to `/etc/xdg/lxsession/LXDE-pi/autostart` for boot autostart.
-
-### macOS
-
-```bash
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-  --kiosk --noerrdialogs --disable-infobars \
-  http://<server>:5173
-```
-
-Add as a Login Item in **System Settings → General → Login Items**.
-
-### Windows
-
-Create a shortcut with target:
-
-```
-"C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk --noerrdialogs --disable-infobars http://<server>:5173
-```
-
-Copy to `shell:startup` to run on login.
-
-**Unlock kiosk:** Hold `Ctrl+Alt+K` for 3 seconds to open the admin panel.
-
----
-
-## Network Deployment
-
-For kiosks on separate machines, point the display client at the server's IP:
-
-```env
-# apps/display-client/.env.local
-VITE_API_BASE=http://192.168.1.10:3000
-VITE_WS_BASE=ws://192.168.1.10:3001
-
-# Pre-configure token to skip the token entry screen
-VITE_SCREEN_TOKEN=your-screen-token-here
-```
-
-See [docs/SETUP.md](docs/SETUP.md) for cross-VLAN and firewall configuration.
-
----
-
-## User Roles
-
-| Role | Can do |
-|------|--------|
-| **Super Admin** | Everything, including deleting users and assigning any role |
-| **Admin** | Manage all content and users (cannot delete users) |
-| **Operator** | Manage screens, playlists, assets (no user management) |
-| **Viewer** | Read-only access to all content pages |
+Setup and operations guides live on the website: [Getting Started](https://joemighty.github.io/DisplayGrid/guides/getting-started.html) · [Hardware](https://joemighty.github.io/DisplayGrid/guides/hardware.html) · [Kiosk Setup](https://joemighty.github.io/DisplayGrid/guides/kiosk-setup.html) · [Network](https://joemighty.github.io/DisplayGrid/guides/network-setup.html) · [Raspberry Pi](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html)
 
 ---
 
@@ -314,7 +156,7 @@ Issues and pull requests are welcome. Please open an issue before starting signi
 
 ---
 
-## Ethical Use
+## Ethical use
 
 DisplayGrid is designed for community gathering places: restaurants, churches, schools, and event venues.
 

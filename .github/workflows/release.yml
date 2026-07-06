@@ -407,5 +407,8 @@ jobs:
           files: release-artifacts/**/*
           draft: false
           prerelease: false
+          # Appends an auto-generated "What's Changed" changelog (commits
+          # since the previous tag) below the download tables above.
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
