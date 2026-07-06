@@ -159,65 +159,53 @@ jobs:
           New-Item -ItemType Directory -Force -Path apps/dashboard/.next/standalone
           Copy-Item -Path apps/dashboard-build/* -Destination apps/dashboard/.next/standalone/ -Recurse -Force
 
-      - name: Rebuild native modules for Electron
+      - name: Replace native modules with platform builds
         shell: bash
         run: |
-          # Get the exact Electron version that was installed (resolves the ^ range).
-          # node-linker=hoisted puts electron in the root node_modules; require.resolve
-          # walks up from the app dir, so this works in any layout.
+          # The dashboard artifact is traced on ubuntu, so its node_modules
+          # carry LINUX native binaries. Every platform must swap in its own:
+          # shipping the linux better_sqlite3.node broke Windows installs with
+          # ERR_DLOPEN_FAILED ("not a valid Win32 application"). Fetch the
+          # official Electron prebuilds directly into the shipped module —
+          # @electron/rebuild's walker claimed success while updating the
+          # repo-root copy instead of the standalone one, so it is not used.
           ELECTRON_VERSION=$(node -p "require(require.resolve('electron/package.json',{paths:[process.cwd()+'/apps/electron-server']})).version")
-          # Map matrix arch to @electron/rebuild --arch value
-          REBUILD_ARCH="${{ matrix.platform == 'mac' && 'universal' || 'x64' }}"
-          echo "Rebuilding native modules for Electron $ELECTRON_VERSION arch=$REBUILD_ARCH"
-          # Rebuild better-sqlite3 inside the staged dashboard package so it uses
-          # Electron's ABI instead of the Node.js ABI from the build machine.
-          # (sharp is N-API and ABI-stable — no rebuild needed.)
-          # With the hoisted layout the traced deps live at the standalone ROOT
-          # node_modules. The package.json next to it is the monorepo root one,
-          # which declares no runtime deps — and @electron/rebuild only rebuilds
-          # modules reachable from the module-dir package.json's dependencies.
-          # Patch better-sqlite3 in so the walker picks it up.
           STANDALONE="apps/dashboard/.next/standalone"
+          BSQ="$STANDALONE/node_modules/better-sqlite3"
+          BEFORE=$(sha256sum "$BSQ/build/Release/better_sqlite3.node" | cut -d' ' -f1)
+
           if [ "${{ matrix.platform }}" = "mac" ]; then
-            # No universal prebuilds exist, and letting @electron/rebuild
-            # compile from source takes 20+ minutes (it also picks up the
-            # hoisted repo-root copy). Instead: fetch the official x64 and
-            # arm64 Electron prebuilds and lipo them into one fat binary.
-            # electron-builder's x64ArchFiles already accepts the identical
-            # fat binary in both slices of the universal build.
-            BSQ="$STANDALONE/node_modules/better-sqlite3"
-            cd "$BSQ"
-            npx --yes prebuild-install --runtime=electron --target="$ELECTRON_VERSION" --arch=x64 --force
-            mv build/Release/better_sqlite3.node /tmp/bsq-x64.node
-            npx --yes prebuild-install --runtime=electron --target="$ELECTRON_VERSION" --arch=arm64 --force
-            mv build/Release/better_sqlite3.node /tmp/bsq-arm64.node
-            lipo -create /tmp/bsq-x64.node /tmp/bsq-arm64.node -output build/Release/better_sqlite3.node
-            lipo -info build/Release/better_sqlite3.node
-            cd - > /dev/null
+            # No universal prebuilds exist — fetch both arches and lipo them.
+            # electron-builder's x64ArchFiles accepts the identical fat binary
+            # in both slices of the universal build.
+            ( cd "$BSQ" &&
+              npx --yes prebuild-install --runtime=electron --target="$ELECTRON_VERSION" --arch=x64 --force &&
+              mv build/Release/better_sqlite3.node /tmp/bsq-x64.node &&
+              npx --yes prebuild-install --runtime=electron --target="$ELECTRON_VERSION" --arch=arm64 --force &&
+              mv build/Release/better_sqlite3.node /tmp/bsq-arm64.node &&
+              lipo -create /tmp/bsq-x64.node /tmp/bsq-arm64.node -output build/Release/better_sqlite3.node &&
+              lipo -info build/Release/better_sqlite3.node )
           else
-            node -e "
-              const fs = require('fs');
-              const p  = '$STANDALONE/package.json';
-              const j  = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8'))
-                                          : { name: 'dashboard-standalone', version: '0.0.0' };
-              j.dependencies = { ...(j.dependencies || {}), 'better-sqlite3': '*' };
-              fs.writeFileSync(p, JSON.stringify(j, null, 2));
-            "
-            npx --yes @electron/rebuild \
-              --force \
-              --module-dir "$STANDALONE" \
-              --version "$ELECTRON_VERSION" \
-              --arch "$REBUILD_ARCH"
+            ( cd "$BSQ" &&
+              npx --yes prebuild-install --runtime=electron --target="$ELECTRON_VERSION" --arch=x64 --force )
           fi
-          # Strip node-gyp build intermediates (obj.target/, .deps/, *.o, *.a).
-          # These are produced by the rebuild above but are not needed at runtime.
-          # On macOS they also cause @electron/universal to fail when building the
-          # universal DMG because the same intermediate file appears in both the
-          # x64 and arm64 temp packages and is flagged as an ambiguous native file.
-          NATIVE_MODS="$STANDALONE/node_modules"
-          find "$NATIVE_MODS" -type d -name "obj.target" -exec rm -rf {} + 2>/dev/null || true
-          find "$NATIVE_MODS" -type d -name ".deps"      -exec rm -rf {} + 2>/dev/null || true
-          find "$NATIVE_MODS" -type f \( -name "*.o" -o -name "*.a" \) -delete 2>/dev/null || true
+
+          AFTER=$(sha256sum "$BSQ/build/Release/better_sqlite3.node" | cut -d' ' -f1)
+          echo "better_sqlite3.node: $BEFORE -> $AFTER"
+          if [ "${{ matrix.platform }}" != "linux" ] && [ "$BEFORE" = "$AFTER" ]; then
+            echo "::error::better_sqlite3.node was not replaced for ${{ matrix.platform }} — the linux binary would ship"
+            exit 1
+          fi
+
+          # sharp (image processing for uploads) also ships linux-only from the
+          # artifact. Reinstall the platform's own build. macOS installs the
+          # runner-native arm64 build (Intel macs: uploads unsupported for now).
+          SHARP_VERSION=$(node -p "require('./$STANDALONE/node_modules/sharp/package.json').version")
+          rm -rf "$STANDALONE/node_modules/sharp" "$STANDALONE/node_modules/@img"
+          ( cd "$STANDALONE" &&
+            npm install --no-save --omit=dev "sharp@$SHARP_VERSION" &&
+            rm -f package-lock.json )
+          node -e "require(process.cwd()+'/$STANDALONE/node_modules/sharp'); console.log('sharp loads OK on this platform')"
 
       # electron-updater compares the packaged app's version against the
       # update feed, so the app must carry the release version (the repo
