@@ -1,0 +1,3 @@
+{$DOMAIN} {
+	reverse_proxy displaygrid:3000
+}

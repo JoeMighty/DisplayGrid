@@ -44,6 +44,19 @@ The Server App is fully self-contained: on first launch it creates its database 
 
 > **Raspberry Pi:** See the [Raspberry Pi Setup Guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html) to run the kiosk using Chromium in kiosk mode.
 
+### Docker — Server
+
+Run the server on any machine with Docker; displays connect over the network:
+
+```bash
+docker run -d --name displaygrid \
+  -p 3000:3000 -p 3001:3001 \
+  -v displaygrid-data:/data \
+  ghcr.io/joemighty/displaygrid:latest
+```
+
+The dashboard is at `http://<host>:3000` (WebSocket server on `3001`). All state — database, uploads, auth secret — lives in the `/data` volume. Or clone the repo and `docker compose up -d`; [compose.yaml](compose.yaml) includes an optional HTTPS proxy (`DOMAIN=signage.example.com docker compose --profile tls up -d`).
+
 ---
 
 ## Screenshots

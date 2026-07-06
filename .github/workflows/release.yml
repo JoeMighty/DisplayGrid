@@ -245,6 +245,7 @@ jobs:
             dist/electron-server/*.deb
             dist/electron-server/*.yml
             dist/electron-server/*.blockmap
+            !dist/electron-server/builder-debug.yml
           retention-days: 1
 
   # ── Build Kiosk App ────────────────────────────────────────────────────────
@@ -311,7 +312,47 @@ jobs:
             dist/electron-kiosk/*.deb
             dist/electron-kiosk/*.yml
             dist/electron-kiosk/*.blockmap
+            !dist/electron-kiosk/builder-debug.yml
           retention-days: 1
+
+  # ── Docker image (server) ──────────────────────────────────────────────────
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute image tags
+        id: meta
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            V="${GITHUB_REF_NAME#v}"
+            echo "tags=ghcr.io/joemighty/displaygrid:${V},ghcr.io/joemighty/displaygrid:latest" >> "$GITHUB_OUTPUT"
+          else
+            echo "tags=ghcr.io/joemighty/displaygrid:dev" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Builds on every run (verification); pushes only on tags.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ startsWith(github.ref, 'refs/tags/') }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   # ── Publish GitHub Release ─────────────────────────────────────────────────
   publish:
@@ -356,6 +397,12 @@ jobs:
             | Linux x64 Debian | `DisplayGrid-Kiosk-amd64.deb` |
 
             > **Raspberry Pi**: See the [Raspberry Pi Setup Guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html) to run the kiosk using Chromium in kiosk mode.
+
+            ### Docker (Server)
+
+            ```
+            docker pull ghcr.io/joemighty/displaygrid:latest
+            ```
 
           files: release-artifacts/**/*
           draft: false

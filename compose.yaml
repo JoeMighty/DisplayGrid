@@ -1,0 +1,38 @@
+# DisplayGrid server.
+#
+#   docker compose up -d
+#
+# Dashboard: http://<host>:3000 — WebSocket server: <host>:3001.
+# Display clients need both ports reachable.
+#
+# Optional HTTPS for the dashboard via Caddy (WebSocket stays on plain 3001):
+#
+#   DOMAIN=signage.example.com docker compose --profile tls up -d
+
+services:
+  displaygrid:
+    image: ghcr.io/joemighty/displaygrid:latest
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - displaygrid-data:/data
+
+  caddy:
+    image: caddy:2
+    profiles: [tls]
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN to your hostname}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+
+volumes:
+  displaygrid-data:
+  caddy-data:

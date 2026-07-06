@@ -215,6 +215,10 @@ function spawnNext() {
     // Auth.js v5 rejects requests in production unless the host is trusted;
     // the server only binds localhost, so trusting it is safe.
     AUTH_TRUST_HOST: 'true',
+    // Keep uploaded assets in userData alongside the DB. Without this the
+    // dashboard defaults to cwd/../../data/uploads, which lands outside the
+    // install directory in packaged apps.
+    UPLOAD_DIR: path.join(userData, 'uploads'),
     // Next.js standalone bundles its own node_modules including sharp
     NEXT_SHARP_PATH: isDev
       ? resPath('node_modules/sharp')

@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+**/.next
+**/dist
+data
+docs
+.git
+.github
+.claude
+*.md
+Dockerfile
+compose.yaml
+test-asset.png
