@@ -51,6 +51,18 @@ function isSlideActiveNow(scheduleJson) {
     const sched = JSON.parse(scheduleJson);
     if (!sched) return true;
     const now = new Date();
+
+    // Date range (inclusive). Compare against the local calendar date so a slide
+    // set to run "until 2026-12-24" stays live through the whole of that day.
+    if (sched.startDate || sched.endDate) {
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      const today = `${y}-${m}-${d}`;
+      if (sched.startDate && today < sched.startDate) return false;
+      if (sched.endDate   && today > sched.endDate)   return false;
+    }
+
     const dayOfWeek = now.getDay(); // 0 = Sunday
     if (Array.isArray(sched.days) && !sched.days.includes(dayOfWeek)) return false;
     if (sched.startTime && sched.endTime) {

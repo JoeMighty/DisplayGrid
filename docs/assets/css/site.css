@@ -462,13 +462,27 @@ pre:hover .copy-btn { opacity: 1; }
 .lane.planned .dot { background: var(--amber); box-shadow: 0 0 12px rgba(251,191,36,0.7); }
 .lane.exploring .dot { background: var(--text-dim); }
 
-.rm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
-.rm-item .core { padding: 1.5rem 1.6rem; height: 100%; }
-.rm-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; }
-.rm-top h3 { font-size: 1.02rem; }
-.rm-tag { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-dim); border: 1px solid var(--hairline); padding: 0.18rem 0.6rem; border-radius: 999px; white-space: nowrap; }
+/* Vertical list — a rail down the left with a node per item */
+.rm-list { display: flex; flex-direction: column; position: relative; padding-left: 1.6rem; }
+.rm-list::before {
+  content: ''; position: absolute; left: 4px; top: 0.6rem; bottom: 0.6rem; width: 1px;
+  background: linear-gradient(var(--hairline), transparent);
+}
+.rm-row { position: relative; padding: 0.85rem 0; border-bottom: 1px solid var(--hairline); }
+.rm-row:last-child { border-bottom: none; }
+.rm-row::before {
+  content: ''; position: absolute; left: calc(-1.6rem + 1px); top: 1.35rem;
+  width: 9px; height: 9px; border-radius: 999px; background: var(--bg);
+  border: 2px solid var(--text-dim);
+}
+.lane.shipped  .rm-row::before { border-color: var(--emerald); box-shadow: 0 0 8px rgba(52,211,153,0.6); }
+.lane.building .rm-row::before { border-color: var(--blue);    box-shadow: 0 0 8px rgba(91,140,255,0.6); }
+.lane.planned  .rm-row::before { border-color: var(--amber); }
+.rm-row-head { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+.rm-row-head h3 { font-size: 1.02rem; letter-spacing: -0.01em; }
+.rm-row p { font-size: 0.9rem; color: var(--text-mute); margin-top: 0.3rem; max-width: 64ch; line-height: 1.6; }
+.rm-tag { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-dim); border: 1px solid var(--hairline); padding: 0.14rem 0.55rem; border-radius: 999px; white-space: nowrap; }
 .rm-tag.ship { color: #6ee7b7; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.06); }
-.rm-item p { font-size: 0.875rem; color: var(--text-mute); }
 
 /* ── Guides ──────────────────────────────────────────────────────────── */
 .page-head { padding-top: clamp(9rem, 15vh, 11rem); padding-bottom: clamp(2.5rem, 5vw, 4rem); }
@@ -548,7 +562,7 @@ pre:hover .copy-btn { opacity: 1; }
   .section { padding-block: 4.5rem; }
   .hero { padding-top: 7.5rem; }
   .bento .cell, .bento .cell-4, .bento .cell-6 { grid-column: span 12; }
-  .steps, .rm-grid, .roles, .dl-grid { grid-template-columns: 1fr; }
+  .steps, .roles, .dl-grid { grid-template-columns: 1fr; }
   .mock-cards { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
   .footer-base { flex-direction: column; align-items: flex-start; }

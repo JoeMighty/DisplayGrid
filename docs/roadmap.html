@@ -58,8 +58,8 @@
     <span class="eyebrow rv"><span class="dot"></span> Public roadmap</span>
     <h1 class="grad-text rv" data-d="1">Where DisplayGrid is going</h1>
     <p class="lede rv" data-d="2">
-      Everything ships in the open. Recent releases, what’s being built now, and the ideas
-      being explored — no dates promised, no features paywalled later.
+      Everything ships in the open — what’s already released, what’s in production now, and
+      what’s planned. No dates promised, no features paywalled later.
     </p>
   </div>
 </header>
@@ -70,88 +70,120 @@
   <div class="lane shipped">
     <div class="lane-head rv">
       <span class="dot"></span>
-      <h2>Recently shipped</h2>
-      <span class="count">8 releases</span>
+      <h2>Shipped</h2>
+      <span class="count">9 releases</span>
     </div>
-    <div class="rm-grid">
-      <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Raspberry Pi kiosk &amp; one-URL pairing</h3><span class="rm-tag ship">v1.0.26 · Jul 2026</span></div>
+    <div class="rm-list">
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Date-range scheduling</h3><span class="rm-tag ship">v1.0.27 · Jul 2026</span></div>
+        <p>Give any slide a start and end date — “show the Christmas menu 1–24 December” — on top of the existing day-of-week and time-of-day windows. Runs indefinitely when left blank.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Raspberry Pi kiosk &amp; one-URL pairing</h3><span class="rm-tag ship">v1.0.26 · Jul 2026</span></div>
         <p>One command turns a fresh Raspberry Pi into a fullscreen kiosk (<span style="font-family:var(--font-mono); font-size:0.85em;">curl … | bash</span>). And any display pairs with zero typing — put the token in the URL (<span style="font-family:var(--font-mono); font-size:0.85em;">/display?token=lobby</span>) and bookmark it.</p>
-      </div></div></div>
-      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Browser displays &amp; blank-slide fixes</h3><span class="rm-tag ship">v1.0.24–25 · Jul 2026</span></div>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Browser displays &amp; blank-slide fixes</h3><span class="rm-tag ship">v1.0.24–25 · Jul 2026</span></div>
         <p>The server now serves the display client itself at <span style="font-family:var(--font-mono); font-size:0.85em;">/display</span>, so any browser or Raspberry Pi can pair without the desktop app. URL slides entered as a bare domain now open correctly instead of rendering blank.</p>
-      </div></div></div>
-      <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Packaged-app reliability</h3><span class="rm-tag ship">v1.0.22–23 · Jul 2026</span></div>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Packaged-app reliability</h3><span class="rm-tag ship">v1.0.22–23 · Jul 2026</span></div>
         <p>Installers now ship platform-correct native modules on every OS — with hard CI assertions that a broken package can never publish again. Releases also gained an automatic what&rsquo;s-changed changelog grouped into Added / Fixed / Changed.</p>
-      </div></div></div>
-      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Live-stream slides</h3><span class="rm-tag ship">v1.0.21 · Jul 2026</span></div>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Live-stream slides</h3><span class="rm-tag ship">v1.0.21 · Jul 2026</span></div>
         <p>Play HLS (<span style="font-family:var(--font-mono); font-size:0.85em;">.m3u8</span>) and WebRTC (WHEP) sources as playlist slides. Pair with go2rtc or MediaMTX to put IP cameras and OBS feeds on any screen. Streams play muted with a self-healing playback watchdog.</p>
-      </div></div></div>
-      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Docker image</h3><span class="rm-tag ship">v1.0.20 · Jul 2026</span></div>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Docker image</h3><span class="rm-tag ship">v1.0.20 · Jul 2026</span></div>
         <p>The whole server in one container on GHCR — migrations on boot, state in a single volume, optional HTTPS proxy profile in compose. <span style="font-family:var(--font-mono); font-size:0.85em;">docker compose up -d</span> and you’re live.</p>
-      </div></div></div>
-      <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Auto-updating apps</h3><span class="rm-tag ship">v1.0.19 · Jul 2026</span></div>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Auto-updating apps</h3><span class="rm-tag ship">v1.0.19 · Jul 2026</span></div>
         <p>Server and Kiosk apps keep themselves current from GitHub Releases on Windows and Linux. Kiosks download silently and update on restart — a live display is never interrupted.</p>
-      </div></div></div>
-      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Solid packaged apps &amp; new licence</h3><span class="rm-tag ship">v1.0.18 · Jul 2026</span></div>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Solid packaged apps &amp; new licence</h3><span class="rm-tag ship">v1.0.18 · Jul 2026</span></div>
         <p>The Server App became fully self-contained — automatic database setup on first launch and working auth out of the box. DisplayGrid also adopted the Hippocratic Licence 3.0, making the ethical-use clause binding.</p>
-      </div></div></div>
+      </div>
     </div>
   </div>
 
-  <!-- Up next -->
+  <!-- In production -->
   <div class="lane building">
     <div class="lane-head rv">
       <span class="dot"></span>
-      <h2>Up next</h2>
-      <span class="count">In design &amp; build</span>
+      <h2>In production</h2>
+      <span class="count">Building now</span>
     </div>
-    <div class="rm-grid">
-      <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Documented REST API</h3><span class="rm-tag">integrations</span></div>
+    <div class="rm-list">
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Remote display operations</h3><span class="rm-tag">operations</span></div>
+        <p>See what each screen is actually showing right now from the dashboard, and reload or restart it remotely — no walk across the building when something looks wrong.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Documented REST API</h3><span class="rm-tag">integrations</span></div>
         <p>A stable, documented API with automation tokens — trigger the emergency override from a script, bulk-upload assets, or wire DisplayGrid into n8n and Home Assistant.</p>
-      </div></div></div>
-      <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Date-range scheduling</h3><span class="rm-tag">campaigns</span></div>
-        <p>Absolute start and end dates for slides — “show this promotion 1–24 December” — on top of the existing day-of-week and time-window scheduling.</p>
-      </div></div></div>
-      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Ops &amp; troubleshooting guide</h3><span class="rm-tag">docs</span></div>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Ops &amp; troubleshooting guide</h3><span class="rm-tag">docs</span></div>
         <p>A proper “when things go wrong” page: where the logs live, how updates apply, and fixes for the most common setup issues.</p>
-      </div></div></div>
+      </div>
     </div>
   </div>
 
-  <!-- Exploring -->
-  <div class="lane exploring">
+  <!-- Planned -->
+  <div class="lane planned">
     <div class="lane-head rv">
       <span class="dot"></span>
-      <h2>Exploring</h2>
-      <span class="count">Research</span>
+      <h2>Planned</h2>
+      <span class="count">Under consideration</span>
     </div>
-    <div class="rm-grid">
-      <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>NDI source support</h3></div>
-        <p>A server-side bridge that discovers NDI sources on the LAN (ProPresenter, OBS, PTZ cameras, vMix) and re-serves them as WebRTC — so every display, including Raspberry Pis, can show them through the existing live-stream slide type.</p>
-      </div></div></div>
-      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Remote display operations</h3></div>
-        <p>See what a screen is actually showing right now from the dashboard, and reload or restart it remotely — no walk across the building.</p>
-      </div></div></div>
-      <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Backup &amp; restore</h3></div>
+    <div class="rm-list">
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Slide template library</h3><span class="rm-tag">content</span></div>
+        <p>Pre-made, good-looking layouts — menu board, event schedule, welcome screen, announcement — so a volunteer can produce professional content in minutes without a designer.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Native widgets</h3><span class="rm-tag">content</span></div>
+        <p>Weather, news/RSS, calendar and service times, and countdowns as first-class slide types — the signage staples, beyond the existing clock.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Emergency override templates</h3><span class="rm-tag">safety</span></div>
+        <p>Pre-set fire, lockdown, and closure messages — one tap to broadcast the right full-screen alert to every display.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Backup &amp; restore</h3><span class="rm-tag">reliability</span></div>
         <p>One-click export of the database and asset library to a single archive, and a matching import — for migrations, upgrades, and peace of mind.</p>
-      </div></div></div>
-      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Analytics &amp; approval workflows</h3></div>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Display groups &amp; bulk assignment</h3><span class="rm-tag">operations</span></div>
+        <p>Push one playlist to many screens at once, and manage displays in named groups beyond the existing zones.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Preview before publish</h3><span class="rm-tag">content</span></div>
+        <p>See exactly what a screen will show before pushing it live — catch mistakes without walking to the display.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Offline media pre-caching</h3><span class="rm-tag">reliability</span></div>
+        <p>Displays download their assets locally for instant, outage-proof playback — no buffering, no blank screens when the network hiccups.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Embed-blocked slide notice</h3><span class="rm-tag">polish</span></div>
+        <p>When a web page refuses to be embedded, show a clear placeholder instead of a silent black screen.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>NDI source support</h3><span class="rm-tag">exploring</span></div>
+        <p>A server-side bridge that discovers NDI sources on the LAN (ProPresenter, OBS, PTZ cameras, vMix) and re-serves them as WebRTC — so every display, including Raspberry Pis, can show them through the existing live-stream slide type.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Import from Canva &amp; Google Slides</h3><span class="rm-tag">content</span></div>
+        <p>Bring in designs from the tools people already use, instead of rebuilding them slide by slide.</p>
+      </div>
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>Proof-of-play &amp; approval workflows</h3><span class="rm-tag">teams</span></div>
         <p>Proof-of-play reports for venues that sell screen time, audit logs, and content approval flows for teams with volunteers or multiple editors.</p>
-      </div></div></div>
+      </div>
     </div>
   </div>
 

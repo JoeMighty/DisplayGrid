@@ -117,6 +117,8 @@ function parseSchedule(json: string | null) {
       days:      (s.days ?? [0,1,2,3,4,5,6]) as number[],
       startTime: (s.startTime ?? '00:00') as string,
       endTime:   (s.endTime   ?? '23:59') as string,
+      startDate: (s.startDate ?? '') as string,
+      endDate:   (s.endDate   ?? '') as string,
     };
   } catch { return null; }
 }
@@ -139,6 +141,8 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
   const [schedDays, setSchedDays]             = useState<number[]>(parsedSched?.days ?? [0,1,2,3,4,5,6]);
   const [schedStart, setSchedStart]           = useState(parsedSched?.startTime ?? '00:00');
   const [schedEnd, setSchedEnd]               = useState(parsedSched?.endTime ?? '23:59');
+  const [schedStartDate, setSchedStartDate]   = useState(parsedSched?.startDate ?? '');
+  const [schedEndDate, setSchedEndDate]       = useState(parsedSched?.endDate ?? '');
 
   function toggleDay(d: number) {
     setSchedDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d].sort());
@@ -162,7 +166,11 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
       enabled,
       sortOrder:       slide?.sortOrder ?? 9999,
       scheduleJson:    schedEnabled
-        ? JSON.stringify({ days: schedDays, startTime: schedStart, endTime: schedEnd })
+        ? JSON.stringify({
+            days: schedDays, startTime: schedStart, endTime: schedEnd,
+            ...(schedStartDate ? { startDate: schedStartDate } : {}),
+            ...(schedEndDate   ? { endDate:   schedEndDate   } : {}),
+          })
         : null,
     };
     const url    = slide ? `/api/playlists/${playlistId}/slides/${slide.id}` : `/api/playlists/${playlistId}/slides`;
@@ -287,6 +295,21 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
                     <label className="block text-xs text-gray-500 mb-1">End time</label>
                     <input type="time" value={schedEnd} onChange={e => setSchedEnd(e.target.value)}
                       className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-blue-500" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-2">Date range <span className="text-gray-600">(optional — leave blank to run indefinitely)</span></p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">From date</label>
+                      <input type="date" value={schedStartDate} max={schedEndDate || undefined} onChange={e => setSchedStartDate(e.target.value)}
+                        className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-blue-500" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Until date</label>
+                      <input type="date" value={schedEndDate} min={schedStartDate || undefined} onChange={e => setSchedEndDate(e.target.value)}
+                        className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-blue-500" />
+                    </div>
                   </div>
                 </div>
               </>
