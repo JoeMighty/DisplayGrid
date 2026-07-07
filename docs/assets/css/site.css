@@ -394,12 +394,17 @@ body.menu-open { overflow: hidden; }
 .app-tabs button.active { background: #fff; color: #0a0a0c; }
 
 .dl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; text-align: left; }
-.dl-grid .core { padding: 1.6rem; height: 100%; display: flex; flex-direction: column; }
+/* Extra bottom padding reserves the secondary-link row on EVERY card so the
+   primary button shares one baseline whether or not a .deb link is present. */
+.dl-grid .core { padding: 1.6rem 1.6rem 2.9rem; height: 100%; display: flex; flex-direction: column; position: relative; }
 .dl-grid .plat { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; color: var(--text-hi); margin-bottom: 0.3rem; }
-.dl-grid .desc { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1.4rem; flex: 1; }
+/* Reserve a uniform description block (fits the longest, 3 lines) so every
+   card is the same height. */
+.dl-grid .desc { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1.4rem; min-height: 3.4rem; }
 .dl-grid .f-icon { margin-bottom: 1rem; }
-.dl-grid .btn { width: 100%; justify-content: space-between; font-size: 0.85rem; }
-.dl-grid .alt { margin-top: 0.7rem; font-size: 0.74rem; color: var(--text-dim); }
+.dl-grid .btn { width: 100%; justify-content: space-between; font-size: 0.85rem; margin-top: auto; }
+/* Pinned into the reserved row so it never pushes the button up. */
+.dl-grid .alt { position: absolute; left: 1.6rem; right: 1.6rem; bottom: 1.05rem; margin: 0; font-size: 0.74rem; color: var(--text-dim); }
 .dl-grid .alt a { color: var(--text-mute); text-decoration: underline; text-underline-offset: 3px; }
 .dl-grid .alt a:hover { color: var(--text-hi); }
 .dl-detect-ring .shell, .dl-detect-ring.shell { border-color: rgba(52,211,153,0.35); }
