@@ -66,7 +66,8 @@
       <ul>
         <li><a href="#overview">Overview</a></li>
         <li><a href="#requirements">Requirements</a></li>
-        <li><a href="#os-setup">OS setup</a></li>
+        <li><a href="#quick-setup">Quick setup</a></li>
+        <li><a href="#os-setup">Manual setup</a></li>
         <li><a href="#auto-login">Auto-login</a></li>
         <li><a href="#kiosk-autostart">Kiosk autostart</a></li>
         <li><a href="#hide-cursor">Hide the cursor</a></li>
@@ -97,7 +98,23 @@
         <li>Network connection (Ethernet recommended for reliability)</li>
       </ul>
 
-      <h2 id="os-setup">OS setup</h2>
+      <h2 id="quick-setup">Quick setup (recommended)</h2>
+      <p>On a fresh <strong>Raspberry Pi OS Lite (64-bit)</strong>, one command installs Chromium, points it at your server, and boots the Pi straight into your signage. SSH in (or open a terminal on the Pi) and run:</p>
+      <pre><code>curl -sSL https://joemighty.github.io/DisplayGrid/pi-setup.sh | bash</code></pre>
+      <p>It asks for two things:</p>
+      <ul>
+        <li><strong>Server address</strong> — e.g. <code>http://192.168.1.10:5555</code> (the desktop Server App uses port <code>5555</code>; Docker and run-from-source use <code>3000</code>)</li>
+        <li><strong>Screen token</strong> — from the <strong>Screens</strong> page in the dashboard. Set a memorable custom token like <code>lobby</code> when you create the screen.</li>
+      </ul>
+      <p>Then reboot (<code>sudo reboot</code>) and the Pi opens fullscreen at <code>http://&lt;server&gt;/display?token=&lt;token&gt;</code> — the token is in the URL, so there is nothing to type on the display. The kiosk relaunches automatically if Chromium crashes and survives power cuts.</p>
+      <div class="callout">
+        <p><strong>Unattended install:</strong> set the values ahead of time to skip the prompts —<br>
+        <code>DG_SERVER=http://192.168.1.10:5555 DG_TOKEN=lobby bash -c "$(curl -sSL https://joemighty.github.io/DisplayGrid/pi-setup.sh)"</code></p>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-dim);">Manage it later: change the URL in <code>~/.displaygrid/url</code> then <code>sudo systemctl restart displaygrid-kiosk</code> · view logs with <code>journalctl -u displaygrid-kiosk -b</code> · remove with <code>~/.displaygrid/uninstall.sh</code>.</p>
+      <p>Prefer to wire it up by hand, or using the Desktop image? The manual steps below still apply.</p>
+
+      <h2 id="os-setup">Manual setup</h2>
       <p>Flash <strong>Raspberry Pi OS Lite (64-bit)</strong> or the full desktop image using <a href="https://www.raspberrypi.com/software/" target="_blank" rel="noopener">Raspberry Pi Imager</a>. The Lite image uses fewer resources and is recommended for dedicated kiosks.</p>
 
       <div class="callout callout--warn">

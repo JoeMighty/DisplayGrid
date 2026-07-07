@@ -48,7 +48,7 @@ const STEPS: Step[] = [
   {
     n: 5,
     title: 'Pair the display client',
-    desc: 'On your screen device, open this server\'s address followed by /display (e.g. http://192.168.1.10:5555/display) and enter the screen token from the Screens page.',
+    desc: 'On your screen device, open this server\'s address followed by /display and the screen token (e.g. http://192.168.1.10:5555/display?token=lobby) — the display connects with nothing to type. Or open /display and enter the token by hand.',
     cta: 'Open display client',
     href: '/display',
     check: async () => false, // Manual step — user marks complete

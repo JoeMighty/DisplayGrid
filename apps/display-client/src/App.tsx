@@ -15,7 +15,14 @@ const API_BASE    = _elCfg.apiBase     ?? import.meta.env.VITE_API_BASE    ?? ''
 // right when the display ran on the same machine as the server.
 const WS_BASE     = _elCfg.wsBase      ?? import.meta.env.VITE_WS_BASE     ??
   (typeof location !== 'undefined' ? `ws://${location.hostname}:3001` : 'ws://localhost:3001');
-const SCREEN_TOKEN = _elCfg.screenToken ?? import.meta.env.VITE_SCREEN_TOKEN ?? '';
+
+// A token in the URL (?token=lobby) lets a display pair with zero typing —
+// bookmark the URL, put it in a Pi kiosk autostart, or a TV's kiosk config.
+// Precedence: Electron kiosk config, then URL, then build-time env.
+const _urlToken = (typeof location !== 'undefined'
+  ? new URLSearchParams(location.search).get('token')
+  : null) || undefined;
+const SCREEN_TOKEN = _elCfg.screenToken ?? _urlToken ?? import.meta.env.VITE_SCREEN_TOKEN ?? '';
 
 type AppState = 'setup' | 'loading' | 'playing' | 'error';
 
@@ -179,6 +186,11 @@ export default function App() {
               Connect
             </button>
           </form>
+          <p style={{ color: '#4b5563', fontSize: '0.75rem', marginTop: '1.25rem', lineHeight: 1.5 }}>
+            Tip: skip this screen by adding the token to the URL —
+            <br />
+            <code style={{ fontFamily: 'monospace', color: '#6b7280' }}>{(typeof location !== 'undefined' ? location.origin + location.pathname : '/display')}?token=YOUR-TOKEN</code>
+          </p>
         </div>
       </div>
     );
