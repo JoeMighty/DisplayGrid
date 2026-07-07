@@ -402,7 +402,9 @@ body.menu-open { overflow: hidden; }
    card is the same height. */
 .dl-grid .desc { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1.4rem; min-height: 3.4rem; }
 .dl-grid .f-icon { margin-bottom: 1rem; }
-.dl-grid .btn { width: 100%; justify-content: space-between; font-size: 0.85rem; margin-top: auto; }
+/* nowrap keeps a long label like "Download .AppImage" on one line so every
+   download button is the same height as the single-line ones. */
+.dl-grid .btn { width: 100%; justify-content: space-between; font-size: 0.85rem; margin-top: auto; white-space: nowrap; }
 /* Pinned into the reserved row so it never pushes the button up. */
 .dl-grid .alt { position: absolute; left: 1.6rem; right: 1.6rem; bottom: 1.05rem; margin: 0; font-size: 0.74rem; color: var(--text-dim); }
 .dl-grid .alt a { color: var(--text-mute); text-decoration: underline; text-underline-offset: 3px; }
