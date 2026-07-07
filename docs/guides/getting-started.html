@@ -159,7 +159,7 @@ pnpm db:migrate</code></pre>
         <li>On the device you want to use as a display, open a browser and go to <code>http://&lt;server-ip&gt;:5173</code>. (Packaged and Docker installs serve the display client at <code>http://&lt;server&gt;/display</code> on the dashboard port instead.)</li>
         <li>Enter the screen token when prompted. The display will connect to the WebSocket server and start playing your playlist.</li>
       </ol>
-      <p>To skip the token entry screen on future boots, set <code>VITE_SCREEN_TOKEN</code> in <code>apps/display-client/.env.local</code>. See the <a href="kiosk-setup.html">Kiosk Setup guide</a> for details.</p>
+      <p>To skip the token entry screen entirely, put the token in the URL: <code>http://&lt;server&gt;/display?token=&lt;token&gt;</code> — bookmark it or set it as the device's kiosk URL and the display pairs with nothing to type. (In dev you can also set <code>VITE_SCREEN_TOKEN</code> in <code>apps/display-client/.env.local</code>.) See the <a href="kiosk-setup.html">Kiosk Setup guide</a> for details.</p>
 
       <h2 id="local-domain">Local domain (optional)</h2>
       <p>For a cleaner URL (<code>http://displaygrid.test</code> instead of <code>http://localhost:3000</code>), add a hosts file entry. Run the setup script for your OS:</p>

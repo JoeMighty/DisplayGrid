@@ -71,9 +71,17 @@
     <div class="lane-head rv">
       <span class="dot"></span>
       <h2>Recently shipped</h2>
-      <span class="count">6 releases</span>
+      <span class="count">8 releases</span>
     </div>
     <div class="rm-grid">
+      <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
+        <div class="rm-top"><h3>Raspberry Pi kiosk &amp; one-URL pairing</h3><span class="rm-tag ship">v1.0.26 · Jul 2026</span></div>
+        <p>One command turns a fresh Raspberry Pi into a fullscreen kiosk (<span style="font-family:var(--font-mono); font-size:0.85em;">curl … | bash</span>). And any display pairs with zero typing — put the token in the URL (<span style="font-family:var(--font-mono); font-size:0.85em;">/display?token=lobby</span>) and bookmark it.</p>
+      </div></div></div>
+      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
+        <div class="rm-top"><h3>Browser displays &amp; blank-slide fixes</h3><span class="rm-tag ship">v1.0.24–25 · Jul 2026</span></div>
+        <p>The server now serves the display client itself at <span style="font-family:var(--font-mono); font-size:0.85em;">/display</span>, so any browser or Raspberry Pi can pair without the desktop app. URL slides entered as a bare domain now open correctly instead of rendering blank.</p>
+      </div></div></div>
       <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
         <div class="rm-top"><h3>Packaged-app reliability</h3><span class="rm-tag ship">v1.0.22–23 · Jul 2026</span></div>
         <p>Installers now ship platform-correct native modules on every OS — with hard CI assertions that a broken package can never publish again. Releases also gained an automatic what&rsquo;s-changed changelog grouped into Added / Fixed / Changed.</p>
@@ -106,10 +114,6 @@
     </div>
     <div class="rm-grid">
       <div class="rm-item rv"><div class="shell" style="height:100%;"><div class="core">
-        <div class="rm-top"><h3>Raspberry Pi kiosk image</h3><span class="rm-tag">flash &amp; boot</span></div>
-        <p>A ready-made SD-card image that boots straight into a fullscreen display — set the server address and screen token in a file on the boot partition. Because the Pi is a thin client, server updates reach every display instantly with zero device maintenance.</p>
-      </div></div></div>
-      <div class="rm-item rv" data-d="1"><div class="shell" style="height:100%;"><div class="core">
         <div class="rm-top"><h3>Documented REST API</h3><span class="rm-tag">integrations</span></div>
         <p>A stable, documented API with automation tokens — trigger the emergency override from a script, bulk-upload assets, or wire DisplayGrid into n8n and Home Assistant.</p>
       </div></div></div>

@@ -38,7 +38,15 @@ docker run -d --name displaygrid \
 
 Or `docker compose up -d` — [compose.yaml](compose.yaml) includes an optional HTTPS proxy profile.
 
-**Raspberry Pi displays** run Chromium in kiosk mode pointed at your server — see the [Raspberry Pi guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html). No app install, no device maintenance: server updates reach every Pi instantly.
+**Raspberry Pi displays** run Chromium in kiosk mode pointed at your server. On a fresh Raspberry Pi OS Lite, one command sets everything up:
+
+```bash
+curl -sSL https://joemighty.github.io/DisplayGrid/pi-setup.sh | bash
+```
+
+It installs Chromium, asks for your server address and screen token, and boots the Pi fullscreen into your signage — see the [Raspberry Pi guide](https://joemighty.github.io/DisplayGrid/guides/raspberry-pi.html). No app install, no device maintenance: server updates reach every Pi instantly.
+
+**Any browser display** — pair with zero typing by putting the token in the URL: open `http://<server>:5555/display?token=<token>` on the device (bookmark it, or use a memorable custom token like `lobby` set on the Screens page).
 
 ---
 
@@ -93,7 +101,7 @@ Or `docker compose up -d` — [compose.yaml](compose.yaml) includes an optional 
 - Auto-updating apps — kiosks update silently on restart, never mid-show
 - Runs on Windows, macOS, Linux, Raspberry Pi, and Docker
 
-See the [roadmap](https://joemighty.github.io/DisplayGrid/roadmap.html) for what's next — Raspberry Pi disk images, a documented REST API, date-range scheduling, and NDI support.
+See the [roadmap](https://joemighty.github.io/DisplayGrid/roadmap.html) for what's next — a documented REST API, date-range scheduling, and NDI support.
 
 ---
 
