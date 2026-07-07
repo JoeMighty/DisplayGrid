@@ -128,6 +128,15 @@ function StreamSlide({ url }: { url: string }) {
   );
 }
 
+// A bare domain like "bbc.co.uk" is otherwise treated as a relative path and
+// resolves against the display's own origin. Prepend https:// when no scheme
+// is present so URL slides point where the operator intended.
+function normalizeUrl(raw: string): string {
+  const u = raw.trim();
+  if (!u) return u;
+  return /^[a-z][a-z0-9+.-]*:\/\//i.test(u) ? u : `https://${u}`;
+}
+
 function SlideContent({ slide }: { slide: Slide }) {
   const src = `${API_BASE}/api/assets/${slide.assetId}/file`;
 
@@ -147,7 +156,7 @@ function SlideContent({ slide }: { slide: Slide }) {
 
   if (slide.contentType === 'url') return (
     <iframe
-      src={slide.content ?? ''}
+      src={normalizeUrl(slide.content ?? '')}
       style={{ width: '100%', height: '100%', border: 'none', background: '#000' }}
       allow="autoplay"
     />

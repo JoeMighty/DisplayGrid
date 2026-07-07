@@ -147,10 +147,16 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    // A bare domain ("bbc.co.uk") would resolve relative to the display's own
+    // origin and render blank — store URL slides with an explicit scheme.
+    const normalizedContent =
+      contentType === 'url' && content.trim() && !/^[a-z][a-z0-9+.-]*:\/\//i.test(content.trim())
+        ? `https://${content.trim()}`
+        : content;
     const body = {
       contentType,
       assetId:         contentType === 'asset' && assetId ? parseInt(assetId) : null,
-      content:         contentType !== 'asset' ? content : null,
+      content:         contentType !== 'asset' ? normalizedContent : null,
       durationSeconds: Number(durationSeconds),
       transition,
       enabled,
@@ -203,7 +209,12 @@ function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
               <label className="block text-sm font-medium text-gray-300 mb-1.5">
                 {contentType === 'url' ? 'URL' : 'Text'}
               </label>
-              <input value={content} onChange={e => setContent(e.target.value)} placeholder={contentType === 'url' ? 'https://…' : 'Enter text…'} className={inputCls} />
+              <input value={content} onChange={e => setContent(e.target.value)} placeholder={contentType === 'url' ? 'https://example.com' : 'Enter text…'} className={inputCls} />
+              {contentType === 'url' && (
+                <p className="mt-1.5 text-xs text-gray-500">
+                  Some sites (Google, BBC, YouTube watch pages, banks) block being embedded and will show blank. Use a page you control, an embeddable widget, or a slideshow/kiosk URL.
+                </p>
+              )}
             </div>
           )}
 
