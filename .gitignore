@@ -23,3 +23,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# display client build shipped under the dashboard (built in CI/Docker)
+apps/dashboard/public/display/
+apps/display-client/dist-web/

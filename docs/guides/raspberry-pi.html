@@ -150,7 +150,8 @@ nano ~/.config/lxsession/LXDE-pi/autostart</code></pre>
   --disable-session-crashed-bubble \
   --autoplay-policy=no-user-gesture-required \
   --disable-features=TranslateUI \
-  http://192.168.1.10:3000</code></pre>
+  http://192.168.1.10:5555/display</code></pre>
+      <div class="callout"><p><strong>Which port?</strong> The address is your server followed by <code>/display</code>. The desktop Server App listens on port <code>5555</code>; Docker and run-from-source installs use port <code>3000</code> (e.g. <code>http://192.168.1.10:3000/display</code>).</p></div>
 
       <h3>Minimal / headless (Openbox + systemd)</h3>
       <p>Create an Openbox autostart:</p>
@@ -165,7 +166,7 @@ chromium-browser \
   --disable-infobars \
   --disable-session-crashed-bubble \
   --autoplay-policy=no-user-gesture-required \
-  http://192.168.1.10:3000 &</code></pre>
+  http://192.168.1.10:5555/display &</code></pre>
 
       <p>Create a systemd service to start X on boot at <code>~/.config/systemd/user/kiosk.service</code>:</p>
       <pre><code>[Unit]
@@ -212,7 +213,7 @@ while true; do
     --noerrdialogs \
     --disable-infobars \
     --autoplay-policy=no-user-gesture-required \
-    http://192.168.1.10:3000
+    http://192.168.1.10:5555/display
   sleep 2
 done</code></pre>
 
@@ -247,7 +248,7 @@ rm -f ~/.config/chromium/SingletonLock</code></pre>
 
       <h3>Use the screen token for zero-touch setup</h3>
       <p>Append the screen token as a URL parameter so the Pi boots straight into the player without showing the token entry screen:</p>
-      <pre><code>http://192.168.1.10:3000/display?token=YOUR_SCREEN_TOKEN</code></pre>
+      <pre><code>http://192.168.1.10:5555/display/display?token=YOUR_SCREEN_TOKEN</code></pre>
       <p>Get the token from the dashboard: <strong>Screens → your screen → key icon → Copy token</strong>.</p>
     </article>
   </div>

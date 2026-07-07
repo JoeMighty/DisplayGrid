@@ -9,6 +9,14 @@ const nextConfig = {
     // dependencies into the standalone output (required for pnpm workspaces)
     outputFileTracingRoot: path.join(__dirname, '../../'),
   },
+  async rewrites() {
+    return [
+      // The display client SPA is shipped under public/display (built with
+      // base /display/). public/ has no directory-index resolution, so map
+      // the bare path to its entry point.
+      { source: '/display', destination: '/display/index.html' },
+    ];
+  },
 };
 
 module.exports = nextConfig;

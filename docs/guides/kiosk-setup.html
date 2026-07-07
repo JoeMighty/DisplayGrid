@@ -96,13 +96,14 @@ VITE_SCREEN_TOKEN=your-screen-token-here</code></pre>
   --noerrdialogs \
   --disable-infobars \
   --autoplay-policy=no-user-gesture-required \
-  http://192.168.1.10:5173</code></pre>
+  http://192.168.1.10:5555/display</code></pre>
+      <div class="callout"><p><strong>Which port?</strong> The address is your server followed by <code>/display</code>. The desktop Server App listens on port <code>5555</code>; Docker and run-from-source installs use port <code>3000</code> (e.g. <code>http://192.168.1.10:3000/display</code>).</p></div>
 
       <h3>Autostart on Raspberry Pi OS (LXDE)</h3>
       <p>Edit the autostart file:</p>
       <pre><code>sudo nano /etc/xdg/lxsession/LXDE-pi/autostart</code></pre>
       <p>Add this line at the end:</p>
-      <pre><code>@chromium-browser --kiosk --noerrdialogs --disable-infobars --autoplay-policy=no-user-gesture-required http://192.168.1.10:5173</code></pre>
+      <pre><code>@chromium-browser --kiosk --noerrdialogs --disable-infobars --autoplay-policy=no-user-gesture-required http://192.168.1.10:5555/display</code></pre>
 
       <h3>Autostart with systemd (headless or Wayland)</h3>
       <p>Create a systemd user service at <code>~/.config/systemd/user/displaygrid-kiosk.service</code>:</p>
@@ -111,7 +112,7 @@ Description=DisplayGrid Kiosk
 After=graphical-session.target
 
 [Service]
-ExecStart=chromium-browser --kiosk --noerrdialogs --disable-infobars http://192.168.1.10:5173
+ExecStart=chromium-browser --kiosk --noerrdialogs --disable-infobars http://192.168.1.10:5555/display
 Restart=on-failure
 Environment=DISPLAY=:0
 
@@ -135,7 +136,7 @@ unclutter -idle 1 &amp;</code></pre>
   --noerrdialogs \
   --disable-infobars \
   --autoplay-policy=no-user-gesture-required \
-  http://192.168.1.10:5173</code></pre>
+  http://192.168.1.10:5555/display</code></pre>
 
       <h3>Autostart on login</h3>
       <ol>
@@ -152,7 +153,7 @@ unclutter -idle 1 &amp;</code></pre>
   --noerrdialogs ^
   --disable-infobars ^
   --autoplay-policy=no-user-gesture-required ^
-  http://192.168.1.10:5173</code></pre>
+  http://192.168.1.10:5555/display</code></pre>
 
       <h3>Autostart on login</h3>
       <ol>

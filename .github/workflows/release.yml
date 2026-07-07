@@ -27,6 +27,19 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # The server serves browser displays at /display — build the display
+      # client against that base path and ship it via the dashboard's public
+      # dir. (The kiosk app uses its own separately-built copy.)
+      - name: Build display client for /display
+        working-directory: apps/display-client
+        run: npx vite build --base=/display/ --outDir dist-web
+
+      - name: Ship display client under dashboard public/
+        run: |
+          mkdir -p apps/dashboard/public
+          rm -rf apps/dashboard/public/display
+          cp -r apps/display-client/dist-web apps/dashboard/public/display
+
       - name: Build dashboard (standalone)
         working-directory: apps/dashboard
         run: pnpm build

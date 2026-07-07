@@ -27,6 +27,12 @@ COPY . .
 ENV NEXTAUTH_SECRET=build-placeholder \
     NEXTAUTH_URL=http://localhost:3000 \
     DB_PATH=/tmp/build.db
+
+# Browser displays are served by the dashboard at /display.
+RUN cd apps/display-client && npx vite build --base=/display/ --outDir dist-web && \
+    mkdir -p ../dashboard/public && rm -rf ../dashboard/public/display && \
+    cp -r dist-web ../dashboard/public/display
+
 RUN cd apps/dashboard && pnpm build
 
 # Stage the standalone output exactly like CI does: static assets and public

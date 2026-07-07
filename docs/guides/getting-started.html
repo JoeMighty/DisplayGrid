@@ -156,7 +156,7 @@ pnpm db:migrate</code></pre>
       <h2 id="display-client">Connect a display</h2>
       <ol>
         <li>On the <strong>Screens</strong> page, click the key icon on your screen card to view its token.</li>
-        <li>On the device you want to use as a display, open a browser and go to <code>http://&lt;server-ip&gt;:5173</code>.</li>
+        <li>On the device you want to use as a display, open a browser and go to <code>http://&lt;server-ip&gt;:5173</code>. (Packaged and Docker installs serve the display client at <code>http://&lt;server&gt;/display</code> on the dashboard port instead.)</li>
         <li>Enter the screen token when prompted. The display will connect to the WebSocket server and start playing your playlist.</li>
       </ol>
       <p>To skip the token entry screen on future boots, set <code>VITE_SCREEN_TOKEN</code> in <code>apps/display-client/.env.local</code>. See the <a href="kiosk-setup.html">Kiosk Setup guide</a> for details.</p>

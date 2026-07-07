@@ -10,7 +10,11 @@ import { HEARTBEAT_INTERVAL_MS, FALLBACK_POLL_MS, DEFAULT_KIOSK_KEY_COMBO, KIOSK
 const _elCfg = (typeof window !== 'undefined' && (window as any).__displaygrid) || {};
 
 const API_BASE    = _elCfg.apiBase     ?? import.meta.env.VITE_API_BASE    ?? '';
-const WS_BASE     = _elCfg.wsBase      ?? import.meta.env.VITE_WS_BASE     ?? 'ws://localhost:3001';
+// Default the WS server to the host serving this page — correct for the
+// packaged server app, Docker, and source installs alike. localhost was only
+// right when the display ran on the same machine as the server.
+const WS_BASE     = _elCfg.wsBase      ?? import.meta.env.VITE_WS_BASE     ??
+  (typeof location !== 'undefined' ? `ws://${location.hostname}:3001` : 'ws://localhost:3001');
 const SCREEN_TOKEN = _elCfg.screenToken ?? import.meta.env.VITE_SCREEN_TOKEN ?? '';
 
 type AppState = 'setup' | 'loading' | 'playing' | 'error';
