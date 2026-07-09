@@ -10,6 +10,8 @@ interface Override {
   isActive: boolean;
 }
 
+interface Template { id: string; label: string; message: string; }
+
 export default function EmergencyOverridePanel() {
   const [override, setOverride]   = useState<Override | null>(null);
   const [loading, setLoading]     = useState(true);
@@ -17,6 +19,7 @@ export default function EmergencyOverridePanel() {
   const [message, setMessage]     = useState('');
   const [minutes, setMinutes]     = useState('60');
   const [saving, setSaving]       = useState(false);
+  const [templates, setTemplates] = useState<Template[]>([]);
 
   async function load() {
     const res = await fetch('/api/emergency-override');
@@ -25,6 +28,17 @@ export default function EmergencyOverridePanel() {
   }
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    fetch('/api/emergency-override/templates')
+      .then(r => r.ok ? r.json() : [])
+      .then(setTemplates)
+      .catch(() => {});
+  }, []);
+
+  function pickTemplate(t: Template) {
+    setMessage(t.message);
+    setExpanded(true);
+  }
 
   async function activate() {
     setSaving(true);
@@ -75,6 +89,20 @@ export default function EmergencyOverridePanel() {
             </p>
           )}
           <p className="text-xs text-red-400/70 mt-0.5">All screens are showing the override content.</p>
+        </div>
+      )}
+
+      {!override && templates.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <span className="text-xs text-gray-600 self-center mr-1">Presets:</span>
+          {templates.map(t => (
+            <button
+              key={t.id}
+              onClick={() => pickTemplate(t)}
+              title={t.message}
+              className="px-2.5 py-1 text-xs font-medium rounded-full border border-red-900/50 bg-red-950/30 text-red-300 hover:bg-red-900/40 hover:border-red-800 transition"
+            >{t.label}</button>
+          ))}
         </div>
       )}
 

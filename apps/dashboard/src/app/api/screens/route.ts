@@ -3,11 +3,11 @@ import { auth } from '@/lib/auth';
 import { db, screens, zones, screenSessions } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { generateScreenToken } from '@/lib/tokens';
+import { authorizeApi } from '@/lib/api-auth';
 import { DEFAULT_RESOLUTION_W, DEFAULT_RESOLUTION_H, DEFAULT_REFRESH_RATE } from '@displaygrid/shared';
 
-export async function GET() {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET(req: NextRequest) {
+  if (!await authorizeApi(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const rows = await db
     .select({
@@ -33,7 +33,16 @@ export async function GET() {
     .leftJoin(screenSessions, eq(screens.id, screenSessions.screenId))
     .all();
 
-  return NextResponse.json(rows);
+  // Same 90s threshold the dashboard UI intends to use — computed here so
+  // API consumers don't have to duplicate the heartbeat window. lastSeen is a
+  // Date (drizzle timestamp mode), not epoch seconds.
+  const now = Date.now();
+  const withOnline = rows.map(r => ({
+    ...r,
+    online: r.lastSeen ? (now - r.lastSeen.getTime()) < 90_000 : false,
+  }));
+
+  return NextResponse.json(withOnline);
 }
 
 export async function POST(req: NextRequest) {

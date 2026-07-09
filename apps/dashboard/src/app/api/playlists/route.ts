@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db, playlists, slides, screens } from '@/lib/db';
 import { eq, count } from 'drizzle-orm';
+import { authorizeApi } from '@/lib/api-auth';
 
-export async function GET() {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET(req: NextRequest) {
+  if (!await authorizeApi(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const rows = await db
     .select({

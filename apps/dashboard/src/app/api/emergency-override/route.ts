@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { db, emergencyOverride } from '@/lib/db';
 import { eq } from 'drizzle-orm';
+import { authorizeApi } from '@/lib/api-auth';
 
-export async function GET() {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET(req: NextRequest) {
+  if (!await authorizeApi(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const now = new Date();
   const rows = await db.select().from(emergencyOverride)
@@ -17,8 +16,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!await authorizeApi(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { message, assetId, activeMinutes } = await req.json();
 
@@ -37,9 +35,8 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(override, { status: 201 });
 }
 
-export async function DELETE() {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function DELETE(req: NextRequest) {
+  if (!await authorizeApi(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   await db.update(emergencyOverride).set({ isActive: false }).where(eq(emergencyOverride.isActive, true));
   return new NextResponse(null, { status: 204 });

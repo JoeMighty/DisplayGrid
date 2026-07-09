@@ -9,6 +9,7 @@ import {
   arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { SLIDE_TEMPLATES, type SlideTemplate } from '@/lib/slide-templates';
 
 interface Asset { id: number; originalName: string; mimeType: string; type: string; filename: string; }
 interface Slide {
@@ -121,6 +122,93 @@ function parseSchedule(json: string | null) {
       endDate:   (s.endDate   ?? '') as string,
     };
   } catch { return null; }
+}
+
+function TemplatePicker({ playlistId, onClose, onCreated }: {
+  playlistId: number; onClose: () => void; onCreated: () => void;
+}) {
+  const [chosen, setChosen] = useState<SlideTemplate | null>(null);
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+
+  function choose(t: SlideTemplate) {
+    setChosen(t);
+    setValues(Object.fromEntries(t.fields.map(f => [f.key, f.default])));
+  }
+
+  async function create() {
+    if (!chosen) return;
+    setSaving(true);
+    const html = chosen.render(values);
+    const res = await fetch(`/api/playlists/${playlistId}/slides`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contentType: 'html', content: html, durationSeconds: 10, transition: 'fade', enabled: true }),
+    });
+    setSaving(false);
+    if (res.ok) onCreated();
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-2xl max-h-[88vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 sticky top-0 bg-gray-900">
+          <h2 className="text-base font-semibold text-gray-100">{chosen ? chosen.name : 'Choose a template'}</h2>
+          <button onClick={chosen ? () => setChosen(null) : onClose} className="text-gray-500 hover:text-gray-300 text-sm">{chosen ? '← Back' : 'Close'}</button>
+        </div>
+
+        {!chosen ? (
+          <div className="grid grid-cols-2 gap-3 p-6">
+            {SLIDE_TEMPLATES.map(t => (
+              <button key={t.id} onClick={() => choose(t)}
+                className="text-left rounded-lg border border-gray-800 hover:border-blue-600 bg-gray-800/40 hover:bg-gray-800 transition overflow-hidden group">
+                <div className="h-24 border-b border-gray-800 overflow-hidden bg-black">
+                  <iframe srcDoc={t.render(Object.fromEntries(t.fields.map(f => [f.key, f.default])))}
+                    title={t.name} tabIndex={-1}
+                    style={{ width: '400%', height: '400%', transform: 'scale(0.25)', transformOrigin: 'top left', border: 'none', pointerEvents: 'none' }} />
+                </div>
+                <div className="p-3">
+                  <div className="text-sm font-medium text-gray-200">{t.name}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{t.description}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="p-6 grid md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              {chosen.fields.map(f => (
+                <div key={f.key}>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">{f.label}</label>
+                  {f.type === 'textarea' || f.type === 'list' ? (
+                    <textarea value={values[f.key] ?? ''} onChange={e => setValues(v => ({ ...v, [f.key]: e.target.value }))}
+                      rows={f.type === 'list' ? 5 : 3} className={inputCls + ' resize-none font-mono text-xs'} />
+                  ) : f.type === 'color' ? (
+                    <input type="color" value={values[f.key] ?? '#000000'} onChange={e => setValues(v => ({ ...v, [f.key]: e.target.value }))}
+                      className="w-full h-9 bg-gray-800 border border-gray-700 rounded-lg cursor-pointer" />
+                  ) : (
+                    <input value={values[f.key] ?? ''} onChange={e => setValues(v => ({ ...v, [f.key]: e.target.value }))} className={inputCls} />
+                  )}
+                  {f.hint && <p className="text-xs text-gray-600 mt-1">{f.hint}</p>}
+                </div>
+              ))}
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1.5">Preview</p>
+              <div className="rounded-lg overflow-hidden border border-gray-800 bg-black" style={{ aspectRatio: '16 / 9' }}>
+                <iframe srcDoc={chosen.render(values)} title="Preview"
+                  style={{ width: '400%', height: '400%', transform: 'scale(0.25)', transformOrigin: 'top left', border: 'none' }} />
+              </div>
+              <button onClick={create} disabled={saving}
+                className="w-full mt-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition">
+                {saving ? 'Adding…' : 'Add to playlist'}
+              </button>
+              <p className="text-xs text-gray-600 mt-2">Creates an editable HTML slide you can fine-tune afterwards.</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function SlideModal({ slide, assets, playlistId, onSave, onClose }: {
@@ -337,6 +425,7 @@ export default function PlaylistEditorPage() {
   const [slides,   setSlides]   = useState<Slide[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [modal,    setModal]    = useState<'add' | Slide | null>(null);
+  const [templatePicker, setTemplatePicker] = useState(false);
   const [deleting, setDeleting] = useState<number | null>(null);
 
   const sensors = useSensors(
@@ -403,10 +492,16 @@ export default function PlaylistEditorPage() {
             <p className="text-sm text-gray-400">{slides.length} slide{slides.length !== 1 ? 's' : ''} · drag to reorder</p>
           </div>
         </div>
-        <button onClick={() => setModal('add')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Slide
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setTemplatePicker(true)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm font-medium rounded-lg transition">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            From Template
+          </button>
+          <button onClick={() => setModal('add')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Slide
+          </button>
+        </div>
       </div>
 
       {slides.length === 0 ? (
@@ -443,6 +538,14 @@ export default function PlaylistEditorPage() {
           playlistId={playlist.id}
           onSave={() => { setModal(null); load(); }}
           onClose={() => setModal(null)}
+        />
+      )}
+
+      {templatePicker && (
+        <TemplatePicker
+          playlistId={playlist.id}
+          onClose={() => setTemplatePicker(false)}
+          onCreated={() => { setTemplatePicker(false); load(); }}
         />
       )}
     </div>

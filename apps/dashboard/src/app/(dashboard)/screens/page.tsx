@@ -10,7 +10,7 @@ interface Screen {
   refreshRate: number; rotation: number;
   panelGridCols: number; panelGridRows: number;
   colourProfile: string;
-  lastSeen: number | null;
+  lastSeen: string | null;
   currentSlideId: number | null;
   clientIp: string | null;
 }
@@ -25,9 +25,10 @@ interface Playlist { id: number; name: string; screenId: number; screenName: str
 
 type StatusLevel = 'online' | 'idle' | 'offline' | 'never';
 
-function getStatus(lastSeen: number | null): { level: StatusLevel; label: string } {
+function getStatus(lastSeen: string | null): { level: StatusLevel; label: string } {
   if (!lastSeen) return { level: 'never', label: 'Never connected' };
-  const ago = Math.floor(Date.now() / 1000) - lastSeen;
+  // The API serializes lastSeen as an ISO timestamp, not raw epoch seconds.
+  const ago = Math.floor(Date.now() / 1000) - Math.floor(new Date(lastSeen).getTime() / 1000);
   if (ago < 90)   return { level: 'online',  label: 'Online' };
   if (ago < 600)  return { level: 'idle',    label: `Idle ${Math.round(ago / 60)}m ago` };
   if (ago < 3600) return { level: 'offline', label: `Offline ${Math.round(ago / 60)}m ago` };

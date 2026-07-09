@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>REST API — DisplayGrid</title>
+  <meta name="description" content="DisplayGrid REST API reference — trigger the emergency override and read screen and playlist status from scripts, Home Assistant, or n8n using a token." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/site.css" />
+</head>
+<body>
+
+<div class="mesh" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="nav-wrap">
+  <nav class="nav" aria-label="Main">
+    <a href="index.html" class="nav-brand">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+      DisplayGrid
+    </a>
+    <ul class="nav-links">
+      <li><a href="download.html">Download</a></li>
+      <li><a href="guides/getting-started.html">Guides</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="https://github.com/JoeMighty/DisplayGrid" class="gh" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+      <a href="download.html" class="btn btn-primary">
+        Get started
+        <span class="orb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+      </a>
+      <button class="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </nav>
+</div>
+
+<div class="menu" aria-hidden="true">
+  <a href="index.html">Home <small>What DisplayGrid does</small></a>
+  <a href="download.html">Download <small>Apps, Docker, and source</small></a>
+  <a href="guides/getting-started.html">Getting Started <small>Zero to first screen</small></a>
+  <a href="roadmap.html">Roadmap <small>Shipped and what’s next</small></a>
+  <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub <small>Source &amp; releases</small></a>
+</div>
+
+<header class="page-head">
+  <div class="container">
+    <span class="eyebrow rv">Reference</span>
+    <h1 class="grad-text rv" data-d="1">REST API</h1>
+    <p class="lede rv" data-d="2">Drive your screens from scripts, Home Assistant, or n8n — trigger the emergency override and read screen and playlist status over HTTP with a token.</p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="guide-layout">
+    <aside class="guide-toc rv" data-d="2">
+      <p class="label">On this page</p>
+      <ul>
+        <li><a href="#auth">Authentication</a></li>
+        <li><a href="#base">Base URL</a></li>
+        <li><a href="#emergency">Emergency override</a></li>
+        <li><a href="#screens">Screens</a></li>
+        <li><a href="#playlists">Playlists</a></li>
+        <li><a href="#recipes">Recipes</a></li>
+      </ul>
+    </aside>
+
+    <article class="prose rv" data-d="3">
+      <h2 id="auth">Authentication</h2>
+      <p>Create a token in the dashboard under <strong>Settings → API tokens</strong> (Admin or Super Admin only). The token is shown once — copy it then. Send it as a bearer token on every request:</p>
+      <pre><code>Authorization: Bearer dg_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</code></pre>
+      <div class="callout"><p>Tokens carry the same weight as an operator account for the endpoints below. Keep them secret, use one per integration, and revoke any you no longer need.</p></div>
+
+      <h2 id="base">Base URL</h2>
+      <p>All endpoints are served by your own server — there is no DisplayGrid cloud. Use your server’s address:</p>
+      <ul>
+        <li>Desktop Server App: <code>http://&lt;host&gt;:5555</code></li>
+        <li>Docker / run-from-source: <code>http://&lt;host&gt;:3000</code></li>
+      </ul>
+      <p>Examples below use <code>$DG</code> for the base URL and <code>$TOKEN</code> for your token.</p>
+
+      <h2 id="emergency">Emergency override</h2>
+      <p>Broadcast a full-screen message to every display at once, or clear it.</p>
+
+      <h3>GET <code>/api/emergency-override</code></h3>
+      <p>Returns the active override, or <code>null</code> if none.</p>
+      <pre><code>curl -H "Authorization: Bearer $TOKEN" $DG/api/emergency-override</code></pre>
+
+      <h3>POST <code>/api/emergency-override</code></h3>
+      <p>Activates an override. Body fields:</p>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>message</code></td><td>string</td><td>Text shown full-screen.</td></tr>
+          <tr><td><code>activeMinutes</code></td><td>number</td><td>Auto-clear after N minutes. Omit or <code>0</code> = until cancelled.</td></tr>
+        </tbody>
+      </table>
+      <pre><code>curl -X POST $DG/api/emergency-override \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Fire — evacuate now","activeMinutes":30}'</code></pre>
+
+      <h3>DELETE <code>/api/emergency-override</code></h3>
+      <p>Clears the override; screens resume normal playback.</p>
+      <pre><code>curl -X DELETE -H "Authorization: Bearer $TOKEN" $DG/api/emergency-override</code></pre>
+
+      <h2 id="screens">Screens</h2>
+      <h3>GET <code>/api/screens</code></h3>
+      <p>Lists every screen with its pairing token, zone, resolution, and live online/last-seen status — useful for monitoring displays from an external dashboard.</p>
+      <pre><code>curl -H "Authorization: Bearer $TOKEN" $DG/api/screens</code></pre>
+
+      <h2 id="playlists">Playlists</h2>
+      <h3>GET <code>/api/playlists</code></h3>
+      <p>Lists playlists with their screen, active state, and slide count.</p>
+      <pre><code>curl -H "Authorization: Bearer $TOKEN" $DG/api/playlists</code></pre>
+
+      <h2 id="recipes">Recipes</h2>
+      <h3>Panic button (Home Assistant)</h3>
+      <p>Wire a physical button or automation to a REST command that fires the override:</p>
+      <pre><code>rest_command:
+  displaygrid_evacuate:
+    url: "http://192.168.1.10:5555/api/emergency-override"
+    method: POST
+    headers:
+      authorization: "Bearer dg_your_token"
+      content-type: "application/json"
+    payload: '{"message":"Evacuate the building now"}'</code></pre>
+
+      <h3>Alert when a screen goes offline (cron)</h3>
+      <pre><code># every 5 minutes, warn if any screen hasn't checked in recently
+curl -s -H "Authorization: Bearer $TOKEN" $DG/api/screens \
+  | jq -r '.[] | select(.online == false) | .name'</code></pre>
+
+      <div class="callout callout--warn"><p>The API surface is intentionally small for now — emergency override plus read-only screen and playlist status. More endpoints are on the <a href="roadmap.html">roadmap</a>; tell us what you’d automate.</p></div>
+    </article>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="footer-brand">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          DisplayGrid
+        </a>
+        <p class="tag">Source-available digital signage for the places people gather.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="api.html">REST API</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Guides</h4>
+        <ul>
+          <li><a href="guides/getting-started.html">Getting Started</a></li>
+          <li><a href="guides/hardware.html">Hardware</a></li>
+          <li><a href="guides/kiosk-setup.html">Kiosk Setup</a></li>
+          <li><a href="guides/network-setup.html">Network</a></li>
+          <li><a href="guides/raspberry-pi.html">Raspberry Pi</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/blob/main/LICENSE" target="_blank" rel="noopener">Licence (HL3)</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/issues" target="_blank" rel="noopener">Report a bug</a></li>
+          <li><a href="https://github.com/JoeMighty/DisplayGrid/blob/main/README.md" target="_blank" rel="noopener">Run from source</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-base">
+      <span>© 2026 DisplayGrid · <a href="https://github.com/JoeMighty/DisplayGrid/blob/main/LICENSE" target="_blank" rel="noopener">Hippocratic licence 3.0</a></span>
+      <span>Built by <a href="https://github.com/JoeMighty" target="_blank" rel="noopener">JoeMighty</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js"></script>
+</body>
+</html>

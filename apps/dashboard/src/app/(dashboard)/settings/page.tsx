@@ -123,6 +123,157 @@ export default function SettingsPage() {
           {saved && <span className="text-sm text-green-400">Saved!</span>}
         </div>
       </form>
+
+      <div className="max-w-xl mt-4">
+        <EmergencyTemplates />
+      </div>
+
+      <div className="max-w-xl mt-4">
+        <ApiTokens />
+      </div>
     </div>
+  );
+}
+
+interface TokenSummary { id: string; name: string; createdAt: number; lastUsed: number | null; }
+
+function ApiTokens() {
+  const [tokens, setTokens] = useState<TokenSummary[]>([]);
+  const [loading, setLoad]  = useState(true);
+  const [name, setName]     = useState('');
+  const [creating, setCreating] = useState(false);
+  const [fresh, setFresh]   = useState<string | null>(null);
+
+  async function load() {
+    const res = await fetch('/api/tokens');
+    setTokens(res.ok ? await res.json() : []);
+    setLoad(false);
+  }
+  useEffect(() => { load(); }, []);
+
+  async function create() {
+    if (!name.trim()) return;
+    setCreating(true);
+    const res = await fetch('/api/tokens', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.trim() }),
+    });
+    setCreating(false);
+    if (res.ok) { const d = await res.json(); setFresh(d.token); setName(''); load(); }
+  }
+  async function revoke(id: string) {
+    if (!confirm('Revoke this token? Anything using it will stop working.')) return;
+    await fetch(`/api/tokens?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+    load();
+  }
+
+  return (
+    <Section title="API tokens">
+      <p className="text-xs text-gray-600 -mt-1 mb-1">
+        For automation — trigger the emergency override or read screen status from scripts, Home Assistant, or n8n.
+        See the <a href="https://joemighty.github.io/DisplayGrid/api.html" target="_blank" rel="noopener" className="text-blue-400 hover:text-blue-300">API reference</a>.
+      </p>
+
+      {fresh && (
+        <div className="rounded-lg border border-green-800/60 bg-green-950/30 p-3">
+          <p className="text-xs text-green-300 mb-1.5">Copy this token now — it won’t be shown again.</p>
+          <code className="block text-xs font-mono text-green-200 bg-black/40 rounded px-2 py-1.5 break-all select-all">{fresh}</code>
+          <button onClick={() => setFresh(null)} className="text-xs text-gray-400 hover:text-gray-200 mt-2">Done</button>
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="Token name (e.g. Home Assistant)" className={inputCls} />
+        <button onClick={create} disabled={creating || !name.trim()} className="shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition">
+          {creating ? 'Creating…' : 'Create'}
+        </button>
+      </div>
+
+      {loading ? (
+        <p className="text-sm text-gray-600">Loading…</p>
+      ) : tokens.length === 0 ? (
+        <p className="text-sm text-gray-600">No tokens yet.</p>
+      ) : (
+        <div className="divide-y divide-gray-800 border border-gray-800 rounded-lg">
+          {tokens.map(t => (
+            <div key={t.id} className="flex items-center justify-between px-3 py-2.5">
+              <div>
+                <div className="text-sm text-gray-200">{t.name}</div>
+                <div className="text-xs text-gray-600">
+                  Created {new Date(t.createdAt).toLocaleDateString()} · {t.lastUsed ? `last used ${new Date(t.lastUsed).toLocaleDateString()}` : 'never used'}
+                </div>
+              </div>
+              <button onClick={() => revoke(t.id)} className="text-xs text-gray-500 hover:text-red-400 transition">Revoke</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </Section>
+  );
+}
+
+interface Template { id: string; label: string; message: string; }
+
+function EmergencyTemplates() {
+  const [items, setItems]   = useState<Template[]>([]);
+  const [loading, setLoad]  = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+
+  useEffect(() => {
+    fetch('/api/emergency-override/templates')
+      .then(r => r.ok ? r.json() : [])
+      .then(d => { setItems(d); setLoad(false); })
+      .catch(() => setLoad(false));
+  }, []);
+
+  function update(i: number, patch: Partial<Template>) {
+    setItems(list => list.map((t, idx) => idx === i ? { ...t, ...patch } : t));
+  }
+  function remove(i: number) { setItems(list => list.filter((_, idx) => idx !== i)); }
+  function add() { setItems(list => [...list, { id: `new${Date.now()}`, label: '', message: '' }]); }
+
+  async function save() {
+    setSaving(true);
+    const res = await fetch('/api/emergency-override/templates', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(items.filter(t => t.label.trim() && t.message.trim())),
+    });
+    if (res.ok) setItems(await res.json());
+    setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 3000);
+  }
+
+  return (
+    <Section title="Emergency presets">
+      <p className="text-xs text-gray-600 -mt-1 mb-1">One-tap messages for the emergency override on the Overview page.</p>
+      {loading ? (
+        <p className="text-sm text-gray-600">Loading…</p>
+      ) : (
+        <div className="space-y-2">
+          {items.map((t, i) => (
+            <div key={t.id} className="flex gap-2 items-start">
+              <input
+                value={t.label} onChange={e => update(i, { label: e.target.value })}
+                placeholder="Label" className={inputCls + ' w-40 shrink-0'} />
+              <input
+                value={t.message} onChange={e => update(i, { message: e.target.value })}
+                placeholder="Message shown on screens" className={inputCls} />
+              <button onClick={() => remove(i)} title="Remove"
+                className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-gray-700 text-gray-500 hover:text-red-400 hover:border-red-800 transition">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          ))}
+          <div className="flex items-center gap-3 pt-1">
+            <button onClick={add} className="text-sm text-blue-400 hover:text-blue-300 transition">+ Add preset</button>
+            <div className="flex-1" />
+            <button onClick={save} disabled={saving} className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition">
+              {saving ? 'Saving…' : 'Save presets'}
+            </button>
+            {saved && <span className="text-sm text-green-400">Saved!</span>}
+          </div>
+        </div>
+      )}
+    </Section>
   );
 }

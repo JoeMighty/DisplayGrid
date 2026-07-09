@@ -7,6 +7,15 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
+  // API endpoints that authenticate themselves (session OR Bearer API token).
+  // The middleware must not redirect these to /login, or token clients (which
+  // carry no session cookie) would get an HTML redirect instead of JSON.
+  const isTokenApi =
+    pathname === '/api/emergency-override' ||
+    pathname === '/api/screens' ||
+    pathname === '/api/playlists';
+  if (isTokenApi) return NextResponse.next();
+
   // Public routes — always allowed
   const isPublic =
     pathname.startsWith('/login') ||
