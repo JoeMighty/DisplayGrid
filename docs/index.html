@@ -49,6 +49,7 @@
   <a href="guides/getting-started.html">Getting Started <small>Zero to first screen</small></a>
   <a href="guides/hardware.html">Hardware <small>Displays, players, mounts</small></a>
   <a href="roadmap.html">Roadmap <small>Shipped and what’s next</small></a>
+  <a href="api.html">API <small>REST reference</small></a>
   <a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub <small>Source & releases</small></a>
 </div>
 
@@ -171,8 +172,8 @@
 
       <div class="cell rv" data-d="2"><div class="shell"><div class="core">
         <div class="f-icon rose"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
-        <h3>Emergency override</h3>
-        <p>Broadcast a full-screen urgent message to every display with one click.</p>
+        <h3>Emergency override <span class="badge-new">New</span></h3>
+        <p>Broadcast a full-screen urgent message to every display with one click — or fire a one-tap preset (fire, lockdown, closure) with no typing.</p>
       </div></div></div>
 
       <div class="cell rv" data-d="3"><div class="shell"><div class="core">
@@ -221,6 +222,18 @@
         <div class="f-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12.5a5.5 5.5 0 0 0-5.24-5.49 7 7 0 0 0-13.5 1.72A4.5 4.5 0 0 0 5 17.5h11.5a5.5 5.5 0 0 0 5.5-5z"/></svg></div>
         <h3>Docker <span class="badge-new">New</span></h3>
         <p>One container runs everything: <code style="font-family:var(--font-mono);font-size:0.82em;">docker compose up -d</code>, state in a single volume.</p>
+      </div></div></div>
+
+      <div class="cell cell-6 rv"><div class="shell"><div class="core">
+        <div class="f-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2M18 17v3h4M13 6a3 3 0 0 0-3-3M5.83 21.62A8 8 0 0 1 4 17c0-4.4 3.6-8 8-8 0 0 3.5 0 5.5 2M22 8.34c0-4.7-4-8.34-9-8.34-.34 0-.68.02-1 .06"/></svg></div>
+        <h3>REST API <span class="badge-new">New</span></h3>
+        <p>Token-authenticated endpoints for automation — trigger the emergency override or read screen status from Home Assistant, n8n, or a cron job. <a href="api.html" style="color:#93b4ff;">See the reference</a>.</p>
+      </div></div></div>
+
+      <div class="cell cell-6 rv" data-d="1"><div class="shell"><div class="core">
+        <div class="f-icon amber"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+        <h3>Slide templates <span class="badge-new">New</span></h3>
+        <p>Fillable layouts — welcome screen, announcement, menu board, event schedule — so anyone can build a good-looking slide in minutes, no design skills required.</p>
       </div></div></div>
 
       <div class="cell cell-4 rv"><div class="shell"><div class="core">
@@ -361,6 +374,7 @@
         <ul>
           <li><a href="download.html">Download</a></li>
           <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="api.html">REST API</a></li>
           <li><a href="https://github.com/JoeMighty/DisplayGrid/releases" target="_blank" rel="noopener">Releases</a></li>
           <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
         </ul>

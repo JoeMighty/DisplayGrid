@@ -12,7 +12,7 @@ Restaurants, churches, schools, event venues, and community spaces.<br>DisplayGr
 [![pnpm](https://img.shields.io/badge/pnpm-10-orange.svg)](https://pnpm.io)
 [![SQLite](https://img.shields.io/badge/database-SQLite-lightblue.svg)](https://sqlite.org)
 
-**[Website](https://joemighty.github.io/DisplayGrid/) · [Download](https://joemighty.github.io/DisplayGrid/download.html) · [Roadmap](https://joemighty.github.io/DisplayGrid/roadmap.html) · [Guides](https://joemighty.github.io/DisplayGrid/guides/getting-started.html) · [Report a Bug](https://github.com/JoeMighty/DisplayGrid/issues)**
+**[Website](https://joemighty.github.io/DisplayGrid/) · [Download](https://joemighty.github.io/DisplayGrid/download.html) · [Roadmap](https://joemighty.github.io/DisplayGrid/roadmap.html) · [REST API](https://joemighty.github.io/DisplayGrid/api.html) · [Guides](https://joemighty.github.io/DisplayGrid/guides/getting-started.html) · [Report a Bug](https://github.com/JoeMighty/DisplayGrid/issues)**
 
 </div>
 
@@ -82,7 +82,8 @@ It installs Chromium, asks for your server address and screen token, and boots t
 ## Features
 
 **Content & playback**
-- Drag-and-drop playlist builder with per-slide durations, transitions, and day/time scheduling
+- Drag-and-drop playlist builder with per-slide durations, transitions, and day/time/date scheduling (e.g. "show this playlist 1–24 December")
+- Fillable slide templates — welcome screen, announcement, menu board, event schedule — with live preview, no design skills required
 - Asset library for images, videos, and PDFs with automatic WebP optimisation
 - Live streams: HLS (`.m3u8`) and WebRTC (WHEP) sources as slides — pair with go2rtc or MediaMTX to put IP cameras and OBS feeds on any screen
 - Web page, custom HTML, clock, and text slides
@@ -92,7 +93,8 @@ It installs Chromium, asks for your server address and screen token, and boots t
 - Multi-screen management: resolution, refresh rate, rotation, colour profile, and LED panel grids per screen
 - Real-time delivery — WebSocket pushes playlist changes to every display instantly
 - Screen health monitoring: live online/offline status, last-seen, client IP
-- Emergency override: broadcast a full-screen alert to every display with one click
+- Emergency override with one-tap presets (fire, lockdown, closure, and more) — broadcast a full-screen alert to every display instantly
+- REST API with token auth — trigger the emergency override or read screen/playlist status from Home Assistant, n8n, or a script ([reference](https://joemighty.github.io/DisplayGrid/api.html))
 - Offline resilience — displays cache their last playlist and keep playing through outages
 
 **Platform**
@@ -101,7 +103,7 @@ It installs Chromium, asks for your server address and screen token, and boots t
 - Auto-updating apps — kiosks update silently on restart, never mid-show
 - Runs on Windows, macOS, Linux, Raspberry Pi, and Docker
 
-See the [roadmap](https://joemighty.github.io/DisplayGrid/roadmap.html) for what's next — a documented REST API, date-range scheduling, and NDI support.
+See the [roadmap](https://joemighty.github.io/DisplayGrid/roadmap.html) for what's next — remote display operations, native widgets, and NDI support.
 
 ---
 

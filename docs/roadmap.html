@@ -71,9 +71,13 @@
     <div class="lane-head rv">
       <span class="dot"></span>
       <h2>Shipped</h2>
-      <span class="count">9 releases</span>
+      <span class="count">10 releases</span>
     </div>
     <div class="rm-list">
+      <div class="rm-row rv">
+        <div class="rm-row-head"><h3>REST API, emergency presets &amp; slide templates</h3><span class="rm-tag ship">v1.0.28 · Jul 2026</span></div>
+        <p>A token-authenticated REST API for automation (Home Assistant, n8n, cron) covering the emergency override and read-only screen/playlist status — <a href="api.html" style="color:#93b4ff;">see the reference</a>. One-tap emergency presets (fire, lockdown, closure, and more) on the Overview page. Four fillable slide templates — welcome screen, announcement, menu board, event schedule — with live preview.</p>
+      </div>
       <div class="rm-row rv">
         <div class="rm-row-head"><h3>Date-range scheduling</h3><span class="rm-tag ship">v1.0.27 · Jul 2026</span></div>
         <p>Give any slide a start and end date — “show the Christmas menu 1–24 December” — on top of the existing day-of-week and time-of-day windows. Runs indefinitely when left blank.</p>
@@ -122,10 +126,6 @@
         <p>See what each screen is actually showing right now from the dashboard, and reload or restart it remotely — no walk across the building when something looks wrong.</p>
       </div>
       <div class="rm-row rv">
-        <div class="rm-row-head"><h3>Documented REST API</h3><span class="rm-tag">integrations</span></div>
-        <p>A stable, documented API with automation tokens — trigger the emergency override from a script, bulk-upload assets, or wire DisplayGrid into n8n and Home Assistant.</p>
-      </div>
-      <div class="rm-row rv">
         <div class="rm-row-head"><h3>Ops &amp; troubleshooting guide</h3><span class="rm-tag">docs</span></div>
         <p>A proper “when things go wrong” page: where the logs live, how updates apply, and fixes for the most common setup issues.</p>
       </div>
@@ -141,16 +141,8 @@
     </div>
     <div class="rm-list">
       <div class="rm-row rv">
-        <div class="rm-row-head"><h3>Slide template library</h3><span class="rm-tag">content</span></div>
-        <p>Pre-made, good-looking layouts — menu board, event schedule, welcome screen, announcement — so a volunteer can produce professional content in minutes without a designer.</p>
-      </div>
-      <div class="rm-row rv">
         <div class="rm-row-head"><h3>Native widgets</h3><span class="rm-tag">content</span></div>
         <p>Weather, news/RSS, calendar and service times, and countdowns as first-class slide types — the signage staples, beyond the existing clock.</p>
-      </div>
-      <div class="rm-row rv">
-        <div class="rm-row-head"><h3>Emergency override templates</h3><span class="rm-tag">safety</span></div>
-        <p>Pre-set fire, lockdown, and closure messages — one tap to broadcast the right full-screen alert to every display.</p>
       </div>
       <div class="rm-row rv">
         <div class="rm-row-head"><h3>Backup &amp; restore</h3><span class="rm-tag">reliability</span></div>
@@ -222,6 +214,7 @@
         <ul>
           <li><a href="download.html">Download</a></li>
           <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="api.html">REST API</a></li>
           <li><a href="https://github.com/JoeMighty/DisplayGrid/releases" target="_blank" rel="noopener">Releases</a></li>
           <li><a href="https://github.com/JoeMighty/DisplayGrid" target="_blank" rel="noopener">GitHub</a></li>
         </ul>
